@@ -1,0 +1,29 @@
+<!-- @dsCard group="Colors" -->
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<link rel="stylesheet" href="../colors_and_type.css" />
+<style>
+  body { margin: 0; background: var(--paper); font-family: var(--font-ui); }
+  .wrap { padding: 24px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
+  .sw { border: 1px solid var(--line); border-radius: var(--radius-3); overflow: hidden; background: var(--canvas-2); }
+  .chip { height: 64px; border-bottom: 1px solid var(--line); }
+  .meta { padding: 8px 10px; }
+  .name { font-size: 12px; font-weight: 600; color: var(--ink); }
+  .hex { font-family: var(--font-mono); font-size: 11px; color: var(--ink-3); margin-top: 2px; }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="sw"><div class="chip" style="background:var(--paper)"></div><div class="meta"><div class="name">paper</div><div class="hex">#faf9f5</div></div></div>
+    <div class="sw"><div class="chip" style="background:var(--paper-2)"></div><div class="meta"><div class="name">paper-2</div><div class="hex">#fffffe</div></div></div>
+    <div class="sw"><div class="chip" style="background:var(--canvas)"></div><div class="meta"><div class="name">canvas</div><div class="hex">#f3f3f0</div></div></div>
+    <div class="sw"><div class="chip" style="background:var(--canvas-2)"></div><div class="meta"><div class="name">canvas-2</div><div class="hex">#ffffff</div></div></div>
+    <div class="sw"><div class="chip" style="background:var(--paper-edge)"></div><div class="meta"><div class="name">paper-edge</div><div class="hex">#efede6</div></div></div>
+    <div class="sw"><div class="chip" style="background:var(--canvas-hover)"></div><div class="meta"><div class="name">canvas-hover</div><div class="hex">#ecece8</div></div></div>
+    <div class="sw"><div class="chip" style="background:var(--canvas-press)"></div><div class="meta"><div class="name">canvas-press</div><div class="hex">#e4e4df</div></div></div>
+    <div class="sw"><div class="chip" style="background:var(--frame)"></div><div class="meta"><div class="name">frame</div><div class="hex">#0f0e0c</div></div></div>
+  </div>
+</body>
+</html>

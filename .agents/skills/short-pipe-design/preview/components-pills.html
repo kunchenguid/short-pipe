@@ -1,0 +1,31 @@
+<!-- @dsCard group="Components" -->
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<link rel="stylesheet" href="../colors_and_type.css" />
+<style>
+  body { margin: 0; background: var(--paper); font-family: var(--font-ui); }
+  .wrap { padding: 28px 32px; display: flex; flex-direction: column; gap: 20px; }
+  .row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+  .lbl { font-family: var(--font-mono); font-size: 11px; color: var(--ink-3); width: 92px; }
+  .pill { display: inline-flex; align-items: center; gap: 5px; padding: 2px 9px; border-radius: var(--radius-pill); font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.3px; }
+  .none { background: var(--mute-wash); color: var(--ink-2); }
+  .running { background: var(--caution-wash); color: var(--caution); }
+  .ready { background: var(--ultramarine-wash); color: var(--ultramarine); }
+  .failed { background: var(--vermillion-wash); color: var(--danger); }
+  .proposed { background: var(--canvas); color: var(--ink-2); }
+  .approved { background: var(--ok-wash); color: var(--ok); }
+  .rendered { background: var(--ok-wash); color: var(--ok); }
+  .rejected { background: var(--mute-wash); color: var(--ink-3); }
+  .chip { background: var(--vermillion-wash); color: var(--vermillion); border-radius: var(--radius-pill); padding: 2px 9px; font-size: 11px; font-weight: 600; }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="row"><span class="lbl">transcript</span><span class="pill none">none</span><span class="pill running">transcribing</span><span class="pill ready">transcribed</span><span class="pill failed">failed</span></div>
+    <div class="row"><span class="lbl">candidate</span><span class="pill proposed">proposed</span><span class="pill approved">approved</span><span class="pill rendered">rendered</span><span class="pill rejected">rejected</span></div>
+    <div class="row"><span class="lbl">keywords</span><span class="chip">layoffs</span><span class="chip">40%</span><span class="chip">runway</span></div>
+  </div>
+</body>
+</html>

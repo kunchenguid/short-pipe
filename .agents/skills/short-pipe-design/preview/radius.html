@@ -1,0 +1,25 @@
+<!-- @dsCard group="Spacing" -->
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<link rel="stylesheet" href="../colors_and_type.css" />
+<style>
+  body { margin: 0; background: var(--paper); font-family: var(--font-ui); }
+  .wrap { padding: 26px 32px; display: flex; gap: 18px; align-items: flex-end; }
+  .item { display: flex; flex-direction: column; align-items: center; gap: 10px; }
+  .box { width: 92px; height: 72px; background: var(--canvas-2); border: 1px solid var(--line-strong); }
+  .name { font-family: var(--font-mono); font-size: 11px; color: var(--ink); }
+  .px { font-family: var(--font-mono); font-size: 10px; color: var(--ink-3); }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="item"><div class="box" style="border-radius:var(--radius-1)"></div><span class="name">radius-1</span><span class="px">2px · chips</span></div>
+    <div class="item"><div class="box" style="border-radius:var(--radius-2)"></div><span class="name">radius-2</span><span class="px">4px · buttons</span></div>
+    <div class="item"><div class="box" style="border-radius:var(--radius-3)"></div><span class="name">radius-3</span><span class="px">8px · cards</span></div>
+    <div class="item"><div class="box" style="border-radius:var(--radius-4)"></div><span class="name">radius-4</span><span class="px">12px · panels</span></div>
+    <div class="item"><div class="box" style="border-radius:var(--radius-pill);width:72px"></div><span class="name">radius-pill</span><span class="px">999 · status</span></div>
+  </div>
+</body>
+</html>

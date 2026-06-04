@@ -1,0 +1,60 @@
+<!-- @dsCard group="Brand" -->
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<link rel="stylesheet" href="../colors_and_type.css" />
+<style>
+  body { margin: 0; background: var(--paper); font-family: var(--font-ui); }
+  .wrap { padding: 24px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+  .item { display: flex; flex-direction: column; gap: 10px; align-items: center; }
+  .frame { width: 150px; aspect-ratio: 9/16; background: var(--paper); border: 1px solid var(--line-paper); border-radius: var(--radius-3); overflow: hidden; position: relative; }
+  .tag { position: absolute; top: 8px; left: 10px; font-family: var(--font-mono); font-size: 10px; color: var(--ink-4); }
+  /* square crop pinned to the top, title beneath (top-square layout) */
+  .vid { position: absolute; top: 0; left: 0; width: 150px; height: 150px; background: linear-gradient(160deg, #2b2925, #4a443b); }
+  .title { position: absolute; left: 12px; right: 12px; top: 172px; text-align: center; }
+  .title .ttext { font-family: var(--font-display); font-size: 17px; line-height: 1.08; color: var(--ink); display: block; }
+
+  /* kicker: vermillion rule above */
+  .kicker .rule { display: block; width: 34px; height: 3px; margin: 0 auto 8px; background: var(--vermillion); border-radius: 2px; }
+  /* masthead: italic headline between hairline rules */
+  .masthead .ttext { font-style: italic; }
+  .masthead .ln { display: block; width: 64px; height: 1px; margin: 0 auto; background: var(--line-strong); }
+  .masthead .ln:first-child { margin-bottom: 7px; }
+  .masthead .ln:last-child { margin-top: 7px; }
+  /* eyebrow: uppercase keyword label above */
+  .eyebrow .kw { display: block; font-family: var(--font-ui); font-weight: 700; font-size: 9px; letter-spacing: 2px; text-transform: uppercase; color: var(--vermillion); margin-bottom: 5px; }
+
+  .name { font-family: var(--font-mono); font-size: 12px; color: var(--ink); }
+  .desc { font-family: var(--font-ui); font-size: 11px; color: var(--ink-3); max-width: 150px; text-align: center; }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="item">
+      <div class="frame"><span class="tag">plain</span><div class="vid"></div>
+        <div class="title"><span class="ttext">The Real Reason</span></div></div>
+      <span class="name">plain</span>
+      <span class="desc">serif headline on its own · quiet, understated</span>
+    </div>
+    <div class="item">
+      <div class="frame kicker"><span class="tag">kicker</span><div class="vid"></div>
+        <div class="title"><span class="rule"></span><span class="ttext">The Real Reason</span></div></div>
+      <span class="name">kicker</span>
+      <span class="desc">vermillion rule above the headline · the default</span>
+    </div>
+    <div class="item">
+      <div class="frame masthead"><span class="tag">masthead</span><div class="vid"></div>
+        <div class="title"><span class="ln"></span><span class="ttext">The Real Reason</span><span class="ln"></span></div></div>
+      <span class="name">masthead</span>
+      <span class="desc">italic headline between hairline rules · composed</span>
+    </div>
+    <div class="item">
+      <div class="frame eyebrow"><span class="tag">eyebrow</span><div class="vid"></div>
+        <div class="title"><span class="kw">Layoffs</span><span class="ttext">The Real Reason</span></div></div>
+      <span class="name">eyebrow</span>
+      <span class="desc">top keyword as an uppercase label above · magazine-like</span>
+    </div>
+  </div>
+</body>
+</html>

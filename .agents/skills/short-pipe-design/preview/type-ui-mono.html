@@ -1,0 +1,39 @@
+<!-- @dsCard group="Type" -->
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<link rel="stylesheet" href="../colors_and_type.css" />
+<style>
+  body { margin: 0; background: var(--paper); font-family: var(--font-ui); }
+  .wrap { padding: 26px 32px; display: grid; grid-template-columns: 1fr 1fr; gap: 28px; }
+  .label { font-family: var(--font-mono); font-size: 11px; color: var(--ink-3); margin-bottom: 12px; }
+  .ui-row { display: flex; flex-direction: column; gap: 9px; }
+  .seclabel { font-family: var(--font-ui); font-weight: 700; font-size: 12px; text-transform: uppercase; letter-spacing: 0.6px; color: var(--ink-3); }
+  .body-ui { font-family: var(--font-ui); font-size: 14px; color: var(--ink); }
+  .meta-ui { font-family: var(--font-ui); font-size: 12px; color: var(--ink-3); }
+  .mono-row { display: flex; flex-direction: column; gap: 9px; }
+  .mono { font-family: var(--font-mono); font-size: 13px; color: var(--ink-2); font-variant-numeric: tabular-nums; }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <div>
+      <div class="label">Inter — UI</div>
+      <div class="ui-row">
+        <span class="seclabel">Review queue</span>
+        <span class="body-ui">Find shorts with AI</span>
+        <span class="meta-ui">3 candidates · transcribed</span>
+      </div>
+    </div>
+    <div>
+      <div class="label">JetBrains Mono — machine</div>
+      <div class="mono-row">
+        <span class="mono">0:04 — 0:19  ·  14.2s</span>
+        <span class="mono">w0 → w47</span>
+        <span class="mono">~/Movies/keynote.mp4</span>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

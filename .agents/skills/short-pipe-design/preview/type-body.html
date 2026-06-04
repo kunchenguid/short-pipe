@@ -1,0 +1,29 @@
+<!-- @dsCard group="Type" -->
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<link rel="stylesheet" href="../colors_and_type.css" />
+<style>
+  body { margin: 0; background: var(--paper); font-family: var(--font-ui); }
+  .wrap { padding: 24px 32px; }
+  .label { font-family: var(--font-mono); font-size: 11px; color: var(--ink-3); margin-bottom: 6px; }
+  .title { font-family: var(--font-body); font-weight: 600; font-size: 17px; color: var(--ink); margin-bottom: 16px; }
+  .transcript { font-family: var(--font-body); font-size: 17px; line-height: 1.9; color: var(--ink); }
+  .transcript .kw { color: var(--vermillion); font-weight: 600; }
+  /* highlight-to-select: one continuous selection with rounded ends + grab handles */
+  .sel { background: var(--caution-wash); border-radius: 4px; padding: 2px 0; box-decoration-break: clone; -webkit-box-decoration-break: clone; }
+  .handle { display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: var(--vermillion); vertical-align: 0.05em; margin: 0 2px; box-shadow: 0 0 0 3px var(--vermillion-wash); cursor: ew-resize; }
+  .hint { margin-top: 16px; font-family: var(--font-ui); font-size: 12px; color: var(--ink-3); }
+  .hint b { color: var(--ink-2); }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="label">Newsreader 600 · candidate title  ·  Newsreader 400 / 1.9 · transcript</div>
+    <div class="title">The real reason layoffs happen</div>
+    <div class="transcript">…nobody tells you about running out of money. <span class="handle"></span><span class="sel">The real reason most <span class="kw">layoffs</span> happen has nothing to do with performance.</span><span class="handle"></span> It's almost always a forecasting failure that started two quarters earlier…</div>
+    <div class="hint"><b>Highlight to select:</b> drag across the words you want — like quoting a passage — then grab either handle to nudge an edge.</div>
+  </div>
+</body>
+</html>

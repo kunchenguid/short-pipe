@@ -1,0 +1,39 @@
+<!-- @dsCard group="Colors" -->
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<link rel="stylesheet" href="../colors_and_type.css" />
+<style>
+  body { margin: 0; background: var(--paper); font-family: var(--font-ui); }
+  .wrap { padding: 24px; }
+  .row { display: flex; gap: 14px; }
+  .col { flex: 1; }
+  .sw { border: 1px solid var(--line); border-radius: var(--radius-3); overflow: hidden; background: var(--canvas-2); }
+  .chip { height: 72px; display: flex; align-items: flex-end; padding: 8px 10px; }
+  .chip .t { font-family: var(--font-display); font-size: 22px; }
+  .meta { padding: 8px 10px; }
+  .name { font-size: 12px; font-weight: 600; color: var(--ink); }
+  .hex { font-family: var(--font-mono); font-size: 11px; color: var(--ink-3); margin-top: 2px; }
+  .lines { margin-top: 16px; display: grid; grid-template-columns: repeat(4,1fr); gap: 14px; }
+  .lcard { border: 1px solid var(--line); border-radius: var(--radius-3); padding: 12px; background: var(--canvas-2); }
+  .lbar { height: 0; border-top: 2px solid; margin-bottom: 10px; }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="row">
+      <div class="col sw"><div class="chip" style="background:var(--ink)"><span class="t" style="color:var(--ink-on-dark)">Aa</span></div><div class="meta"><div class="name">ink</div><div class="hex">#16161a</div></div></div>
+      <div class="col sw"><div class="chip" style="background:var(--ink-2)"><span class="t" style="color:#fff">Aa</span></div><div class="meta"><div class="name">ink-2</div><div class="hex">#5a5750</div></div></div>
+      <div class="col sw"><div class="chip" style="background:var(--ink-3)"><span class="t" style="color:#fff">Aa</span></div><div class="meta"><div class="name">ink-3</div><div class="hex">#8b8678</div></div></div>
+      <div class="col sw"><div class="chip" style="background:var(--ink-4)"><span class="t" style="color:#fff">Aa</span></div><div class="meta"><div class="name">ink-4</div><div class="hex">#b8b2a2</div></div></div>
+    </div>
+    <div class="lines">
+      <div class="lcard"><div class="lbar" style="border-color:var(--line)"></div><div class="name">line</div><div class="hex">#e5e4de</div></div>
+      <div class="lcard"><div class="lbar" style="border-color:var(--line-paper)"></div><div class="name">line-paper</div><div class="hex">#e5e2d5</div></div>
+      <div class="lcard"><div class="lbar" style="border-color:var(--line-strong)"></div><div class="name">line-strong</div><div class="hex">#cfcdc4</div></div>
+      <div class="lcard"><div class="lbar" style="border-color:var(--line-dark)"></div><div class="name">line-dark</div><div class="hex">#2a2924</div></div>
+    </div>
+  </div>
+</body>
+</html>

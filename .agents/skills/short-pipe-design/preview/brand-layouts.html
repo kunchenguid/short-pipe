@@ -1,0 +1,64 @@
+<!-- @dsCard group="Brand" -->
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<link rel="stylesheet" href="../colors_and_type.css" />
+<style>
+  body { margin: 0; background: var(--paper); font-family: var(--font-ui); }
+  .wrap { padding: 24px; display: flex; gap: 26px; }
+  .item { display: flex; flex-direction: column; gap: 10px; align-items: center; }
+  .frame { width: 150px; aspect-ratio: 9/16; border-radius: 12px; overflow: hidden; position: relative; }
+  .vid { background: linear-gradient(160deg, #2b2925, #4a443b); }
+  .title { position: absolute; left: 10px; right: 10px; text-align: center; font-family: var(--font-display); font-size: 13px; color: var(--ink); line-height: 1.1; }
+  .cap { position: absolute; left: 12px; right: 12px; text-align: center; font-family: var(--font-caption); font-weight: 800; font-size: 13px; line-height: 1.12; }
+  .kw { color: var(--vermillion); }
+
+  /* full-bleed: video fills the frame, white captions float over it */
+  .fb { background: linear-gradient(160deg, #2b2925, #4a443b); }
+  .fb .cap { bottom: 36px; color: #fff; text-shadow: 0 4px 24px rgba(0,0,0,0.55); }
+
+  /* top-square (half & half): full-width square pinned to the top, title + caption below */
+  .ts { background: var(--paper); }
+  .ts .vid { position: absolute; top: 0; left: 0; width: 150px; height: 150px; }
+  .ts .title { top: 164px; }
+  .ts .cap { top: 210px; color: var(--ink); }
+
+  /* center-square: full-width square centered, title above and caption below */
+  .cs { background: var(--paper); }
+  .cs .vid { position: absolute; top: 58px; left: 0; width: 150px; height: 150px; }
+  .cs .title { top: 26px; }
+  .cs .cap { top: 222px; color: var(--ink); }
+
+  .name { font-family: var(--font-mono); font-size: 12px; color: var(--ink); }
+  .desc { font-family: var(--font-ui); font-size: 11px; color: var(--ink-3); max-width: 150px; text-align: center; }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="item">
+      <div class="frame fb"><div class="cap">the real <span class="kw">reason</span></div></div>
+      <span class="name">full-bleed</span>
+      <span class="desc">video fills the frame · white captions · for rich footage</span>
+    </div>
+    <div class="item">
+      <div class="frame ts">
+        <div class="vid"></div>
+        <div class="title">The Real Reason</div>
+        <div class="cap">the real <span class="kw">reason</span></div>
+      </div>
+      <span class="name">top-square</span>
+      <span class="desc">square pinned to the top · title + ink captions below · the default for talking-head audio</span>
+    </div>
+    <div class="item">
+      <div class="frame cs">
+        <div class="title">The Real Reason</div>
+        <div class="vid"></div>
+        <div class="cap">the real <span class="kw">reason</span></div>
+      </div>
+      <span class="name">center-square</span>
+      <span class="desc">square centered · title above · ink captions below · for a composed look</span>
+    </div>
+  </div>
+</body>
+</html>

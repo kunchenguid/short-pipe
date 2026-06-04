@@ -1,0 +1,29 @@
+<!-- @dsCard group="Components" -->
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<link rel="stylesheet" href="../colors_and_type.css" />
+<style>
+  body { margin: 0; background: var(--paper); font-family: var(--font-ui); }
+  .wrap { padding: 28px 32px; display: flex; flex-direction: column; gap: 18px; }
+  .row { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+  .btn { border: 1px solid var(--line-strong); background: var(--canvas-2); color: var(--ink); border-radius: var(--radius-2); padding: 8px 14px; font-size: 13px; font-weight: 500; font-family: var(--font-ui); cursor: pointer; transition: background var(--dur-1) var(--ease), border-color var(--dur-1) var(--ease); }
+  .btn:hover { background: var(--canvas-hover); }
+  .btn.primary { background: var(--frame); border-color: var(--frame); color: var(--ink-on-dark); }
+  .btn.accent { background: var(--vermillion); border-color: var(--vermillion); color: #fff; }
+  .btn.ghost { background: transparent; border-color: transparent; }
+  .btn.small { padding: 5px 10px; font-size: 12px; }
+  .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+  .lbl { font-family: var(--font-mono); font-size: 11px; color: var(--ink-3); width: 92px; }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="row"><span class="lbl">default</span><button class="btn">Output folder</button><button class="btn">Transcribe</button><button class="btn" disabled>Disabled</button></div>
+    <div class="row"><span class="lbl">primary</span><button class="btn primary">New project from video</button><button class="btn primary small">Approve</button></div>
+    <div class="row"><span class="lbl">accent</span><button class="btn accent">Render</button><button class="btn accent small">Re-render</button></div>
+    <div class="row"><span class="lbl">ghost</span><button class="btn ghost">All projects</button><button class="btn ghost small">Sign out</button></div>
+  </div>
+</body>
+</html>

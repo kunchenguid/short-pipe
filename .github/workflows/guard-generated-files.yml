@@ -1,0 +1,67 @@
+name: Guard generated files
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+concurrency:
+  group: guard-generated-files-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    name: Generated files must not be committed
+    runs-on: ubuntu-latest
+    if: >-
+      github.event.pull_request.user.login != 'release-please[bot]' &&
+      (github.event.pull_request.user.login != 'github-actions[bot]' ||
+      !startsWith(github.event.pull_request.head.ref, 'release-please--'))
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Check PR does not commit generated artifacts
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          set -eu
+          files=$(git diff --name-only "${BASE_SHA}...${HEAD_SHA}")
+          name_status=$(git diff --name-status "${BASE_SHA}...${HEAD_SHA}")
+
+          violated=""
+          for path in out dist; do
+            if printf '%s\n' "$files" | grep -qE "^${path}(/|$)"; then
+              violated="${violated} ${path}/"
+            fi
+          done
+
+          for path in CHANGELOG.md; do
+            if printf '%s\n' "$files" | grep -qxF -- "$path"; then
+              violated="${violated} ${path}"
+            fi
+          done
+
+          manifest_status=$(printf '%s\n' "$name_status" | awk '$2 == ".release-please-manifest.json" { print $1; exit }')
+          config_status=$(printf '%s\n' "$name_status" | awk '$2 == "release-please-config.json" { print $1; exit }')
+          if [ -n "$manifest_status" ] && ! { [ "$manifest_status" = "A" ] && [ "$config_status" = "A" ]; }; then
+            violated="${violated} .release-please-manifest.json"
+          fi
+
+          if [ -n "$violated" ]; then
+            {
+              echo "::error::This PR modifies generated or local-only files:${violated}"
+              echo
+              echo "Do not commit build output, release artifacts, or generated release metadata."
+              echo "See CONTRIBUTING.md for the full contributor workflow."
+            } >&2
+            exit 1
+          fi
+
+          echo "No generated artifacts modified. OK."

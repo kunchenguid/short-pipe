@@ -1,0 +1,47 @@
+# macOS only for now. Short Pipe ships exclusively as a universal mac build
+# distributed through the Homebrew cask (see .github/workflows/release-please.yml).
+# There are no Windows or Linux targets; add them here if that ever changes.
+appId: com.shortpipe.app
+productName: Short Pipe
+copyright: Copyright (c) 2026 Kun Chen
+artifactName: ${productName}-${version}-${os}-${arch}.${ext}
+
+directories:
+  output: dist
+  buildResources: build
+
+asar: true
+
+files:
+  - out/**/*
+  - package.json
+  - "!**/*.map"
+  - "!**/*.md"
+
+# Bundled skills (shorts-from-longform). Copied verbatim to resourcesPath/skills
+# so the SKILL.md files survive the `!**/*.md` filter above and the agent can
+# read them on disk at runtime.
+extraResources:
+  - from: skills
+    to: skills
+
+mac:
+  category: public.app-category.video
+  icon: build/icon.icns
+  target:
+    - target: dmg
+      arch:
+        - arm64
+        - x64
+    - target: zip
+      arch:
+        - arm64
+        - x64
+  identity: null
+  hardenedRuntime: false
+  gatekeeperAssess: false
+
+dmg:
+  writeUpdateInfo: false
+
+publish: null

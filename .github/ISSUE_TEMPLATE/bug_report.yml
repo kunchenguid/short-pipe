@@ -1,0 +1,86 @@
+name: Bug report
+description: Something went wrong with Short Pipe
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for reporting a bug.
+        The most useful details are which pipeline stage failed, how Short Pipe was launched, and whether this happened in source mode or the packaged app.
+
+  - type: textarea
+    id: summary
+    attributes:
+      label: What happened?
+      description: A short description of what you expected and what actually happened.
+      placeholder: Transcription finished, but the agent never proposed any candidates.
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: How to reproduce
+      description: Include the source video details, launch mode, and any relevant steps.
+      placeholder: |
+        1. Run `pnpm dev` or launch the packaged app.
+        2. Pick a 10-minute talking-head mp4.
+        3. Run transcription, then ask the agent for candidates.
+    validations:
+      required: true
+
+  - type: dropdown
+    id: stage
+    attributes:
+      label: Pipeline stage
+      options:
+        - Pick / import video
+        - Transcribe (Whisper)
+        - Candidates (agent proposal)
+        - Review / trim
+        - Render (HyperFrames)
+        - Sign in / auth
+        - other / not sure
+    validations:
+      required: true
+
+  - type: dropdown
+    id: launch-mode
+    attributes:
+      label: Launch mode
+      options:
+        - Packaged app
+        - pnpm dev
+        - tests
+        - other / not sure
+    validations:
+      required: true
+
+  - type: input
+    id: platform
+    attributes:
+      label: macOS and Node version
+      description: Include `node --version` if running from source.
+      placeholder: macOS 15.3 / Node v24.13.1
+    validations:
+      required: true
+
+  - type: input
+    id: tools
+    attributes:
+      label: ffmpeg / hyperframes versions
+      description: Output of `ffmpeg -version | head -1` and `hyperframes --version` if the failure is in transcribe or render.
+      placeholder: ffmpeg 7.1 / hyperframes 0.x
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs or error output
+      description: Paste relevant terminal output, app errors, or agent-turn log excerpts.
+      render: text
+
+  - type: textarea
+    id: extra
+    attributes:
+      label: Anything else
+      description: Screenshots, the rendered clip, or hunches that may help.

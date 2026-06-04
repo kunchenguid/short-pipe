@@ -1,0 +1,26 @@
+<!-- @dsCard group="Colors" -->
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<link rel="stylesheet" href="../colors_and_type.css" />
+<style>
+  body { margin: 0; background: var(--paper); font-family: var(--font-ui); }
+  .wrap { padding: 24px; display: flex; flex-direction: column; gap: 14px; }
+  .row { display: flex; align-items: center; gap: 14px; }
+  .pill { display: inline-flex; align-items: center; padding: 3px 11px; border-radius: var(--radius-pill); font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.3px; }
+  .swatch { width: 22px; height: 22px; border-radius: 5px; flex-shrink: 0; }
+  .hex { font-family: var(--font-mono); font-size: 11px; color: var(--ink-3); margin-left: auto; }
+  .desc { font-size: 12px; color: var(--ink-2); width: 200px; }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="row"><span class="swatch" style="background:var(--ok)"></span><span class="pill" style="background:var(--ok-wash);color:var(--ok)">approved</span><span class="desc">ok · approved / rendered</span><span class="hex">#2f7d46 · wash #e2f0e4</span></div>
+    <div class="row"><span class="swatch" style="background:var(--caution)"></span><span class="pill" style="background:var(--caution-wash);color:var(--caution)">running</span><span class="desc">caution · transcribing</span><span class="hex">#bd8400 · wash #f9eccf</span></div>
+    <div class="row"><span class="swatch" style="background:var(--ultramarine)"></span><span class="pill" style="background:var(--ultramarine-wash);color:var(--ultramarine)">ready</span><span class="desc">info · transcribed / ready</span><span class="hex">#1f3a7a · wash #eceff7</span></div>
+    <div class="row"><span class="swatch" style="background:var(--danger)"></span><span class="pill" style="background:var(--vermillion-wash);color:var(--danger)">failed</span><span class="desc">danger · failed</span><span class="hex">#c0301a · wash #fbede9</span></div>
+    <div class="row"><span class="swatch" style="background:var(--mute)"></span><span class="pill" style="background:var(--mute-wash);color:var(--ink-3)">rejected</span><span class="desc">mute · rejected / none</span><span class="hex">#9a9587 · wash #eceae2</span></div>
+  </div>
+</body>
+</html>

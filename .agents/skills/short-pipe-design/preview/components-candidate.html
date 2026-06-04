@@ -1,0 +1,55 @@
+<!-- @dsCard group="Components" -->
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<link rel="stylesheet" href="../colors_and_type.css" />
+<style>
+  body { margin: 0; background: var(--paper); font-family: var(--font-ui); padding: 20px; }
+  .candidate { background: var(--canvas-2); border: 1px solid var(--line); border-radius: var(--radius-3); padding: 16px; display: flex; gap: 16px; max-width: 660px; }
+  /* 9:16 video preview */
+  .preview { width: 78px; flex-shrink: 0; aspect-ratio: 9/16; border-radius: var(--radius-2); overflow: hidden; position: relative; background: linear-gradient(160deg, #2b2925, #4a443b); display: flex; align-items: flex-end; justify-content: center; }
+  .preview .play { position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); width: 26px; height: 26px; border-radius: 50%; background: rgba(15,14,12,0.45); display: flex; align-items: center; justify-content: center; }
+  .preview .play svg { width: 12px; height: 12px; color: #fff; }
+  .preview .mini-cap { font-family: var(--font-caption); font-weight: 800; font-size: 9px; color: #fff; text-align: center; line-height: 1.1; padding: 0 6px 8px; text-shadow: 0 2px 8px rgba(0,0,0,0.6); }
+  .preview .mini-cap .kw { color: var(--vermillion); }
+  /* body */
+  .body { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 10px; }
+  .head { display: flex; align-items: flex-start; gap: 12px; }
+  .rank { font-family: var(--font-display); font-size: 26px; color: var(--ink-4); line-height: 1; }
+  .title { font-family: var(--font-body); font-weight: 600; font-size: 17px; color: var(--ink); flex: 1; }
+  .pill { display: inline-flex; padding: 2px 9px; border-radius: var(--radius-pill); font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.3px; background: var(--canvas); color: var(--ink-2); height: fit-content; }
+  /* the actual proposed passage */
+  .passage { font-family: var(--font-body); font-size: 15px; line-height: 1.55; color: var(--ink-2); border-left: 2px solid var(--line-strong); padding-left: 12px; }
+  .passage .kw { color: var(--vermillion); font-weight: 600; }
+  .meta { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; font-family: var(--font-mono); font-size: 12px; color: var(--ink-3); }
+  .chip { background: var(--vermillion-wash); color: var(--vermillion); border-radius: var(--radius-pill); padding: 1px 8px; font-size: 11px; font-weight: 600; font-family: var(--font-ui); }
+  .actions { display: flex; gap: 8px; align-items: center; margin-top: 2px; }
+  .btn { display: inline-flex; align-items: center; gap: 5px; border: 1px solid var(--line-strong); background: var(--canvas-2); color: var(--ink); border-radius: var(--radius-2); padding: 5px 11px; font-size: 12px; font-weight: 500; font-family: var(--font-ui); cursor: pointer; }
+  .btn.primary { background: var(--frame); border-color: var(--frame); color: var(--ink-on-dark); }
+  .btn svg { width: 13px; height: 13px; }
+</style>
+</head>
+<body>
+  <div class="candidate">
+    <div class="preview">
+      <div class="play"><svg viewBox="0 0 24 24" fill="currentColor"><polygon points="6 3 20 12 6 21 6 3"/></svg></div>
+      <div class="mini-cap">the real <span class="kw">reason</span></div>
+    </div>
+    <div class="body">
+      <div class="head">
+        <span class="rank">1</span>
+        <span class="title">The real reason layoffs happen</span>
+        <span class="pill">proposed</span>
+      </div>
+      <div class="passage">“The real reason most <span class="kw">layoffs</span> happen has nothing to do with performance.”</div>
+      <div class="meta"><span>0:06 — 0:11</span><span>·</span><span>5.7s</span><span>·</span><span>23 words</span><span class="chip">layoffs</span></div>
+      <div class="actions">
+        <button class="btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="6" r="3"/><path d="M8.12 8.12 12 12"/><path d="M20 4 8.12 15.88"/><circle cx="6" cy="18" r="3"/><path d="M14.8 14.8 20 20"/></svg>Trim</button>
+        <button class="btn primary"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>Approve</button>
+        <button class="btn">Reject</button>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

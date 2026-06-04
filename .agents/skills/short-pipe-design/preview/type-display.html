@@ -1,0 +1,24 @@
+<!-- @dsCard group="Type" -->
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<link rel="stylesheet" href="../colors_and_type.css" />
+<style>
+  body { margin: 0; background: var(--paper); font-family: var(--font-ui); }
+  .wrap { padding: 28px 32px; display: flex; flex-direction: column; gap: 18px; }
+  .row { display: flex; align-items: baseline; gap: 18px; border-bottom: 1px solid var(--line); padding-bottom: 16px; }
+  .row:last-child { border-bottom: none; }
+  .tag { font-family: var(--font-mono); font-size: 11px; color: var(--ink-3); width: 110px; flex-shrink: 0; }
+  .spec { font-family: var(--font-display); color: var(--ink); }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="row"><span class="tag">display · 40</span><span class="spec" style="font-size:40px;letter-spacing:-0.4px">Short Pipe</span></div>
+    <div class="row"><span class="tag">h1 · 28</span><span class="spec" style="font-size:28px;letter-spacing:-0.2px">Your projects</span></div>
+    <div class="row"><span class="tag">h2 · 22</span><span class="spec" style="font-size:22px">Connect Codex</span></div>
+    <div class="row"><span class="tag">rank · 24</span><span class="spec" style="font-size:24px;color:var(--ink-4)">1&nbsp;&nbsp;2&nbsp;&nbsp;3</span></div>
+  </div>
+</body>
+</html>

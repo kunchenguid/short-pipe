@@ -1,0 +1,85 @@
+import type { TranscriptStatus } from "@shared/project";
+import { Icon, Spinner } from "./Icon";
+
+/**
+ * The "Let the agent find your shorts" stage state - shown in the centre pane
+ * when there are no candidates to inspect yet. The agent reads the transcript on
+ * the user's own Codex plan; nothing leaves the machine.
+ */
+export function AgentEmpty({
+  status,
+  running,
+  step,
+  count,
+  onCount,
+  onRun,
+  onAbort,
+  error,
+}: {
+  status: TranscriptStatus;
+  running: boolean;
+  step: string | null;
+  count: number;
+  onCount: (n: number) => void;
+  onRun: () => void;
+  onAbort: () => void;
+  error: string | null;
+}) {
+  const label = status === "ready" ? "Find shorts with AI" : "Transcribe & find shorts";
+  const MIN = 2;
+  const MAX = 6;
+  return (
+    <div className="stage-scroll">
+      <div className="runner-empty">
+        <div className="ic">
+          <Icon name="sparkles" />
+        </div>
+        <h3>Let the agent find your shorts</h3>
+        <p>
+          It reads the transcript on your Codex plan and proposes ranked soundbites into the
+          filmstrip. Nothing leaves this machine.
+        </p>
+        {running ? (
+          <>
+            <div className="runner-status">
+              <Spinner /> {step ?? "Working..."}
+            </div>
+            <button type="button" className="btn" onClick={onAbort}>
+              Stop
+            </button>
+          </>
+        ) : (
+          <>
+            <div className="count-step">
+              <button
+                type="button"
+                className="step"
+                onClick={() => onCount(Math.max(MIN, count - 1))}
+                disabled={count <= MIN}
+                aria-label="One fewer"
+              >
+                <Icon name="minus" />
+              </button>
+              <span className="count-val">
+                <strong>{count}</strong> shorts
+              </span>
+              <button
+                type="button"
+                className="step"
+                onClick={() => onCount(Math.min(MAX, count + 1))}
+                disabled={count >= MAX}
+                aria-label="One more"
+              >
+                <Icon name="plus" />
+              </button>
+            </div>
+            <button type="button" className="btn primary" onClick={onRun}>
+              <Icon name="sparkles" /> {label}
+            </button>
+          </>
+        )}
+        {error && <div className="banner error">{error}</div>}
+      </div>
+    </div>
+  );
+}

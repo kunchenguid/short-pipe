@@ -1,0 +1,131 @@
+name: release-please
+
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: write
+  pull-requests: write
+  issues: write
+
+jobs:
+  release-please:
+    runs-on: ubuntu-latest
+    outputs:
+      short-pipe-release-created: ${{ steps.release.outputs.release_created }}
+      short-pipe-tag-name: ${{ steps.release.outputs.tag_name }}
+      short-pipe-version: ${{ steps.release.outputs.version }}
+    steps:
+      - uses: googleapis/release-please-action@v4
+        id: release
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+  macos:
+    needs: release-please
+    if: ${{ needs.release-please.outputs.short-pipe-release-created == 'true' }}
+    runs-on: macos-latest
+    timeout-minutes: 30
+    env:
+      CSC_IDENTITY_AUTO_DISCOVERY: "false"
+      TAG_NAME: ${{ needs.release-please.outputs.short-pipe-tag-name }}
+      VERSION: ${{ needs.release-please.outputs.short-pipe-version }}
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: ${{ env.TAG_NAME }}
+
+      - uses: pnpm/action-setup@v6
+        with:
+          version: 11.1.1
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Typecheck
+        run: pnpm typecheck
+
+      - name: Test
+        run: pnpm test
+
+      - name: Build
+        env:
+          SHORT_PIPE_UMAMI_HOST: https://a.kunchenguid.com
+          SHORT_PIPE_UMAMI_WEBSITE_ID: ${{ vars.SHORT_PIPE_UMAMI_WEBSITE_ID }}
+        run: pnpm build
+
+      - name: Package macOS app
+        run: pnpm exec electron-builder --mac dir --universal
+
+      - name: Ad-hoc sign app
+        run: codesign --force --deep --sign - "dist/mac-universal/Short Pipe.app"
+
+      - name: Create DMG
+        run: |
+          DMG_NAME="Short-Pipe-${VERSION}-universal.dmg"
+          hdiutil create -volname "Short Pipe" \
+            -srcfolder "dist/mac-universal/Short Pipe.app" \
+            -ov -format UDZO "dist/${DMG_NAME}"
+          echo "DMG_NAME=${DMG_NAME}" >> "$GITHUB_ENV"
+          echo "DMG_PATH=dist/${DMG_NAME}" >> "$GITHUB_ENV"
+
+      - name: Upload DMG to release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release upload "$TAG_NAME" "$DMG_PATH" --clobber
+
+      - name: Compute SHA256
+        run: |
+          SHA256=$(shasum -a 256 "$DMG_PATH" | awk '{print $1}')
+          echo "SHA256=${SHA256}" >> "$GITHUB_ENV"
+
+      - name: Update Homebrew Cask
+        env:
+          HOMEBREW_TAP_TOKEN: ${{ secrets.HOMEBREW_TAP_TOKEN }}
+        run: |
+          git clone "https://x-access-token:${HOMEBREW_TAP_TOKEN}@github.com/kunchenguid/homebrew-tap.git" "$RUNNER_TEMP/homebrew-tap"
+          mkdir -p "$RUNNER_TEMP/homebrew-tap/Casks"
+          cat > "$RUNNER_TEMP/homebrew-tap/Casks/short-pipe.rb" << CASK_EOF
+          cask "short-pipe" do
+            version "${VERSION}"
+            sha256 "${SHA256}"
+
+            url "https://github.com/kunchenguid/short-pipe/releases/download/${TAG_NAME}/Short-Pipe-${VERSION}-universal.dmg"
+            name "Short Pipe"
+            desc "Turn long-form video into captioned vertical shorts, locally"
+            homepage "https://github.com/kunchenguid/short-pipe"
+
+            depends_on macos: ">= :ventura"
+
+            app "Short Pipe.app"
+            uninstall quit: "com.shortpipe.app"
+
+            postflight do
+              system_command "/usr/bin/xattr",
+                             args: ["-cr", "#{appdir}/Short Pipe.app"],
+                             must_succeed: false
+            end
+
+            zap trash: [
+              "~/.short-pipe",
+              "~/Library/Application Support/Short Pipe",
+              "~/Library/Preferences/com.shortpipe.app.plist",
+              "~/Library/Saved Application State/com.shortpipe.app.savedState",
+            ]
+          end
+          CASK_EOF
+          cd "$RUNNER_TEMP/homebrew-tap"
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add Casks/short-pipe.rb
+          if ! git diff --cached --quiet; then
+            git commit -m "short-pipe ${VERSION}"
+            git push
+          fi

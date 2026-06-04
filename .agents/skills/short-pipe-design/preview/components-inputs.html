@@ -1,0 +1,29 @@
+<!-- @dsCard group="Components" -->
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<link rel="stylesheet" href="../colors_and_type.css" />
+<style>
+  body { margin: 0; background: var(--paper); font-family: var(--font-ui); }
+  .wrap { padding: 28px 32px; display: flex; gap: 26px; flex-wrap: wrap; align-items: center; }
+  .field { display: flex; align-items: center; gap: 7px; font-size: 12px; color: var(--ink-3); }
+  select, input[type="text"] { font-family: var(--font-ui); font-size: 13px; border: 1px solid var(--line-strong); border-radius: var(--radius-2); padding: 6px 9px; background: var(--canvas-2); color: var(--ink); }
+  .title-input { font-family: var(--font-body); font-weight: 600; font-size: 16px; padding: 6px 10px; border: 1px solid var(--line-strong); border-radius: var(--radius-2); background: var(--canvas-2); color: var(--ink); width: 260px; }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <label class="field">Layout
+      <select><option>card</option><option>full-bleed</option></select>
+    </label>
+    <label class="field">Captions
+      <select><option>clean</option><option>karaoke</option><option>bold-pop</option></select>
+    </label>
+    <label class="field">How many
+      <select><option>2</option><option selected>3</option><option>4</option></select>
+    </label>
+    <input class="title-input" type="text" value="The real reason layoffs happen" />
+  </div>
+</body>
+</html>

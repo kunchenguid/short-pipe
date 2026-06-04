@@ -1,0 +1,27 @@
+<!-- @dsCard group="Brand" -->
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<link rel="stylesheet" href="../colors_and_type.css" />
+<style>
+  body { margin: 0; background: var(--paper); font-family: var(--font-ui); }
+  .wrap { padding: 24px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+  .frame { background: var(--frame); border-radius: var(--radius-3); aspect-ratio: 9/16; display: flex; align-items: center; justify-content: center; padding: 0 18px; overflow: hidden; position: relative; }
+  .tag { position: absolute; top: 10px; left: 12px; font-family: var(--font-mono); font-size: 10px; color: var(--ink-4); }
+  .cap { font-family: var(--font-caption); color: #fff; text-align: center; line-height: 1.15; text-shadow: 0 4px 24px rgba(0,0,0,0.55); }
+  .clean { font-weight: 700; font-size: 26px; }
+  .pop { font-weight: 900; font-size: 30px; letter-spacing: -1px; text-transform: uppercase; }
+  .kara { font-weight: 800; font-size: 26px; }
+  .kara .dim { opacity: 0.35; }
+  .kw { color: var(--vermillion); }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="frame"><span class="tag">clean</span><span class="cap clean">it has nothing to do with <span class="kw">performance</span></span></div>
+    <div class="frame"><span class="tag">bold-pop</span><span class="cap pop">the real <span class="kw">reason</span> layoffs happen</span></div>
+    <div class="frame"><span class="tag">karaoke</span><span class="cap kara">once you <span class="kw">see</span> it <span class="dim">you cannot unsee</span></span></div>
+  </div>
+</body>
+</html>

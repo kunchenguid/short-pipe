@@ -1,0 +1,28 @@
+<!-- @dsCard group="Spacing" -->
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<link rel="stylesheet" href="../colors_and_type.css" />
+<style>
+  body { margin: 0; background: var(--paper); font-family: var(--font-ui); }
+  .wrap { padding: 34px 32px; display: flex; gap: 28px; align-items: center; }
+  .item { display: flex; flex-direction: column; align-items: center; gap: 14px; }
+  .box { width: 120px; height: 72px; background: var(--canvas-2); border-radius: var(--radius-3); }
+  .b1 { box-shadow: var(--shadow-1); }
+  .b2 { box-shadow: var(--shadow-2); }
+  .b3 { box-shadow: var(--shadow-3); }
+  .b4 { box-shadow: var(--shadow-card); }
+  .name { font-family: var(--font-mono); font-size: 11px; color: var(--ink); }
+  .desc { font-family: var(--font-ui); font-size: 11px; color: var(--ink-3); }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="item"><div class="box b1"></div><span class="name">shadow-1</span><span class="desc">hairline lift</span></div>
+    <div class="item"><div class="box b2"></div><span class="name">shadow-2</span><span class="desc">menu / popover</span></div>
+    <div class="item"><div class="box b3"></div><span class="name">shadow-3</span><span class="desc">modal</span></div>
+    <div class="item"><div class="box b4"></div><span class="name">shadow-card</span><span class="desc">9:16 short</span></div>
+  </div>
+</body>
+</html>

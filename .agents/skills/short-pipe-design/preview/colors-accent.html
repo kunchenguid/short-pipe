@@ -1,0 +1,39 @@
+<!-- @dsCard group="Colors" -->
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<link rel="stylesheet" href="../colors_and_type.css" />
+<style>
+  body { margin: 0; background: var(--paper); font-family: var(--font-ui); }
+  .wrap { padding: 24px; display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  .group .glabel { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.6px; color: var(--ink-3); margin-bottom: 10px; }
+  .ramp { display: flex; border: 1px solid var(--line); border-radius: var(--radius-3); overflow: hidden; }
+  .seg { flex: 1; height: 76px; display: flex; align-items: flex-end; padding: 8px; }
+  .seg .h { font-family: var(--font-mono); font-size: 10px; }
+  .cap { margin-top: 8px; display: flex; justify-content: space-between; font-family: var(--font-mono); font-size: 11px; color: var(--ink-3); }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="group">
+      <div class="glabel">Vermillion · primary accent</div>
+      <div class="ramp">
+        <div class="seg" style="background:var(--vermillion)"><span class="h" style="color:#fff">#c7361f</span></div>
+        <div class="seg" style="background:var(--vermillion-soft)"><span class="h" style="color:var(--ink)">soft</span></div>
+        <div class="seg" style="background:var(--vermillion-wash)"><span class="h" style="color:var(--vermillion)">wash</span></div>
+      </div>
+      <div class="cap"><span>base</span><span>#e8b8ae</span><span>#fbede9</span></div>
+    </div>
+    <div class="group">
+      <div class="glabel">Ultramarine · secondary</div>
+      <div class="ramp">
+        <div class="seg" style="background:var(--ultramarine)"><span class="h" style="color:#fff">#1f3a7a</span></div>
+        <div class="seg" style="background:var(--ultramarine-soft)"><span class="h" style="color:var(--ink)">soft</span></div>
+        <div class="seg" style="background:var(--ultramarine-wash)"><span class="h" style="color:var(--ultramarine)">wash</span></div>
+      </div>
+      <div class="cap"><span>base</span><span>#b8c3dc</span><span>#eceff7</span></div>
+    </div>
+  </div>
+</body>
+</html>

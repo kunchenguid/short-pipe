@@ -1,0 +1,174 @@
+/* ============================================================================
+   SHORT PIPE — Design Tokens: Color + Type
+   ----------------------------------------------------------------------------
+   The "paper and ink" editorial palette is ported verbatim from the product
+   repo (design/tokens/colors_and_type.css), which itself adapted it from the
+   sibling app rough-cut-axi. Only the base tokens port cleanly; the semantic
+   layer (h1/h2/p/code, surfaces, motion) is authored here for design work.
+
+   Source: github.com/kunchenguid/short-pipe  →  design/tokens/colors_and_type.css
+   Fonts are loaded from Google Fonts (see note in README — the repo ships none).
+   ========================================================================== */
+
+@import url("https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&family=Inter:wght@400;500;600;700&family=Outfit:wght@500;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap");
+
+:root {
+  color-scheme: light;
+
+  /* ---- Paper & canvas (warm off-whites, the "page") ---- */
+  --paper: #faf9f5;          /* app background — warm newsprint */
+  --paper-2: #fffffe;        /* raised paper, topbars */
+  --paper-edge: #efede6;     /* hairline between paper surfaces */
+  --canvas: #f3f3f0;         /* recessed wells, tracks */
+  --canvas-2: #ffffff;       /* cards, inputs, controls */
+  --canvas-hover: #ecece8;   /* control hover */
+  --canvas-press: #e4e4df;   /* control active/press */
+
+  /* ---- Ink (text + dark frames) ---- */
+  --frame: #0f0e0c;          /* near-black frame / primary button */
+  --ink: #16161a;            /* primary text */
+  --ink-2: #5a5750;          /* secondary text */
+  --ink-3: #8b8678;          /* tertiary / muted labels */
+  --ink-4: #b8b2a2;          /* faint — big rank numerals, disabled */
+  --ink-on-dark: #fbf7eb;    /* text on dark frames */
+
+  /* ---- Lines / rules ---- */
+  --line: #e5e4de;           /* default hairline */
+  --line-paper: #e5e2d5;     /* hairline on warm paper */
+  --line-strong: #cfcdc4;    /* input borders, stronger rules */
+  --line-dark: #2a2924;      /* rules on dark surfaces */
+
+  /* ---- Accents: vermillion (primary editorial red) + ultramarine ---- */
+  --vermillion: #c7361f;     /* the brand accent — keywords, accent btn */
+  --vermillion-soft: #e8b8ae;
+  --vermillion-wash: #fbe4dd;
+  --ultramarine: #1f3a7a;    /* secondary accent — info, "ready" */
+  --ultramarine-soft: #b8c3dc;
+  --ultramarine-wash: #e4ebfa;
+
+  /* ---- Semantic status ---- */
+  --ok: #2f7d46;       --ok-wash: #d9eede;
+  --caution: #bd8400;  --caution-wash: #fbe7bc;
+  --danger: #c0301a;
+  --mute: #9a9587;     --mute-wash: #eceae2;
+
+  /* ---- Type families ---- */
+  --font-display: "DM Serif Display", "GT Sectra", "Tiempos Headline", Georgia, serif;
+  --font-body: "Newsreader", "Iowan Old Style", Georgia, serif;
+  --font-ui: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-caption: "Outfit", "Inter", system-ui, sans-serif; /* rendered short captions */
+  --font-mono: "JetBrains Mono", "Berkeley Mono", "IBM Plex Mono", ui-monospace, monospace;
+
+  /* ---- Spacing scale (4px base) ---- */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-7: 32px;
+  --space-8: 40px;
+
+  /* ---- Radii ---- */
+  --radius-1: 2px;   /* word-chips, micro */
+  --radius-2: 4px;   /* buttons, inputs */
+  --radius-3: 8px;   /* cards, wells */
+  --radius-4: 12px;  /* large panels */
+  --radius-pill: 999px;
+
+  /* ---- Elevation (warm, low, editorial — never blue/cool) ---- */
+  --shadow-1: 0 1px 2px rgba(15, 14, 12, 0.05);
+  --shadow-2: 0 2px 8px rgba(15, 14, 12, 0.07);
+  --shadow-3: 0 8px 24px rgba(15, 14, 12, 0.10);
+  --shadow-card: 0 24px 60px rgba(15, 14, 12, 0.25); /* the 9:16 card layout */
+
+  /* ---- Motion ---- */
+  --ease: cubic-bezier(0.2, 0.7, 0.2, 1);
+  --dur-1: 120ms;  /* hover/press */
+  --dur-2: 220ms;  /* enter/leave */
+  --dur-3: 480ms;  /* deliberate, panel */
+}
+
+/* ============================================================================
+   SEMANTIC TYPE
+   Display = DM Serif (titles, ranks). Body = Newsreader (reading, candidate
+   titles). UI = Inter (controls, labels, meta). Mono = JetBrains (timecodes,
+   word-ids, paths).
+   ========================================================================== */
+
+.t-display {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: 40px;
+  line-height: 1.05;
+  letter-spacing: -0.4px;
+  color: var(--ink);
+}
+
+.t-h1 {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: 28px;
+  line-height: 1.1;
+  letter-spacing: -0.2px;
+  color: var(--ink);
+}
+
+.t-h2 {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: 22px;
+  line-height: 1.15;
+  color: var(--ink);
+}
+
+.t-title {
+  /* candidate / reading titles — Newsreader, the body serif at display weight */
+  font-family: var(--font-body);
+  font-weight: 600;
+  font-size: 17px;
+  line-height: 1.3;
+  color: var(--ink);
+}
+
+.t-body {
+  font-family: var(--font-body);
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 1.6;
+  color: var(--ink-2);
+}
+
+.t-ui {
+  font-family: var(--font-ui);
+  font-weight: 500;
+  font-size: 13px;
+  line-height: 1.4;
+  color: var(--ink);
+}
+
+.t-label {
+  /* uppercase section labels */
+  font-family: var(--font-ui);
+  font-weight: 700;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  color: var(--ink-3);
+}
+
+.t-meta {
+  font-family: var(--font-ui);
+  font-weight: 400;
+  font-size: 12px;
+  color: var(--ink-3);
+}
+
+.t-mono {
+  font-family: var(--font-mono);
+  font-weight: 500;
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.2px;
+  color: var(--ink-2);
+}

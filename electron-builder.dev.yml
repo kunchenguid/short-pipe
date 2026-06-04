@@ -1,0 +1,8 @@
+# Local/dev packaging config. CI release builds use electron-builder.yml directly.
+# A distinct appId + productName keeps locally-built bundles from colliding with
+# the installed (cask) app in macOS LaunchServices, so `open -a "Short Pipe"` and
+# Finder always resolve to the released /Applications copy instead of a stale
+# local build.
+extends: ./electron-builder.yml
+appId: com.shortpipe.app.dev
+productName: Short Pipe Dev
