@@ -65,14 +65,17 @@ const entries = asar.listPackage(asarPath, { isPack: false });
 // Normalize to POSIX-style absolute-in-archive paths.
 const files = new Set(entries.map((e) => e.replace(/\\/g, "/")));
 
-// All shipped package.json files under node_modules.
+// Shipped package.json files to verify.
 const pkgJsons = entries
   .map((e) => e.replace(/\\/g, "/"))
-  .filter((p) => p.startsWith("/node_modules/") && p.endsWith("/package.json"))
+  .filter(
+    (p) => p === "/package.json" || (p.startsWith("/node_modules/") && p.endsWith("/package.json")),
+  )
   // Only top-level package.json per package dir, not nested dist/package.json etc.
   // A package dir is .../node_modules/<name>[/...]/package.json with no further
   // "/node_modules/" -> handled by the resolution walk; keep the directory's own.
   .filter((p) => {
+    if (p === "/package.json") return true;
     const dir = p.slice(0, -"/package.json".length);
     // package dir must be an immediate child of a node_modules (handles @scope)
     return /\/node_modules\/(@[^/]+\/[^/]+|[^/]+)$/.test(dir);
