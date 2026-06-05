@@ -113,6 +113,25 @@ describe("TranscriptEditor waveform trimmer", () => {
     expect(bins).toBeGreaterThan(0);
   });
 
+  it("uses the known source duration without fallback padding", async () => {
+    const { TranscriptEditor } = await import("./TranscriptEditor");
+    await act(async () => {
+      root.render(
+        <TranscriptEditor
+          projectId="p1"
+          transcript={transcript}
+          candidate={candidate}
+          sourceDuration={30}
+          onClose={() => undefined}
+        />,
+      );
+    });
+    await flush();
+
+    const endHandle = container.querySelector('.wf-handle-end[role="slider"]') as HTMLElement;
+    expect(endHandle.getAttribute("aria-valuemax")).toBe("30");
+  });
+
   it("saves a manual cut override after dragging the end handle", async () => {
     const { TranscriptEditor } = await import("./TranscriptEditor");
     await act(async () => {

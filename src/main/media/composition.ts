@@ -58,7 +58,9 @@ export function selectCaptionGroups(
   clipStart = startTime,
   clipDuration = round(endTime - startTime),
 ): CaptionGroup[] {
-  const inRange = words.filter((w) => w.end > startTime && w.start < endTime);
+  const captionStart = Math.max(startTime, clipStart);
+  const captionEnd = Math.min(endTime, clipStart + clipDuration);
+  const inRange = words.filter((w) => w.end > captionStart && w.start < captionEnd);
   const groups: CaptionGroup[] = [];
   let current: CaptionWord[] = [];
 
@@ -75,7 +77,7 @@ export function selectCaptionGroups(
   for (let i = 0; i < inRange.length; i++) {
     const w = inRange[i];
     const localStart = Math.max(0, round(w.start - clipStart));
-    const localEnd = round(Math.min(endTime, w.end) - clipStart);
+    const localEnd = round(Math.min(captionEnd, w.end) - clipStart);
     const prev = inRange[i - 1];
     const pause = prev ? w.start - prev.end : 0;
     if (current.length > 0 && (pause > 0.25 || current.length >= maxWords)) flush();

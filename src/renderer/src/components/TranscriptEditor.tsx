@@ -105,7 +105,7 @@ export function TranscriptEditor({
   const wordEnd = words[endIdx]?.end ?? wordStart;
   const cutValue = cut ?? { start: wordStart, end: wordEnd };
   // Span the whole source; fall back to just past the last word when unknown.
-  const timelineDuration = Math.max(sourceDuration ?? 0, words[words.length - 1]?.end ?? 0) + 1;
+  const timelineDuration = sourceDuration ?? (words[words.length - 1]?.end ?? 0) + 1;
 
   async function save() {
     setBusy(true);

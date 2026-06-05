@@ -52,6 +52,16 @@ describe("selectCaptionGroups", () => {
     const allText = groups.flatMap((g) => g.words.map((w) => w.text));
     expect(allText).toEqual(["Stop", "blaming", "yourself."]);
   });
+
+  it("drops words outside the resolved manual media window", () => {
+    const groups = selectCaptionGroups(words, 10, 14, [], 4, 12.5, 1.0);
+
+    const allWords = groups.flatMap((g) => g.words);
+    expect(allWords.map((w) => w.text)).toEqual(["Stop", "blaming", "yourself."]);
+    expect(allWords.every((w) => w.start >= 0 && w.end >= 0)).toBe(true);
+    expect(allWords.every((w) => w.end <= 1.0)).toBe(true);
+    expect(groups.every((g) => g.end <= 1.0)).toBe(true);
+  });
 });
 
 describe("buildShortComposition", () => {
