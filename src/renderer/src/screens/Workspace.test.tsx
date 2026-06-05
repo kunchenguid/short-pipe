@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 
 import type { ShortPipeApi } from "@shared/ipc";
-import type { Project } from "@shared/project";
+import type { Candidate, Project } from "@shared/project";
 import { act } from "react";
 import { createRoot, type Root } from "react-dom/client";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
@@ -19,6 +19,29 @@ const projectWithoutDuration: Project = {
   source: { path: "/video.mp4" },
   transcriptStatus: "ready",
   candidates: [],
+};
+
+const sampleCandidate: Candidate = {
+  id: "c1",
+  title: "The real reason layoffs happen",
+  rank: 1,
+  startWordId: "w0",
+  endWordId: "w9",
+  startTime: 0,
+  endTime: 30,
+  layout: "full-bleed",
+  captionStyle: "clean",
+  titleStyle: "plain",
+  theme: "light",
+  videoFit: "full",
+  keywords: ["layoffs"],
+  status: "proposed",
+};
+
+const projectWithCandidate: Project = {
+  ...projectWithoutDuration,
+  source: { path: "/video.mp4", duration: 600 },
+  candidates: [sampleCandidate],
 };
 
 function stubBridge(overrides: Partial<ShortPipeApi> = {}) {
@@ -96,5 +119,88 @@ describe("Workspace empty-state generation", () => {
       runButton?.click();
     });
     expect(bridge.agent.send).not.toHaveBeenCalled();
+  });
+});
+
+describe("Workspace add-one-more-short", () => {
+  it("sends the user's prompt to the agent to find one additional short", async () => {
+    const bridge = stubBridge({
+      projects: {
+        list: vi.fn(),
+        get: vi.fn(async () => projectWithCandidate),
+        create: vi.fn(),
+        delete: vi.fn(),
+        pickSource: vi.fn(),
+        revealOutput: vi.fn(),
+        probe: vi.fn(async () => projectWithCandidate),
+      },
+    });
+    const { Workspace } = await import("./Workspace");
+
+    await act(async () => {
+      root.render(<Workspace projectId="p1" onBack={() => undefined} />);
+    });
+
+    // Reveal the prompt input from the left filmstrip.
+    const addButton = [...container.querySelectorAll("button")].find((button) =>
+      button.textContent?.includes("Add one more short"),
+    );
+    expect(addButton).toBeInstanceOf(HTMLButtonElement);
+    act(() => {
+      addButton?.click();
+    });
+
+    const input = container.querySelector("textarea.add-input") as HTMLTextAreaElement | null;
+    expect(input).toBeInstanceOf(HTMLTextAreaElement);
+    const setValue = Object.getOwnPropertyDescriptor(
+      window.HTMLTextAreaElement.prototype,
+      "value",
+    )?.set;
+    act(() => {
+      setValue?.call(input, "a punchy hook about burnout");
+      input?.dispatchEvent(new Event("input", { bubbles: true }));
+    });
+
+    const submit = [...container.querySelectorAll("button")].find((button) =>
+      button.textContent?.includes("Find it"),
+    );
+    expect(submit).toBeInstanceOf(HTMLButtonElement);
+    await act(async () => {
+      submit?.click();
+    });
+
+    expect(bridge.agent.send).toHaveBeenCalledTimes(1);
+    const [, prompt] = (bridge.agent.send as ReturnType<typeof vi.fn>).mock.calls[0];
+    expect(prompt).toContain("a punchy hook about burnout");
+    expect(prompt).toContain("one");
+  });
+
+  it("opens the prompt box from the filmstrip header plus button", async () => {
+    stubBridge({
+      projects: {
+        list: vi.fn(),
+        get: vi.fn(async () => projectWithCandidate),
+        create: vi.fn(),
+        delete: vi.fn(),
+        pickSource: vi.fn(),
+        revealOutput: vi.fn(),
+        probe: vi.fn(async () => projectWithCandidate),
+      },
+    });
+    const { Workspace } = await import("./Workspace");
+
+    await act(async () => {
+      root.render(<Workspace projectId="p1" onBack={() => undefined} />);
+    });
+
+    expect(container.querySelector("textarea.add-input")).toBeNull();
+    const headerPlus = container.querySelector(
+      'button[aria-label="Add one more short"]',
+    ) as HTMLButtonElement | null;
+    expect(headerPlus).toBeInstanceOf(HTMLButtonElement);
+    act(() => {
+      headerPlus?.click();
+    });
+    expect(container.querySelector("textarea.add-input")).toBeInstanceOf(HTMLTextAreaElement);
   });
 });

@@ -88,7 +88,7 @@ describe("createVideoTools", () => {
     expect((await projects.get(p.id)).transcriptStatus).toBe("ready");
   });
 
-  it("propose_candidates fills the review queue", async () => {
+  it("propose_candidates seeds the review queue", async () => {
     const p = await projects.create({ sourcePath: "/v.mp4" });
     await projects.saveTranscript(p.id, transcript);
     await projects.setTranscriptStatus(p.id, "ready");
@@ -104,8 +104,25 @@ describe("createVideoTools", () => {
         },
       ],
     });
-    expect(text).toContain("Added 1 candidate");
+    expect(text).toContain("Seeded the review queue with 1 candidate");
     expect((await projects.get(p.id)).candidates[0].title).toBe("Why it matters");
+  });
+
+  it("add_candidates appends without wiping the existing queue", async () => {
+    const p = await projects.create({ sourcePath: "/v.mp4" });
+    await projects.saveTranscript(p.id, transcript);
+    await projects.setTranscriptStatus(p.id, "ready");
+    await projects.replaceCandidates(p.id, [
+      { title: "Existing", rank: 1, startWordId: "w0", endWordId: "w1" },
+    ]);
+    const tools = createVideoTools({ projects, projectId: p.id, media: media() });
+    const text = await run(byName(tools, "add_candidates"), {
+      candidates: [{ title: "One more", rank: 2, startWordId: "w1", endWordId: "w2" }],
+    });
+    expect(text).toContain("Added 1 candidate");
+    expect(text).toContain("now holds 2");
+    const titles = (await projects.get(p.id)).candidates.map((c) => c.title);
+    expect(titles).toEqual(["Existing", "One more"]);
   });
 
   it("render_short refuses unapproved candidates", async () => {

@@ -136,7 +136,10 @@ export function createVideoTools(deps: VideoToolDeps): ToolDefinition[] {
     name: "propose_candidates",
     label: "Propose candidates",
     description:
-      "Submit a ranked list of soundbite candidates into the user's review queue. Each references a real word-id range from transcript.json. Replaces any previous proposals. Propose only genuinely strong moments, best first.",
+      "Seed the review queue with the initial ranked set of soundbite candidates. " +
+      "DESTRUCTIVE: this REPLACES every candidate already in the queue, so use it ONLY for the first pass when the queue is empty (or when the user explicitly asks to start over). " +
+      "To add more shorts to a queue that already has candidates, use add_candidates instead - never propose_candidates, or you will wipe the user's existing shorts. " +
+      "Each candidate references a real word-id range from transcript.json. Propose only genuinely strong moments, best first.",
     parameters: Type.Object({
       candidates: Type.Array(ProposalSchema, { minItems: 1 }),
     }),
@@ -147,10 +150,37 @@ export function createVideoTools(deps: VideoToolDeps): ToolDefinition[] {
         content: [
           {
             type: "text" as const,
-            text: `Added ${project.candidates.length} candidate(s) to the review queue. Ask the user to review, trim, and approve them.`,
+            text: `Seeded the review queue with ${project.candidates.length} candidate(s). Ask the user to review, trim, and approve them.`,
           },
         ],
         details: { count: project.candidates.length },
+      };
+    },
+  });
+
+  const addCandidates = defineTool({
+    name: "add_candidates",
+    label: "Add candidates",
+    description:
+      "Add one or more NEW soundbite candidates onto the EXISTING review queue, keeping every candidate already there. " +
+      "ADDITIVE: this is the tool for the 'add one more short' flow and any time the queue is non-empty - it never removes or overwrites existing shorts; the merged list is re-sorted by rank. " +
+      "Each candidate references a real word-id range from transcript.json. Do not duplicate a short already in the queue. Usually called with exactly one candidate.",
+    parameters: Type.Object({
+      candidates: Type.Array(ProposalSchema, { minItems: 1 }),
+    }),
+    async execute(_callId, rawParams) {
+      const params = rawParams as { candidates: CandidateProposal[] };
+      const before = (await projects.get(projectId)).candidates.length;
+      const project = await projects.appendCandidates(projectId, params.candidates);
+      const added = project.candidates.length - before;
+      return {
+        content: [
+          {
+            type: "text" as const,
+            text: `Added ${added} candidate(s) to the review queue, which now holds ${project.candidates.length}. Ask the user to review, trim, and approve them.`,
+          },
+        ],
+        details: { added, count: project.candidates.length },
       };
     },
   });
@@ -185,9 +215,9 @@ export function createVideoTools(deps: VideoToolDeps): ToolDefinition[] {
     },
   });
 
-  return [probe, transcribe, proposeCandidates, renderShortTool];
+  return [probe, transcribe, proposeCandidates, addCandidates, renderShortTool];
 }
 
 export function videoToolNames(): string[] {
-  return ["probe", "transcribe", "propose_candidates", "render_short"];
+  return ["probe", "transcribe", "propose_candidates", "add_candidates", "render_short"];
 }

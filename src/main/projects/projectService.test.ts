@@ -157,6 +157,31 @@ describe("candidates", () => {
     expect(project.candidates[0]).toMatchObject({ startTime: 0.3, endTime: 1.5 });
   });
 
+  it("appends to the existing queue without dropping prior candidates", async () => {
+    await withTranscript();
+    await service.replaceCandidates("id1", [
+      { title: "First", rank: 1, startWordId: "w0", endWordId: "w1" },
+      { title: "Third", rank: 3, startWordId: "w1", endWordId: "w2" },
+    ]);
+    const project = await service.appendCandidates("id1", [
+      { title: "Second", rank: 2, startWordId: "w0", endWordId: "w2" },
+    ]);
+    // Existing candidates are kept; the new one is merged in by rank.
+    expect(project.candidates.map((c) => c.title)).toEqual(["First", "Second", "Third"]);
+    // The appended candidate gets its own fresh id.
+    const ids = project.candidates.map((c) => c.id);
+    expect(new Set(ids).size).toBe(3);
+  });
+
+  it("rejects appends before a transcript exists", async () => {
+    await service.create({ sourcePath: "/a.mp4" });
+    await expect(
+      service.appendCandidates("id1", [
+        { title: "x", rank: 1, startWordId: "w0", endWordId: "w1" },
+      ]),
+    ).rejects.toThrow(/before transcription/);
+  });
+
   it("recomputes cached timing when the word range is trimmed", async () => {
     await withTranscript();
     await service.replaceCandidates("id1", [
