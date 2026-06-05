@@ -1179,6 +1179,147 @@ body {
 }
 .trim-hint strong { color: var(--ink); }
 
+/* ---- Waveform trimmer (precise in/out on the source audio) ---- */
+.waveform-trim {
+  flex: 0 0 auto;
+  border-top: 1px solid var(--line);
+  background: var(--paper-2);
+}
+.waveform-controls {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  padding: 8px 16px;
+}
+.wf-zoom {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+  max-width: 240px;
+}
+.wf-zoom-label {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--ink-4);
+}
+.wf-range {
+  position: relative;
+  flex: 1;
+  height: 4px;
+  border-radius: 2px;
+  background: var(--line-strong);
+}
+.wf-range-fill {
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 42%;
+  border-radius: 2px;
+  background: var(--vermillion);
+}
+.wf-range-thumb {
+  position: absolute;
+  left: 42%; top: 50%;
+  width: 12px; height: 12px;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  background: var(--vermillion);
+  box-shadow: var(--shadow-1);
+}
+.wf-readout {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-mono);
+  font-size: 12.5px;
+  color: var(--ink-2);
+  white-space: nowrap;
+}
+.wf-readout .wf-tc { color: var(--ink-2); }
+.wf-readout .ts-dot { color: var(--ink-4); }
+.wf-readout .ts-dur { color: var(--ink); font-weight: 600; }
+.waveform-scroll {
+  overflow: hidden;
+  background: var(--canvas-2);
+  border-top: 1px solid var(--line);
+}
+.waveform-content {
+  position: relative;
+  height: 96px;
+}
+.wf-silence {
+  position: absolute;
+  top: 0; bottom: 0;
+  left: 89.2%;
+  width: 5.1%;
+  background: var(--mute-wash);
+  z-index: 0;
+}
+.wf-tint {
+  position: absolute;
+  top: 0; bottom: 0;
+  left: 14.6%;
+  width: 50%;
+  background: rgba(199, 54, 31, 0.14);
+  z-index: 1;
+}
+.wf-bars {
+  position: absolute;
+  top: 0; bottom: 0; left: 0;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 8px;
+  pointer-events: none;
+}
+.wf-bars.base { z-index: 2; }
+.wf-bars i {
+  flex: 0 0 3px;
+  width: 3px;
+  border-radius: 1px;
+  background: var(--ink-4);
+}
+.wf-sel-clip {
+  position: absolute;
+  top: 0; bottom: 0;
+  left: 14.6%;
+  width: 50%;
+  overflow: hidden;
+  z-index: 3;
+  pointer-events: none;
+}
+.wf-bars.sel i { background: var(--vermillion); }
+.wf-handle {
+  position: absolute;
+  top: 0; bottom: 0;
+  width: 12px;
+  margin-left: -6px;
+  z-index: 5;
+}
+.wf-handle::before {
+  content: "";
+  position: absolute;
+  left: 50%; top: 0; bottom: 0;
+  width: 2px;
+  transform: translateX(-50%);
+  background: var(--vermillion);
+}
+.wf-handle::after {
+  content: "";
+  position: absolute;
+  left: 50%; top: 50%;
+  width: 12px; height: 20px;
+  transform: translate(-50%, -50%);
+  border-radius: var(--radius-2);
+  background: var(--vermillion);
+  box-shadow: var(--shadow-1);
+}
+.wf-handle-start { left: 14.6%; }
+.wf-handle-end { left: 64.6%; }
+
 /* ============================== DETERMINISTIC INSPECTOR ============================== */
 /* Fixed heights on the variable-height (multi-line serif) inspector blocks so
    the column geometry is identical whether measured pre-font-load or rendered

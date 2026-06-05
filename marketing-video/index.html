@@ -11,7 +11,7 @@
       id="root"
       data-composition-id="main"
       data-start="0"
-      data-duration="43"
+      data-duration="45"
       data-width="1080"
       data-height="1080"
     >
@@ -268,7 +268,8 @@
                       <span class="ts-dot">-</span>
                       <span class="ts-dur" style="position: relative; display: inline-block; width: 3em; text-align: left">
                         <span id="twd-a" style="position: absolute; left: 0; top: 0">3.7s</span>
-                        <span id="twd-b" style="position: absolute; left: 0; top: 0; opacity: 0">5.7s</span>
+                        <span id="twd-b" style="position: absolute; left: 0; top: 0; opacity: 0">5.5s</span>
+                        <span id="twd-c" style="position: absolute; left: 0; top: 0; opacity: 0">5.7s</span>
                       </span>
                     </div>
                     <span class="btn small ghost">
@@ -282,7 +283,44 @@
                       <span class="word">When</span> <span class="word">your</span> <span class="word">mind</span> <span class="word">runs</span> <span class="word">out</span> <span class="word">of</span> <span class="word">things</span> <span class="word">to</span> <span class="word">do,</span> <span class="word">it</span> <span class="word">finally</span> <span class="word">starts</span> <span class="word">to</span> <span class="word">wander.</span>
                     </div>
                   </div>
-                  <div class="trim-hint"><strong>Drag across the transcript</strong> to select your clip - like quoting a passage - then grab either handle to nudge an edge.</div>
+                  <div class="trim-hint"><strong>Drag across the transcript</strong> to select your clip - like quoting a passage - then fine-tune the exact in and out on the waveform below.</div>
+
+                  <!-- waveform trimmer (precise in/out on the source audio) -->
+                  <div class="waveform-trim" id="wf-trim">
+                    <div class="waveform-controls">
+                      <span class="btn small ghost" style="color: var(--ink-2)">
+                        <svg class="lucide" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+                        Reset to words
+                      </span>
+                      <label class="wf-zoom">
+                        <span class="wf-zoom-label">Zoom</span>
+                        <span class="wf-range"><span class="wf-range-fill"></span><span class="wf-range-thumb"></span></span>
+                      </label>
+                      <span class="wf-readout">
+                        <span class="wf-tc">0:06.08</span>
+                        <span class="ts-dot">-&gt;</span>
+                        <span class="wf-tc" style="position: relative; display: inline-block; width: 4.4em; text-align: left">
+                          <span id="wf-out-a" style="position: absolute; left: 0; top: 0">0:11.62</span>
+                          <span id="wf-out-b" style="position: absolute; left: 0; top: 0; opacity: 0">0:11.80</span>
+                        </span>
+                        <span class="ts-dot">-</span>
+                        <span class="ts-dur" style="position: relative; display: inline-block; width: 3em; text-align: left">
+                          <span id="wf-dur-a" style="position: absolute; left: 0; top: 0">5.5s</span>
+                          <span id="wf-dur-b" style="position: absolute; left: 0; top: 0; opacity: 0">5.7s</span>
+                        </span>
+                      </span>
+                    </div>
+                    <div class="waveform-scroll">
+                      <div class="waveform-content" id="wf-content">
+                        <div class="wf-silence" id="wf-silence"></div>
+                        <div class="wf-tint" id="wf-tint"></div>
+                        <div class="wf-bars base" id="wf-bars-base"></div>
+                        <div class="wf-sel-clip" id="wf-sel"><div class="wf-bars sel" id="wf-bars-sel"></div></div>
+                        <div class="wf-handle wf-handle-start" id="wf-h-start"></div>
+                        <div class="wf-handle wf-handle-end" id="wf-h-end"></div>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
 

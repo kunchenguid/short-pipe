@@ -12,8 +12,9 @@
      (nothing leaves the machine) -> three ranked shorts drop into the
      filmstrip -> the top one plays as a captioned 9:16 short -> swap the
      caption style live -> open the transcript editor and drag the handle
-     to extend the clip word by word -> Save -> Export 1080x1920 -> the
-     pill flips to rendered -> wipe back to the outro.
+     to extend the clip word by word -> nudge the precise out point on the
+     waveform -> Save -> Export 1080x1920 -> the pill flips to rendered ->
+     wipe back to the outro.
 
    One camera (#stage) holds the whole app at identity and pushes in on
    each beat. The cursor lives outside the stage and only ever clicks
@@ -68,6 +69,44 @@ $('grip-b').style.display = 'inline-block'
 const gripAR = rectC($('grip-a'))
 const gripBR = rectC($('grip-b'))
 const saveRangeR = rectC($('save-range'))
+
+// Build the waveform peak bars deterministically (no Math.random in the draw, so
+// every render is identical). The base layer is muted; an identical vermillion
+// layer sits in a clip window that grows with the selection. A quiet gap around
+// 89-94% is the detected pause after "boredom" - where the out point lands.
+;(function buildWaveformBars() {
+  const base = $('wf-bars-base')
+  const sel = $('wf-bars-sel')
+  if (!base || !sel || base.childElementCount) return
+  const N = 96
+  let seed = 1337
+  const rnd = () => {
+    seed = (seed * 1103515245 + 12345) & 0x7fffffff
+    return seed / 0x7fffffff
+  }
+  for (let i = 0; i < N; i++) {
+    const t = i / N
+    let amp = 0.42 + 0.42 * Math.abs(Math.sin(i * 0.7)) * (0.6 + 0.4 * Math.sin(i * 0.21))
+    amp *= 0.7 + 0.55 * rnd()
+    if (t < 0.1) amp *= 0.22 + t * 2.2 // quiet lead-in
+    if (t > 0.892 && t < 0.945) amp *= 0.12 // the pause after "boredom"
+    if (t > 0.955) amp *= 0.32 // trailing quiet
+    amp = Math.max(0.06, Math.min(1, amp))
+    const h = Math.round(amp * 78)
+    const b1 = document.createElement('i')
+    b1.style.height = h + 'px'
+    base.appendChild(b1)
+    const b2 = document.createElement('i')
+    b2.style.height = h + 'px'
+    sel.appendChild(b2)
+  }
+  // Size the selection bars to the full content width and offset them left by the
+  // 14.6% in-point, so they line up with the base bars through the clip window.
+  const w = $('wf-content').clientWidth
+  sel.style.width = w + 'px'
+  sel.style.left = -0.146 * w + 'px'
+})()
+const wfContentR = rectC($('wf-content'))
 
 // restore the default load state (library shown, editor hidden)
 $('grip-b').style.display = 'none'
@@ -191,6 +230,11 @@ tl.set('#play-ind', { opacity: 1 }, 0)
 tl.set('#rendered-note', { opacity: 0 }, 0)
 tl.set(['#twc-b', '#twr-b', '#twd-b', '#im-b', '#id-b', '#c1m-b', '#sd-b', '#pa-b'], { opacity: 0 }, 0)
 tl.set('#grip-b', { opacity: 0 }, 0)
+// waveform starts on the original (3.7s) selection: in-point 14.6%, out 64.6%
+tl.set(['#wf-out-b', '#wf-dur-b', '#twd-c'], { opacity: 0 }, 0)
+tl.set('#wf-h-start', { left: '14.6%' }, 0)
+tl.set('#wf-h-end', { left: '64.6%' }, 0)
+tl.set(['#wf-sel', '#wf-tint'], { width: '50%' }, 0)
 // extension words start with a 0-alpha caution-wash so the highlight fades in
 // in-hue (animating from plain `transparent` would blend through grey)
 tl.set(['#ext-1', '#ext-2', '#ext-3', '#ext-4', '#ext-5', '#ext-6'], { backgroundColor: 'rgba(251,231,188,0)' }, 0)
@@ -315,7 +359,7 @@ tl.set('#insp-trimming', { display: 'block' }, 23.5)
 tl.to('#trim-wrap', { opacity: 1, duration: 0.35, ease: 'power2.out' }, 23.55)
 setCam(stagePaneR.x, (gripAR.y + gripBR.y) / 2, 1.4, 23.7, 0.9)
 
-// grab the end handle and drag it right, growing the selection word by word
+// grab the transcript end handle and drag it right, growing by words
 cursorIn(24.7)
 moveCursor(gripAR.x, gripAR.y, 24.75, 0.7)
 tl.to('#cursor', { scale: 0.9, duration: 0.12, ease: 'power2.out' }, 25.45)
@@ -328,72 +372,96 @@ exts.forEach((sel, i) => {
 tl.to('#grip-a', { opacity: 0, duration: 0.2 }, 26.45)
 tl.set('#grip-b', { display: 'inline-block' }, 26.45)
 tl.to('#grip-b', { opacity: 1, duration: 0.2 }, 26.5)
-// the readouts tick up: 8 -> 14 words, 0:06-0:09 -> 0:06-0:11, 3.7s -> 5.7s
+// the word readouts tick up: 8 -> 14 words, 0:06-0:09 -> 0:06-0:11, 3.7s -> 5.5s
 snapCross('#twc-a', '#twc-b', 26.45)
 snapCross('#twr-a', '#twr-b', 26.45)
 snapCross('#twd-a', '#twd-b', 26.45)
+// the waveform selection follows the words: handle, tint and selected bars grow
+// from the "ideas" edge to the "boredom" word edge (out 64.6% -> 89.5%)
+tl.to('#wf-h-end', { left: '89.5%', duration: 0.5, ease: 'power2.inOut' }, 26.1)
+tl.to(['#wf-sel', '#wf-tint'], { width: '74.9%', duration: 0.5, ease: 'power2.inOut' }, 26.1)
 tl.to('#cursor', { scale: 1, duration: 0.15, ease: 'power2.out' }, 26.85)
 cursorOut(27.0)
 
+// push down to the waveform and frame the out handle, so the nudge onto the
+// pause after "boredom" is the hero shot (the selection sits left of centre, the
+// silence band and the muted tail sit right of it)
+const wfPreX = wfContentR.left + 0.895 * wfContentR.w
+const wfEndX = wfContentR.left + 0.919 * wfContentR.w
+setCam(wfContentR.left + 0.87 * wfContentR.w, wfContentR.y, 1.75, 27.0, 0.85)
+cursorIn(27.9)
+moveCursor(wfPreX, wfContentR.y, 27.95, 0.6)
+tl.to('#cursor', { scale: 0.9, duration: 0.12, ease: 'power2.out' }, 28.5)
+// the slight drag right: the out point settles in the silence after "boredom"
+moveCursor(wfEndX, wfContentR.y, 28.65, 0.6)
+tl.to('#wf-h-end', { left: '91.9%', duration: 0.6, ease: 'power2.inOut' }, 28.65)
+tl.to(['#wf-sel', '#wf-tint'], { width: '77.3%', duration: 0.6, ease: 'power2.inOut' }, 28.65)
+// the precise readouts tick 5.5s -> 5.7s in both the waveform and the summary
+snapCross('#wf-out-a', '#wf-out-b', 28.95)
+snapCross('#wf-dur-a', '#wf-dur-b', 28.95)
+snapCross('#twd-b', '#twd-c', 28.95)
+tl.to('#cursor', { scale: 1, duration: 0.15, ease: 'power2.out' }, 29.1)
+cursorOut(29.25)
+
 // pull back so the Save range button is in frame, then save
-resetCam(27.1, 0.6)
-cursorIn(27.8)
-moveCursor(saveRangeR.x, saveRangeR.y, 27.85, 0.7)
-clickAt(saveRangeR.x, saveRangeR.y, 28.6)
-tl.to('#save-range', { scale: 0.97, duration: 0.1, yoyo: true, repeat: 1, transformOrigin: 'center', ease: 'power2.out' }, 28.6)
-cursorOut(28.75)
+resetCam(29.4, 0.6)
+cursorIn(30.05)
+moveCursor(saveRangeR.x, saveRangeR.y, 30.1, 0.7)
+clickAt(saveRangeR.x, saveRangeR.y, 30.85)
+tl.to('#save-range', { scale: 0.97, duration: 0.1, yoyo: true, repeat: 1, transformOrigin: 'center', ease: 'power2.out' }, 30.85)
+cursorOut(31.0)
 
 // back to the preview, with the extended range reflected everywhere
-tl.set('#trim-wrap', { display: 'none' }, 28.85)
-tl.set('#stage-scroll', { display: 'flex' }, 28.85)
-tl.set('#insp-trimming', { display: 'none' }, 28.85)
-tl.set('#insp-full', { display: 'flex' }, 28.85)
-snapCross('#im-a', '#im-b', 28.9)
-snapCross('#id-a', '#id-b', 28.9)
-crossfade('#pa-a', '#pa-b', 28.9)
-snapCross('#c1m-a', '#c1m-b', 28.9)
-snapCross('#sd-a', '#sd-b', 28.9)
-setCam(phoneR.x, phoneR.y, 1.7, 29.0, 0.8)
+tl.set('#trim-wrap', { display: 'none' }, 31.1)
+tl.set('#stage-scroll', { display: 'flex' }, 31.1)
+tl.set('#insp-trimming', { display: 'none' }, 31.1)
+tl.set('#insp-full', { display: 'flex' }, 31.1)
+snapCross('#im-a', '#im-b', 31.15)
+snapCross('#id-a', '#id-b', 31.15)
+crossfade('#pa-a', '#pa-b', 31.15)
+snapCross('#c1m-a', '#c1m-b', 31.15)
+snapCross('#sd-a', '#sd-b', 31.15)
+setCam(phoneR.x, phoneR.y, 1.7, 31.25, 0.8)
 // the extended clip plays one full A -> B -> C pass: the third caption beat is
 // the payoff the longer clip now captures, and the 5.7s scrubber gets a quick
 // emphasis - so the new range is unmistakable in the live preview.
-tl.fromTo('#sd-b', { scale: 1.35, color: '#c7361f' }, { scale: 1, color: '#5a5750', duration: 0.6, ease: 'back.out(2)', transformOrigin: 'right center', immediateRender: false }, 29.1)
-captionCycle('cp', 29.6, 1, true, ['a', 'b', 'c'])
-scrubberCycle(29.6, 1, 3 * BEAT)
+tl.fromTo('#sd-b', { scale: 1.35, color: '#c7361f' }, { scale: 1, color: '#5a5750', duration: 0.6, ease: 'back.out(2)', transformOrigin: 'right center', immediateRender: false }, 31.35)
+captionCycle('cp', 31.85, 1, true, ['a', 'b', 'c'])
+scrubberCycle(31.85, 1, 3 * BEAT)
 
 /* ----------------------------------------------------------------
    SCENE H - export to 1080x1920; the pills flip to rendered.
    ---------------------------------------------------------------- */
-resetCam(33.4, 0.7)
-cursorIn(34.0)
-moveCursor(exportR.x, exportR.y, 34.05, 0.8)
-clickAt(exportR.x, exportR.y, 34.9)
-tl.to('#export-cta', { scale: 0.97, duration: 0.1, yoyo: true, repeat: 1, transformOrigin: 'center', ease: 'power2.out' }, 34.9)
-tl.to('#export-cta', { opacity: 0.75, duration: 0.2 }, 35.0)
-cursorOut(35.1)
+resetCam(35.65, 0.7)
+cursorIn(36.25)
+moveCursor(exportR.x, exportR.y, 36.3, 0.8)
+clickAt(exportR.x, exportR.y, 37.15)
+tl.to('#export-cta', { scale: 0.97, duration: 0.1, yoyo: true, repeat: 1, transformOrigin: 'center', ease: 'power2.out' }, 37.15)
+tl.to('#export-cta', { opacity: 0.75, duration: 0.2 }, 37.25)
+cursorOut(37.35)
 
-tl.to('#export-cta', { opacity: 0, duration: 0.3, ease: 'power2.in' }, 36.0)
-tl.set('#export-cta', { display: 'none' }, 36.32)
-tl.set('#rendered-note', { display: 'flex' }, 36.0)
-tl.to('#rendered-note', { opacity: 1, duration: 0.35, ease: 'power2.out' }, 36.1)
-tl.to(['#insp-pill-p', '#clip1-pill-p'], { opacity: 0, duration: 0.25, ease: 'power2.in' }, 36.0)
-tl.to(['#insp-pill-r', '#clip1-pill-r'], { opacity: 1, duration: 0.3, ease: 'power2.out' }, 36.15)
-setCam(exportR.x, inspPaneR.y + 120, 1.5, 36.3, 0.7)
+tl.to('#export-cta', { opacity: 0, duration: 0.3, ease: 'power2.in' }, 38.25)
+tl.set('#export-cta', { display: 'none' }, 38.57)
+tl.set('#rendered-note', { display: 'flex' }, 38.25)
+tl.to('#rendered-note', { opacity: 1, duration: 0.35, ease: 'power2.out' }, 38.35)
+tl.to(['#insp-pill-p', '#clip1-pill-p'], { opacity: 0, duration: 0.25, ease: 'power2.in' }, 38.25)
+tl.to(['#insp-pill-r', '#clip1-pill-r'], { opacity: 1, duration: 0.3, ease: 'power2.out' }, 38.4)
+setCam(exportR.x, inspPaneR.y + 120, 1.5, 38.55, 0.7)
 
 /* ----------------------------------------------------------------
    SCENE I - a last glance at the finished project, then wipe out.
    ---------------------------------------------------------------- */
-resetCam(37.6, 0.75)
+resetCam(39.85, 0.75)
 
-tl.to('#wipe', { y: '0%', duration: 0.32, ease: 'power3.in' }, 39.0)
-tl.set('#outro', { display: 'flex' }, 39.33)
-tl.to('#outro', { opacity: 1, duration: 0.12, ease: 'none', immediateRender: false }, 39.34)
-tl.to('#wipe', { y: '-100%', duration: 0.34, ease: 'power3.out' }, 39.42)
+tl.to('#wipe', { y: '0%', duration: 0.32, ease: 'power3.in' }, 41.25)
+tl.set('#outro', { display: 'flex' }, 41.58)
+tl.to('#outro', { opacity: 1, duration: 0.12, ease: 'none', immediateRender: false }, 41.59)
+tl.to('#wipe', { y: '-100%', duration: 0.34, ease: 'power3.out' }, 41.67)
 
 /* SCENE J - OUTRO. Identical to frame 0, so the loop is seamless. The
    three pipe bars settle once - long-form funneling to a single short. */
-tl.fromTo('#o-mark', { scale: 0.92 }, { scale: 1, duration: 0.5, ease: 'power3.out', immediateRender: false }, 39.85)
-tl.fromTo('#o-b2', { width: 86 }, { width: 58, duration: 0.6, ease: 'power3.out', immediateRender: false }, 40.0)
-tl.fromTo('#o-b3', { width: 86 }, { width: 32, duration: 0.7, ease: 'power3.out', immediateRender: false }, 40.1)
+tl.fromTo('#o-mark', { scale: 0.92 }, { scale: 1, duration: 0.5, ease: 'power3.out', immediateRender: false }, 42.1)
+tl.fromTo('#o-b2', { width: 86 }, { width: 58, duration: 0.6, ease: 'power3.out', immediateRender: false }, 42.25)
+tl.fromTo('#o-b3', { width: 86 }, { width: 32, duration: 0.7, ease: 'power3.out', immediateRender: false }, 42.35)
 
 window.__timelines['main'] = tl
