@@ -4,7 +4,7 @@ A high-fidelity, interactive recreation of the Short Pipe desktop app, built to 
 together for mockups and prototypes. It keeps the brand, tokens, copy voice, and rendering
 vocabulary of the product **exactly**, while revamping the workspace layout and trim
 interaction toward an ideal editing experience (see the design-system README §1 for the
-rationale and the two UX upgrades).
+rationale and the trim UX notes).
 
 ## Run it
 
@@ -38,7 +38,8 @@ shorts into the filmstrip.
 - **`Filmstrip`** / **`Clip`** — left rail of candidate shorts as 9:16 posters with rank, mini-caption, status, timecode.
 - **`StagePreview`** / **`CaptionLine`** — the centre live 9:16 preview that renders the real `clean` / `karaoke` / `bold-pop` caption styles over `center-square` / `top-square` / `full-bleed` layouts, with a play scrubber.
 - **`Inspector`** — per-candidate panel: proposed **passage**, meta, keyword editor, Trim, Approve / Reject / Render.
-- **`TranscriptTrim`** — the highlight-to-select word range editor (drag to select, drag handles to nudge, ± steppers).
+- **`TranscriptTrim`** - the highlight-to-select word range editor (drag to select, drag handles to nudge, ± steppers).
+  Production pairs this with a bottom waveform trimmer for exact in/out timing.
 - **`AgentEmpty`** — the "Let the agent find your shorts" empty/running state.
 
 ## What's intentionally faked

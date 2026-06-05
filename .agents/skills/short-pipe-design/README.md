@@ -11,10 +11,8 @@ without re-deriving the look every time.
 
 ## 1. Product context
 
-**Short Pipe** is a **local-first macOS/desktop app (Electron + React)**. You point it at a
-long-form video file; it transcribes locally, an agent proposes the best soundbites, you
-review and trim them by word, and it renders 1080×1920 captioned clips — all on your own
-machine.
+**Short Pipe** is a **local-first macOS/desktop app (Electron + React)**.
+You point it at a long-form video file; it transcribes locally, an agent proposes the best soundbites, you select the words and fine-tune the exact cut on a waveform, and it renders 1080×1920 captioned clips - all on your own machine.
 
 The defining product values, in order:
 
@@ -37,7 +35,7 @@ Pick → Transcribe → Propose → Review / Trim → Render → Output
 2. **Transcribe** with local Whisper (via HyperFrames) → word-level timestamps.
 3. **Propose** — the agent reads the transcript and proposes *ranked* soundbite candidates,
    following the bundled `shorts-from-longform` skill.
-4. **Review & trim** — approve, reject, trim by words, swap layout and caption style.
+4. **Review & trim** - approve, reject, select the word range, fine-tune the waveform cut, swap layout and caption style.
 5. **Render** — each approved short is rendered locally to 1080×1920.
 6. **Output** - finished shorts are written to the user's default output folder, or to the project's own `output/` folder when no default is set.
 
@@ -45,12 +43,9 @@ Pick → Transcribe → Propose → Review / Trim → Render → Output
 
 - **Project** - one source video + its transcript + its candidates.
   Output uses the app default folder or the project's own `output/` folder.
-- **Candidate** — a proposed soundbite: `title`, `rank`, an inclusive word-id range
-  (`startWordId`→`endWordId`), `keywords`, and a `status` (`proposed` · `approved` ·
-  `rejected` · `rendered`). In the repo a candidate also carries `layout`, `captionStyle`,
-  `titleStyle`, `theme`, and `videoFit`; when the agent omits layout/theme/caption style,
-  the app fills them from Settings defaults.
-- **Transcript** — a flat list of words, each with `id` (`w0`, `w1`…), `text`, `start`, `end`.
+- **Candidate** - a proposed soundbite: `title`, `rank`, an inclusive word-id range (`startWordId`→`endWordId`), optional manual waveform cut overrides (`cutStart`, `cutEnd`), `keywords`, and a `status` (`proposed` · `approved` · `rejected` · `rendered`).
+  In the repo a candidate also carries `layout`, `captionStyle`, `titleStyle`, `theme`, and `videoFit`; when the agent omits layout/theme/caption style, the app fills them from Settings defaults.
+- **Transcript** - a flat list of words, each with `id` (`w0`, `w1`…), `text`, `start`, `end`, plus optional detected silence windows used for clean cut suggestions.
 
 ### The rendering vocabularies (memorize these)
 
@@ -99,11 +94,12 @@ with the sound off.
 > (filmstrip · live 9:16 preview · inspector). Tokens and content rules are reused 1:1.
 > Two deliberate UX upgrades over the original screens:
 >
-> 1. **Highlight-to-select trimming.** The original trim editor used an "active boundary +
->    click a word to move it" model, which is hard to reason about. We replaced it with
->    **highlight-to-select**: drag across the words you want — exactly like quoting a
->    passage — then drag either rounded handle (or use −/+) to nudge an edge. See the
->    "Body & transcript" card and the editor's Trim mode.
+> 1. **Highlight-to-select plus waveform trimming.** The original trim editor used an "active boundary +
+>    click a word to move it" model, which is hard to reason about. Production now uses
+>    **highlight-to-select** for the word range, then a bottom waveform timeline for exact
+>    in/out handles. Re-selecting words clears the manual waveform override and falls back
+>    to the silence-snapped word range. The current UI kit still models the transcript half;
+>    add the waveform rail when mocking production trim screens.
 > 2. **Project-global style.** The UI kit keeps a single "Style · all shorts" bar as an intentional prototype simplification, while the production app stores layout, caption style, title style, theme, and video fit on each candidate.
 >
 > Note also: the status hues (`--ok`, `--caution`, `--danger`) were enriched a step from the
@@ -148,7 +144,7 @@ Reject · Render · Re-render · Open output folder · Disconnect Codex. Buttons
 | Empty library | *No projects yet. Pick a long-form video to begin - it stays on your disk.* |
 | Agent runner | *Let the agent find your shorts* / *It reads the transcript on your Codex plan and proposes ranked soundbites into the review queue below.* |
 | Empty queue | *No candidates yet. Once the video is transcribed, ask the agent to propose shorts.* |
-| Trim hint | *Click any word to move it, or use - / + to extend by one word.* |
+| Trim hint | *Drag across the transcript to pick the words, then fine-tune the exact in/out on the waveform below - drag the handles to a silent gap so no word is clipped.* |
 | Primary CTA | *New project from video* · *Transcribe & find shorts* · *Find shorts with AI* |
 
 **Titles the agent writes for shorts** are viewer-facing *hooks*, sentence case, no quotes:
@@ -169,7 +165,7 @@ accent. It is intentionally the opposite of the cool, gradient, glassy "AI tool"
 - **Text is warm near-black ink** in four steps: `--ink #16161a` → `--ink-2 #5a5750` →
   `--ink-3 #8b8678` (muted labels) → `--ink-4 #b8b2a2` (faint, e.g. the giant rank numerals).
 - **One brand accent: vermillion `#c7361f`** — keywords, the accent/render button, active
-  trim edges. Used sparingly; it is a spice, not a sauce.
+  trim edges and selected waveform bars. Used sparingly; it is a spice, not a sauce.
 - **Ultramarine `#1f3a7a`** is the quiet secondary — info banners and the `ready` state.
 - **Dark frames** (`--frame #0f0e0c`) appear as the primary button, the rendered-short card
   background, and any "filmstrip"/video chrome. Text on them is warm cream `--ink-on-dark`.
@@ -273,6 +269,7 @@ Root files:
 UI kits:
 - **`ui_kits/short-pipe/`** — the desktop app: Connect → Library → three-pane Editor
   (filmstrip · live 9:16 preview with real caption styles · inspector) → Transcript trim.
+  Production trim screens add a bottom waveform rail for the exact cut.
   See its own `README.md` for the component list.
 
 No slide template was provided in the source repo, so no `slides/` were produced.

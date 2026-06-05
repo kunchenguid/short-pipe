@@ -40,7 +40,7 @@ The on-device pipeline still needs `ffmpeg`/`ffprobe` and the `hyperframes` CLI 
 1. **Pick** a long-form video. It stays on disk.
 2. **Transcribe** with local Whisper (via HyperFrames), producing word-level timestamps.
 3. **Candidates** - the agent reads the transcript and proposes ranked soundbites, defaulting to roughly one short per minute of source video, following the bundled `shorts-from-longform` skill.
-4. **Review and edit** - approve, trim by words, swap layouts and caption styles in the editor.
+4. **Review and edit** - approve, select the word range, fine-tune exact in/out points on the waveform, and swap layouts and caption styles in the editor.
    Use the topbar gear to set defaults for new shorts: output folder, layout, theme, and caption style.
 5. **Render** - HyperFrames (headless Chrome + ffmpeg) renders each approved short locally to 1080x1920.
 6. **Output** - shorts are written to the default output folder, or to the project's own `output/` folder when no default is set.
