@@ -83,11 +83,7 @@ export class ProjectService {
   }
 
   outputDirFor(project: Project): string {
-    // A per-project override wins; otherwise the global default from Settings;
-    // otherwise the project's own output/ folder.
-    return (
-      project.outputDir ?? this.getDefaultOutputDir() ?? join(this.dir(project.id), OUTPUT_DIR)
-    );
+    return this.getDefaultOutputDir() ?? join(this.dir(project.id), OUTPUT_DIR);
   }
 
   // --- reads -------------------------------------------------------------
