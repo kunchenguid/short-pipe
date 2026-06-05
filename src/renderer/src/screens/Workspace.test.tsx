@@ -123,6 +123,23 @@ describe("Workspace empty-state generation", () => {
 });
 
 describe("Workspace add-one-more-short", () => {
+  it("does not expose add-one-more controls before the first short exists", async () => {
+    stubBridge();
+    const { Workspace } = await import("./Workspace");
+
+    await act(async () => {
+      root.render(<Workspace projectId="p1" onBack={() => undefined} />);
+    });
+
+    expect(
+      container.querySelector('button[aria-label="Add one more short"]'),
+    ).not.toBeInstanceOf(HTMLButtonElement);
+    const addButton = [...container.querySelectorAll("button")].find((button) =>
+      button.textContent?.includes("Add one more short"),
+    );
+    expect(addButton).toBeUndefined();
+  });
+
   it("sends the user's prompt to the agent to find one additional short", async () => {
     const bridge = stubBridge({
       projects: {

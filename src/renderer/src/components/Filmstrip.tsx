@@ -164,20 +164,23 @@ export function Filmstrip({
   // The prompt box is shared by two entry points - the header plus and the
   // footer button - so its open state lives here.
   const [adding, setAdding] = useState(false);
+  const canAddMore = candidates.length > 0;
   return (
     <div className="pane filmstrip">
       <div className="pane-head">
         <span className="section-title">Shorts - {candidates.length}</span>
-        <button
-          type="button"
-          className="head-add"
-          onClick={() => setAdding(true)}
-          disabled={running || adding}
-          title="Add one more short"
-          aria-label="Add one more short"
-        >
-          <Icon name="plus" />
-        </button>
+        {canAddMore && (
+          <button
+            type="button"
+            className="head-add"
+            onClick={() => setAdding(true)}
+            disabled={running || adding}
+            title="Add one more short"
+            aria-label="Add one more short"
+          >
+            <Icon name="plus" />
+          </button>
+        )}
       </div>
       <div className="pane-scroll">
         <div className="strip">
@@ -192,14 +195,16 @@ export function Filmstrip({
           ))}
         </div>
       </div>
-      <AddShort
-        running={running}
-        step={step}
-        adding={adding}
-        setAdding={setAdding}
-        onAddShort={onAddShort}
-        onAbort={onAbort}
-      />
+      {canAddMore && (
+        <AddShort
+          running={running}
+          step={step}
+          adding={adding}
+          setAdding={setAdding}
+          onAddShort={onAddShort}
+          onAbort={onAbort}
+        />
+      )}
     </div>
   );
 }
