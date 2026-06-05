@@ -1,6 +1,7 @@
 import type { AuthStatus } from "@shared/auth";
 import { useState } from "react";
 import { sp } from "../api";
+import { DependencyChecklist } from "../components/DependencyChecklist";
 import { Icon, Spinner } from "../components/Icon";
 
 export function AuthGate({ onAuthed }: { onAuthed: (status: AuthStatus) => void }) {
@@ -42,6 +43,7 @@ export function AuthGate({ onAuthed }: { onAuthed: (status: AuthStatus) => void 
             "Sign in with Codex"
           )}
         </button>
+        <DependencyChecklist />
       </div>
     </div>
   );

@@ -12,9 +12,15 @@ let root: Root;
 
 function stubBridge(overrides: Partial<ShortPipeApi> = {}) {
   const bridge: ShortPipeApi = {
-    app: { info: vi.fn(), getUpdateStatus: vi.fn(), openReleasePage: vi.fn() },
+    app: {
+      info: vi.fn(),
+      getUpdateStatus: vi.fn(),
+      openReleasePage: vi.fn(),
+      openExternal: vi.fn(),
+    },
     settings: { get: vi.fn(), update: vi.fn(), chooseOutputDir: vi.fn() },
     auth: { status: vi.fn(), login: vi.fn(), logout: vi.fn() },
+    deps: { check: vi.fn(async () => []) },
     projects: {
       list: vi.fn(),
       get: vi.fn(),

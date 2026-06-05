@@ -21,6 +21,15 @@ export function App() {
       .finally(() => setLoading(false));
   }, []);
 
+  // Sign out of Codex and drop back to the connect screen. Closing any open
+  // project and clearing auth flips the app back to the AuthGate.
+  async function signOut() {
+    await sp.auth.logout();
+    setSettingsOpen(false);
+    setOpenProjectId(null);
+    setAuth(null);
+  }
+
   return (
     <div className="app">
       <div className="topbar">
@@ -43,7 +52,9 @@ export function App() {
         </div>
       </div>
 
-      {settingsOpen && <Settings onClose={() => setSettingsOpen(false)} />}
+      {settingsOpen && (
+        <Settings onClose={() => setSettingsOpen(false)} onSignOut={() => void signOut()} />
+      )}
 
       {loading ? (
         <div className="center-screen">

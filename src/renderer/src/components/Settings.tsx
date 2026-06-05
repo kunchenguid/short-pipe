@@ -3,6 +3,7 @@ import type { CaptionStyle, LayoutKind, Theme } from "@shared/project";
 import { CAPTION_STYLES, LAYOUT_KINDS, THEMES } from "@shared/project";
 import { useEffect, useState } from "react";
 import { sp } from "../api";
+import { DependencyChecklist } from "./DependencyChecklist";
 import { Icon } from "./Icon";
 
 const LAYOUT_LABELS: Record<LayoutKind, string> = {
@@ -27,7 +28,7 @@ const CAPTION_LABELS: Record<CaptionStyle, string> = {
  * output folder for rendered shorts and the layout/theme/caption defaults the
  * agent starts new proposals from. Renders as a modal sheet over the app.
  */
-export function Settings({ onClose }: { onClose: () => void }) {
+export function Settings({ onClose, onSignOut }: { onClose: () => void; onSignOut: () => void }) {
   const [config, setConfig] = useState<ShortPipeConfig | null>(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -176,6 +177,21 @@ export function Settings({ onClose }: { onClose: () => void }) {
                   </button>
                 ))}
               </div>
+            </div>
+
+            <DependencyChecklist />
+
+            <div className="divider" />
+
+            <div className="field-group">
+              <span className="fg-label">Codex account</span>
+              <p className="settings-hint">
+                Disconnect to sign out of Codex on this machine. You'll return to the connect screen
+                and can sign in again anytime.
+              </p>
+              <button type="button" className="btn danger" disabled={busy} onClick={onSignOut}>
+                <Icon name="x" /> Disconnect Codex
+              </button>
             </div>
 
             {error && <div className="banner error">{error}</div>}

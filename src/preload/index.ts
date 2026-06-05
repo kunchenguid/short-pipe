@@ -1,5 +1,6 @@
 import type { AuthStatus } from "@shared/auth";
 import type { SettingsPatch, ShortPipeConfig } from "@shared/config";
+import type { DependencyStatus } from "@shared/deps";
 import type { AppEvent, ChatMessage } from "@shared/events";
 import type { AppInfo, PickResult, ShortPipeApi, UpdateStatus } from "@shared/ipc";
 import type {
@@ -16,6 +17,8 @@ const api: ShortPipeApi = {
     info: (): Promise<AppInfo> => ipcRenderer.invoke("sp:app:info"),
     getUpdateStatus: (): Promise<UpdateStatus> => ipcRenderer.invoke("sp:app:get-update-status"),
     openReleasePage: (): Promise<{ ok: boolean }> => ipcRenderer.invoke("sp:app:open-release-page"),
+    openExternal: (url: string): Promise<{ ok: boolean }> =>
+      ipcRenderer.invoke("sp:app:open-external", url),
   },
   settings: {
     get: (): Promise<ShortPipeConfig> => ipcRenderer.invoke("sp:settings:get"),
@@ -28,6 +31,9 @@ const api: ShortPipeApi = {
     status: (): Promise<AuthStatus> => ipcRenderer.invoke("sp:auth:status"),
     login: (): Promise<AuthStatus> => ipcRenderer.invoke("sp:auth:login"),
     logout: (): Promise<void> => ipcRenderer.invoke("sp:auth:logout"),
+  },
+  deps: {
+    check: (): Promise<DependencyStatus[]> => ipcRenderer.invoke("sp:deps:check"),
   },
   projects: {
     list: (): Promise<ProjectSummary[]> => ipcRenderer.invoke("sp:projects:list"),

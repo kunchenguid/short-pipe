@@ -14,7 +14,19 @@ type SettingsBridge = {
 };
 
 function stubBridge(settings: SettingsBridge) {
-  (window as unknown as { shortpipe: { settings: SettingsBridge } }).shortpipe = { settings };
+  (
+    window as unknown as {
+      shortpipe: {
+        settings: SettingsBridge;
+        deps: { check: () => Promise<unknown[]> };
+        app: { openExternal: () => Promise<{ ok: boolean }> };
+      };
+    }
+  ).shortpipe = {
+    settings,
+    deps: { check: vi.fn(async () => []) },
+    app: { openExternal: vi.fn(async () => ({ ok: true })) },
+  };
 }
 
 const baseConfig: ShortPipeConfig = {
@@ -40,11 +52,11 @@ afterEach(() => {
   container.remove();
 });
 
-async function mount(settings: SettingsBridge) {
+async function mount(settings: SettingsBridge, onSignOut: () => void = () => undefined) {
   stubBridge(settings);
   const { Settings } = await import("./Settings");
   await act(async () => {
-    root.render(<Settings onClose={() => undefined} />);
+    root.render(<Settings onClose={() => undefined} onSignOut={onSignOut} />);
   });
 }
 
@@ -79,5 +91,31 @@ describe("Settings", () => {
       fullBleed?.click();
     });
     expect(update).toHaveBeenCalledWith({ defaultLayout: "full-bleed" });
+  });
+
+  it("shows the on-device tools checklist", async () => {
+    await mount({
+      get: vi.fn(async () => baseConfig),
+      update: vi.fn(),
+      chooseOutputDir: vi.fn(),
+    });
+    expect(container.textContent).toContain("On-device tools");
+  });
+
+  it("signs out of Codex when Disconnect is clicked", async () => {
+    const onSignOut = vi.fn();
+    await mount(
+      { get: vi.fn(async () => baseConfig), update: vi.fn(), chooseOutputDir: vi.fn() },
+      onSignOut,
+    );
+
+    const disconnect = Array.from(container.querySelectorAll<HTMLButtonElement>("button")).find(
+      (b) => b.textContent?.includes("Disconnect"),
+    );
+    expect(disconnect).toBeTruthy();
+    await act(async () => {
+      disconnect?.click();
+    });
+    expect(onSignOut).toHaveBeenCalledOnce();
   });
 });
