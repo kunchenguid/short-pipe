@@ -43,9 +43,13 @@ Three excellent candidates still beat ten mediocre ones - a long list of weak cl
 
 ## Layout
 
+Omit `layout`, `captionStyle`, and `theme` by default.
+When you omit them, Short Pipe applies the user's Settings defaults.
+Only include one of those fields when the specific footage or transcript strongly needs an override for that candidate.
+
 - `full-bleed` - the source video fills the whole 1080x1920 frame (cropped). Use when the source is already visually interesting (a face, a demo, motion).
 - `top-square` - a full-width square crop of the video pinned to the top of an editorial paper page, with the title and captions stacked in the open space below. Use when the speaker is visually secondary and the roomy lower half should let captions carry the piece.
-- `center-square` - a full-width square crop centered on the paper page, the title above it and captions below. The default for talking-head audio-led content: balanced, composed, and strong for a single quote or calm explainer.
+- `center-square` - a full-width square crop centered on the paper page, the title above it and captions below. Balanced, composed, and strong for a single quote or calm explainer.
 
 When unsure, prefer `center-square` for talking-head audio-led content and `full-bleed` for visually rich footage.
 Both square layouts show a static title, so give every candidate a short, punchy `title` - it appears on the page, not just in the app.
@@ -88,5 +92,6 @@ Keywords are emphasized in the captions, so do not mark every word - pick the fe
 
 ## Calling propose_candidates
 
-Each candidate needs: `title` (a short viewer-facing hook), `rank`, `startWordId`, `endWordId`, and ideally `reason`, `layout`, `captionStyle`, and `keywords`.
+Each candidate needs: `title` (a short viewer-facing hook), `rank`, `startWordId`, `endWordId`, and ideally `reason` and `keywords`.
+Leave `layout`, `captionStyle`, and `theme` unset unless the candidate needs to override the user's Settings defaults.
 `propose_candidates` replaces any previous proposals for the project, so always submit the complete ranked list in one call.

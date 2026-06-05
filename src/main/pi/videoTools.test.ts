@@ -64,6 +64,14 @@ describe("createVideoTools", () => {
     expect(tools.map((t) => t.name).sort()).toEqual(videoToolNames().sort());
   });
 
+  it("tells the agent to omit user-defaulted presentation fields", () => {
+    const tools = createVideoTools({ projects, projectId: "id1", media: media() });
+    const schema = JSON.stringify(byName(tools, "propose_candidates").parameters);
+
+    expect(schema).toContain("Omit layout, captionStyle, and theme");
+    expect(schema).not.toContain("light = paper page + ink text (default");
+  });
+
   it("probe caches source info and reports it", async () => {
     const p = await projects.create({ sourcePath: "/v.mp4" });
     const tools = createVideoTools({ projects, projectId: p.id, media: media() });

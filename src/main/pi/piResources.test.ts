@@ -14,6 +14,12 @@ describe("buildAgentSystemPrompt", () => {
   it("only renders approved candidates", () => {
     expect(buildAgentSystemPrompt()).toMatch(/not render anything the user has not approved/i);
   });
+
+  it("asks the agent to leave user-defaulted presentation fields unset", () => {
+    const prompt = buildAgentSystemPrompt();
+
+    expect(prompt).toContain("omit layout, captionStyle, and theme");
+  });
 });
 
 describe("createAgentResourceLoader", () => {
