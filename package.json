@@ -1,6 +1,6 @@
 {
   "name": "short-pipe",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Local-first Electron app that turns long-form video into captioned vertical shorts, powered by your own Codex subscription.",
   "license": "MIT",
   "author": "Kun Chen",
