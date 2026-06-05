@@ -1,6 +1,8 @@
 import type { AuthStatus } from "@shared/auth";
 import { useEffect, useState } from "react";
 import { sp } from "./api";
+import { Icon } from "./components/Icon";
+import { Settings } from "./components/Settings";
 import { UpdateIndicator } from "./components/UpdateIndicator";
 import { AuthGate } from "./screens/AuthGate";
 import { Home } from "./screens/Home";
@@ -10,6 +12,7 @@ export function App() {
   const [auth, setAuth] = useState<AuthStatus | null>(null);
   const [loading, setLoading] = useState(true);
   const [openProjectId, setOpenProjectId] = useState<string | null>(null);
+  const [settingsOpen, setSettingsOpen] = useState(false);
 
   useEffect(() => {
     sp.auth
@@ -26,9 +29,21 @@ export function App() {
           <span className="tagline">long-form in, captioned shorts out</span>
         </div>
         <div className="topbar-actions">
+          {auth?.authenticated && (
+            <button
+              type="button"
+              className="btn small ghost icon-only"
+              aria-label="Settings"
+              onClick={() => setSettingsOpen(true)}
+            >
+              <Icon name="settings" />
+            </button>
+          )}
           <UpdateIndicator />
         </div>
       </div>
+
+      {settingsOpen && <Settings onClose={() => setSettingsOpen(false)} />}
 
       {loading ? (
         <div className="center-screen">

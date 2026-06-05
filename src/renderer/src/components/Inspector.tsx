@@ -293,7 +293,7 @@ export function Inspector({
                   disabled={busy}
                   onClick={() => void call(() => sp.projects.revealOutput(projectId))}
                 >
-                  <Icon name="folderOpen" /> Reveal
+                  <Icon name="folderOpen" /> Open folder
                 </button>
                 <button type="button" className="btn" disabled={busy} onClick={exportShort}>
                   <Icon name="rotateCw" /> {busy ? "Exporting..." : "Re-export"}

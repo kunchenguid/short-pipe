@@ -6,6 +6,7 @@ import { fileURLToPath, pathToFileURL } from "node:url";
 import {
   DEFAULT_CODEX_MODEL,
   normalizeShortPipeConfig,
+  type SettingsPatch,
   type ShortPipeConfig,
 } from "@shared/config";
 import type { AppEvent } from "@shared/events";
@@ -22,6 +23,7 @@ import {
   transcribeProject,
 } from "./projects/projectOps";
 import { ProjectService } from "./projects/projectService";
+import { SettingsService } from "./settings/settingsService";
 import { readJsonFile } from "./storage/json";
 import { bootstrapLayout, resolveShortPipeRoot, type ShortPipeLayout } from "./storage/layout";
 import { getDefaultTelemetry, initDefaultTelemetry } from "./telemetry";
@@ -38,6 +40,7 @@ const isolatedUserDataDir =
 type Services = {
   layout: ShortPipeLayout;
   auth: CodexAuthService;
+  settings: SettingsService;
   projects: ProjectService;
   agent: AgentRuntimeService;
 };
@@ -105,12 +108,24 @@ function modelIdFromConfig(value: string): string {
 
 async function createServices(layout: ShortPipeLayout): Promise<Services> {
   const config = normalizeShortPipeConfig(await readJsonFile<ShortPipeConfig>(layout.configPath));
+  const settings = new SettingsService({ configPath: layout.configPath, initial: config });
   const auth = new CodexAuthService({
     authPath: layout.codexAuthPath,
     codec: createSafeStorageTokenCodec(safeStorage),
     openExternal: (url) => shell.openExternal(url),
   });
-  const projects = new ProjectService({ layout });
+  const projects = new ProjectService({
+    layout,
+    getCandidateDefaults: () => {
+      const c = settings.get();
+      return {
+        layout: c.defaultLayout,
+        captionStyle: c.defaultCaptionStyle,
+        theme: c.defaultTheme,
+      };
+    },
+    getDefaultOutputDir: () => settings.get().defaultOutputDir,
+  });
   const agent = new AgentRuntimeService({
     agentDir: layout.piAgentDir,
     modelId: modelIdFromConfig(config.defaultModel),
@@ -119,7 +134,7 @@ async function createServices(layout: ShortPipeLayout): Promise<Services> {
     skillsDir: skillsDirFor(),
     media: realMediaDeps,
   });
-  return { layout, auth, projects, agent };
+  return { layout, auth, settings, projects, agent };
 }
 
 function broadcast(event: AppEvent): void {
@@ -131,7 +146,7 @@ function broadcast(event: AppEvent): void {
 }
 
 export function registerIpc(services: Services): void {
-  const { projects, agent, auth } = services;
+  const { projects, agent, auth, settings } = services;
 
   ipcMain.handle(
     "sp:app:info",
@@ -159,6 +174,17 @@ export function registerIpc(services: Services): void {
     return { ok: true };
   });
 
+  ipcMain.handle("sp:settings:get", () => settings.get());
+  ipcMain.handle("sp:settings:update", (_e, patch: SettingsPatch) => settings.update(patch));
+  ipcMain.handle("sp:settings:choose-output-dir", async () => {
+    const result = await dialog.showOpenDialog({
+      title: "Choose a default output folder for shorts",
+      properties: ["openDirectory", "createDirectory"],
+    });
+    if (result.canceled || result.filePaths.length === 0) return settings.get();
+    return settings.update({ defaultOutputDir: result.filePaths[0] });
+  });
+
   ipcMain.handle("sp:auth:status", () => auth.status());
   ipcMain.handle("sp:auth:login", () => auth.login());
   ipcMain.handle("sp:auth:logout", async () => {
@@ -181,14 +207,6 @@ export function registerIpc(services: Services): void {
     });
     if (result.canceled || result.filePaths.length === 0) return { canceled: true };
     return { canceled: false, path: result.filePaths[0] };
-  });
-  ipcMain.handle("sp:projects:choose-output-dir", async (_e, projectId: string) => {
-    const result = await dialog.showOpenDialog({
-      title: "Choose an output folder for shorts",
-      properties: ["openDirectory", "createDirectory"],
-    });
-    if (result.canceled || result.filePaths.length === 0) return projects.get(projectId);
-    return projects.setOutputDir(projectId, result.filePaths[0]);
   });
   ipcMain.handle("sp:projects:reveal-output", async (_e, projectId: string) => {
     const project = await projects.get(projectId);
