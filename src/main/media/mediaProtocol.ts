@@ -149,6 +149,9 @@ export function registerMediaProtocol(deps: MediaProtocolDeps): void {
             keywords: kw != null ? kw.split(",").filter(Boolean) : candidate.keywords,
             startTime: num(q.get("s"), candidate.startTime),
             endTime: num(q.get("e"), candidate.endTime),
+            // Manual waveform cut override (absent unless the user fine-tuned it).
+            cutStart: q.get("cs") != null ? num(q.get("cs"), candidate.startTime) : undefined,
+            cutEnd: q.get("ce") != null ? num(q.get("ce"), candidate.endTime) : undefined,
           },
         });
         return new Response(html, {

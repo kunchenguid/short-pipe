@@ -76,6 +76,13 @@ export type ShortPipeApi = {
     /** Kicks off local-Whisper transcription; resolves when it finishes. */
     run: (projectId: string) => Promise<Project>;
   };
+  waveform: {
+    /**
+     * Peak magnitudes (0..1) for the source's [from, to] window, `bins` bars.
+     * The waveform trimmer fetches only the slice it is currently showing.
+     */
+    peaks: (projectId: string, from: number, to: number, bins: number) => Promise<number[]>;
+  };
   candidates: {
     patch: (projectId: string, candidateId: string, patch: CandidatePatch) => Promise<Project>;
     approve: (projectId: string, candidateId: string) => Promise<Project>;

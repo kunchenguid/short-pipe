@@ -101,6 +101,14 @@ export type Candidate = {
   /** Seconds, cached from the word range for quick display and cutting. */
   startTime: number;
   endTime: number;
+  /**
+   * Manual cut override (seconds on the source timeline), set by dragging the
+   * waveform trimmer. When BOTH are present they replace the silence-snapped
+   * window for preview and render, giving sub-word precision. Cleared whenever
+   * the word range changes (re-selecting words is the "start over" gesture).
+   */
+  cutStart?: number;
+  cutEnd?: number;
   layout: LayoutKind;
   captionStyle: CaptionStyle;
   /** How the static title is dressed on the square layouts. */
@@ -181,6 +189,8 @@ export type CandidatePatch = Partial<
     | "title"
     | "startWordId"
     | "endWordId"
+    | "cutStart"
+    | "cutEnd"
     | "layout"
     | "captionStyle"
     | "titleStyle"

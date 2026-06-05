@@ -24,9 +24,12 @@ export function StagePreview({
   const [playing, setPlaying] = useState(false);
   const [frac, setFrac] = useState(0);
   const frameRef = useRef<HTMLIFrameElement>(null);
-  // The actual (padded) clip length comes from the preview driver; until it
-  // reports, fall back to the word-range duration.
-  const wordRangeDur = Math.max(0, candidate.endTime - candidate.startTime);
+  // The actual clip length comes from the preview driver; until it reports, fall
+  // back to the manual cut window when set, else the word-range duration.
+  const hasCut = candidate.cutStart != null && candidate.cutEnd != null;
+  const wordRangeDur = hasCut
+    ? Math.max(0, (candidate.cutEnd as number) - (candidate.cutStart as number))
+    : Math.max(0, candidate.endTime - candidate.startTime);
   const [dur, setDur] = useState(wordRangeDur);
 
   const params = new URLSearchParams({
@@ -40,6 +43,11 @@ export function StagePreview({
     s: String(candidate.startTime),
     e: String(candidate.endTime),
   });
+  // A manual waveform trim overrides the silence-snapped window in the preview.
+  if (hasCut) {
+    params.set("cs", String(candidate.cutStart));
+    params.set("ce", String(candidate.cutEnd));
+  }
   const src = `sp-media://frame/${projectId}/${candidate.id}?${params.toString()}`;
 
   useEffect(() => {

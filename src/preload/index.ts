@@ -48,6 +48,10 @@ const api: ShortPipeApi = {
     run: (projectId: string): Promise<Project> =>
       ipcRenderer.invoke("sp:transcript:run", projectId),
   },
+  waveform: {
+    peaks: (projectId: string, from: number, to: number, bins: number): Promise<number[]> =>
+      ipcRenderer.invoke("sp:waveform:peaks", projectId, from, to, bins),
+  },
   candidates: {
     patch: (projectId: string, candidateId: string, patch: CandidatePatch): Promise<Project> =>
       ipcRenderer.invoke("sp:candidates:patch", projectId, candidateId, patch),

@@ -1138,6 +1138,99 @@ input[type="text"] {
   color: var(--ink-2);
 }
 
+/* ---- Waveform trimmer (precise in/out on a zoomable, scrollable timeline) ---- */
+.waveform-trim {
+  border-top: 1px solid var(--line);
+  background: var(--paper-2);
+  flex: 0 0 auto;
+}
+.waveform-controls {
+  display: flex;
+  align-items: center;
+  gap: var(--space-5);
+  padding: var(--space-2) var(--space-5);
+}
+.wf-zoom {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  flex: 1;
+  max-width: 280px;
+}
+.wf-zoom-label {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--ink-4);
+}
+.wf-zoom input[type="range"] {
+  flex: 1;
+  accent-color: var(--vermillion);
+  cursor: pointer;
+}
+.wf-readout {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--ink-2);
+}
+.wf-readout .ts-dur {
+  color: var(--ink);
+  font-weight: 600;
+}
+.waveform-scroll {
+  overflow-x: auto;
+  overflow-y: hidden;
+  background: var(--canvas-2);
+  border-top: 1px solid var(--line);
+}
+.waveform-content {
+  position: relative;
+}
+.waveform-canvas {
+  position: sticky;
+  left: 0;
+  top: 0;
+  display: block;
+  z-index: 0;
+  pointer-events: none;
+}
+.wf-handle {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 12px;
+  margin-left: -6px;
+  z-index: 2;
+  cursor: ew-resize;
+  touch-action: none;
+}
+.wf-handle::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  transform: translateX(-50%);
+  background: var(--vermillion);
+}
+.wf-handle::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 12px;
+  height: 18px;
+  transform: translate(-50%, -50%);
+  border-radius: var(--radius-2);
+  background: var(--vermillion);
+  box-shadow: var(--shadow-1);
+}
+
 /* ---- Topbar actions / update indicator ---- */
 .topbar-actions {
   display: flex;

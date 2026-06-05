@@ -17,7 +17,13 @@ export type RenderOptions = {
   candidate: Pick<
     Candidate,
     "startTime" | "endTime" | "layout" | "captionStyle" | "keywords" | "title"
-  > & { titleStyle?: TitleStyle; theme?: Theme; videoFit?: VideoFit };
+  > & {
+    titleStyle?: TitleStyle;
+    theme?: Theme;
+    videoFit?: VideoFit;
+    cutStart?: number;
+    cutEnd?: number;
+  };
   words: TranscriptWord[];
   /** Detected pauses; clip boundaries snap to them when present. */
   silences?: Silence[];

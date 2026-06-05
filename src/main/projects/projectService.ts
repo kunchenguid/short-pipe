@@ -13,6 +13,7 @@ import type {
   TranscriptStatus,
 } from "@shared/project";
 import { projectSummary } from "@shared/project";
+import { extractPeaks } from "../media/waveform";
 import { readJsonFile, writeJsonFile } from "../storage/json";
 import { assertSafeId, projectDir, type ShortPipeLayout } from "../storage/layout";
 import {
@@ -122,6 +123,21 @@ export class ProjectService {
     await writeJsonFile(this.transcriptPath(projectId), transcript);
   }
 
+  /**
+   * Waveform peaks for the source's [from, to] window, `bins` bars normalized to
+   * 0..1. The waveform trimmer requests only the slice it is showing, so a long
+   * source stays cheap (one short ffmpeg pass per visible window).
+   */
+  async getWaveformPeaks(
+    projectId: string,
+    from: number,
+    to: number,
+    bins: number,
+  ): Promise<number[]> {
+    const project = await this.get(projectId);
+    return extractPeaks(project.source.path, { from, to, bins });
+  }
+
   // --- create / delete ---------------------------------------------------
 
   async create(input: CreateProjectInput): Promise<Project> {
@@ -194,14 +210,21 @@ export class ProjectService {
   /**
    * Patch a candidate. When the word range changes (from the transcript editor),
    * the cached startTime/endTime are recomputed from the transcript so renders
-   * stay consistent with the displayed trim.
+   * stay consistent with the displayed trim, and any manual waveform cut override
+   * is cleared - re-selecting words is the explicit "start over" gesture, so the
+   * clip drops back to silence-snapping unless the same patch sets a new override.
    */
   async patchCandidate(
     projectId: string,
     candidateId: string,
     patch: CandidatePatch,
   ): Promise<Project> {
-    let derived: { startTime?: number; endTime?: number } = {};
+    let derived: {
+      startTime?: number;
+      endTime?: number;
+      cutStart?: number;
+      cutEnd?: number;
+    } = {};
     if (patch.startWordId !== undefined || patch.endWordId !== undefined) {
       const [transcript, project] = await Promise.all([
         this.getTranscript(projectId),
@@ -209,11 +232,17 @@ export class ProjectService {
       ]);
       const current = project.candidates.find((c) => c.id === candidateId);
       if (transcript && current) {
-        derived = wordTimeRange(
-          transcript.words,
-          patch.startWordId ?? current.startWordId,
-          patch.endWordId ?? current.endWordId,
-        );
+        derived = {
+          ...wordTimeRange(
+            transcript.words,
+            patch.startWordId ?? current.startWordId,
+            patch.endWordId ?? current.endWordId,
+          ),
+          // Default the override to cleared, but let this same patch set a fresh
+          // one (the editor saves the word range and the waveform cut together).
+          cutStart: patch.cutStart,
+          cutEnd: patch.cutEnd,
+        };
       }
     }
     return this.mutate(projectId, (project) => ({

@@ -136,6 +136,42 @@ describe("candidates", () => {
     expect(patched.candidates[0].endTime).toBe(1.5);
   });
 
+  it("clears the manual cut override when the word range changes", async () => {
+    await withTranscript();
+    await service.replaceCandidates("id1", [
+      { title: "Clip", rank: 1, startWordId: "w0", endWordId: "w2" },
+    ]);
+    const candidateId = (await service.get("id1")).candidates[0].id;
+
+    const withCut = await service.patchCandidate("id1", candidateId, {
+      cutStart: 0.05,
+      cutEnd: 1.4,
+    });
+    expect(withCut.candidates[0]).toMatchObject({ cutStart: 0.05, cutEnd: 1.4 });
+
+    // Re-selecting words is the "start over" gesture: the override drops.
+    const retrimmed = await service.patchCandidate("id1", candidateId, { startWordId: "w1" });
+    expect(retrimmed.candidates[0].cutStart).toBeUndefined();
+    expect(retrimmed.candidates[0].cutEnd).toBeUndefined();
+  });
+
+  it("keeps a cut override set in the same patch as the word range", async () => {
+    await withTranscript();
+    await service.replaceCandidates("id1", [
+      { title: "Clip", rank: 1, startWordId: "w0", endWordId: "w2" },
+    ]);
+    const candidateId = (await service.get("id1")).candidates[0].id;
+
+    // The editor saves the word range and the fresh waveform cut together.
+    const patched = await service.patchCandidate("id1", candidateId, {
+      startWordId: "w0",
+      endWordId: "w2",
+      cutStart: 0.1,
+      cutEnd: 1.45,
+    });
+    expect(patched.candidates[0]).toMatchObject({ cutStart: 0.1, cutEnd: 1.45 });
+  });
+
   it("patches, renders, and removes candidates", async () => {
     await withTranscript();
     await service.replaceCandidates("id1", [

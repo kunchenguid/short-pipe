@@ -48,6 +48,7 @@ function stubBridge(overrides: Partial<ShortPipeApi> = {}) {
       probe: vi.fn(() => new Promise<Project>(() => undefined)),
     },
     transcript: { get: vi.fn(async () => null), run: vi.fn() },
+    waveform: { peaks: vi.fn(async () => []) },
     candidates: {
       patch: vi.fn(),
       approve: vi.fn(),

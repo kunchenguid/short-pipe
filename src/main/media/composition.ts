@@ -210,6 +210,52 @@ export function clipWindow(
   return { mediaStart, clipDuration: round(mediaEnd - mediaStart) };
 }
 
+/** The minimum any clip window may be, override or snapped. */
+const MIN_CLIP_DURATION = 0.1;
+
+/** A candidate's cut boundaries: word-derived times plus an optional manual override. */
+export type ClipBounds = {
+  startTime: number;
+  endTime: number;
+  cutStart?: number;
+  cutEnd?: number;
+};
+
+/**
+ * The clip's media window. A manual override (`cutStart`/`cutEnd`, set by the
+ * waveform trimmer) wins outright - it's the user's deliberate, sub-word in/out -
+ * and is just clamped to the source. Otherwise we snap to acoustic pauses via
+ * {@link clipWindow}. This is the single resolver both preview and render call,
+ * so a manual trim shows in the live preview and burns into the final cut
+ * identically.
+ */
+export function resolveClipWindow(
+  bounds: ClipBounds,
+  silences: Silence[] | undefined,
+  words: TranscriptWord[],
+  sourceDuration?: number,
+): { mediaStart: number; clipDuration: number } {
+  const { startTime, endTime, cutStart, cutEnd } = bounds;
+  if (
+    cutStart != null &&
+    cutEnd != null &&
+    Number.isFinite(cutStart) &&
+    Number.isFinite(cutEnd) &&
+    cutEnd - cutStart >= MIN_CLIP_DURATION
+  ) {
+    const ceil = sourceDuration ?? Number.POSITIVE_INFINITY;
+    const mediaStart = round(Math.max(0, Math.min(cutStart, ceil)));
+    const mediaEnd = round(Math.max(0, Math.min(cutEnd, ceil)));
+    if (mediaEnd - mediaStart >= MIN_CLIP_DURATION) {
+      return { mediaStart, clipDuration: round(mediaEnd - mediaStart) };
+    }
+  }
+  return clipWindow(startTime, endTime, silences, {
+    sourceDuration,
+    ...neighborBounds(words, startTime, endTime),
+  });
+}
+
 /**
  * The reported end of the word just before [startTime, endTime] and the reported
  * start of the word just after, used to anchor the pause search at each boundary.
@@ -560,7 +606,13 @@ export type BuildPreviewInput = {
   candidate: Pick<
     Candidate,
     "startTime" | "endTime" | "layout" | "captionStyle" | "keywords" | "title"
-  > & { titleStyle?: TitleStyle; theme?: Theme; videoFit?: VideoFit };
+  > & {
+    titleStyle?: TitleStyle;
+    theme?: Theme;
+    videoFit?: VideoFit;
+    cutStart?: number;
+    cutEnd?: number;
+  };
   words: TranscriptWord[];
   /** Detected pauses; clip boundaries snap to them when present. */
   silences?: Silence[];
@@ -579,14 +631,11 @@ export type BuildPreviewInput = {
  */
 export function buildPreviewDocument(input: BuildPreviewInput): string {
   const { candidate, videoSrc, gsapSource, words } = input;
-  const { mediaStart, clipDuration } = clipWindow(
-    candidate.startTime,
-    candidate.endTime,
+  const { mediaStart, clipDuration } = resolveClipWindow(
+    candidate,
     input.silences,
-    {
-      sourceDuration: input.sourceDuration,
-      ...neighborBounds(words, candidate.startTime, candidate.endTime),
-    },
+    words,
+    input.sourceDuration,
   );
   const groups = selectCaptionGroups(
     words,
@@ -679,7 +728,13 @@ export type BuildCompositionInput = {
   candidate: Pick<
     Candidate,
     "startTime" | "endTime" | "layout" | "captionStyle" | "keywords" | "title"
-  > & { titleStyle?: TitleStyle; theme?: Theme; videoFit?: VideoFit };
+  > & {
+    titleStyle?: TitleStyle;
+    theme?: Theme;
+    videoFit?: VideoFit;
+    cutStart?: number;
+    cutEnd?: number;
+  };
   words: TranscriptWord[];
   /** Detected pauses; clip boundaries snap to them when present. */
   silences?: Silence[];
@@ -696,14 +751,11 @@ export type BuildCompositionInput = {
  */
 export function buildShortComposition(input: BuildCompositionInput): string {
   const { candidate, sourceFileName, words } = input;
-  const { mediaStart, clipDuration } = clipWindow(
-    candidate.startTime,
-    candidate.endTime,
+  const { mediaStart, clipDuration } = resolveClipWindow(
+    candidate,
     input.silences,
-    {
-      sourceDuration: input.sourceDuration,
-      ...neighborBounds(words, candidate.startTime, candidate.endTime),
-    },
+    words,
+    input.sourceDuration,
   );
   const groups = selectCaptionGroups(
     words,
