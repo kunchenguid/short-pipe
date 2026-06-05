@@ -18,12 +18,6 @@ export function App() {
       .finally(() => setLoading(false));
   }, []);
 
-  async function logout() {
-    await sp.auth.logout();
-    setOpenProjectId(null);
-    setAuth(await sp.auth.status());
-  }
-
   return (
     <div className="app">
       <div className="topbar">
@@ -33,11 +27,6 @@ export function App() {
         </div>
         <div className="topbar-actions">
           <UpdateIndicator />
-          {auth?.authenticated && (
-            <button type="button" className="btn small ghost" onClick={logout}>
-              Sign out
-            </button>
-          )}
         </div>
       </div>
 
