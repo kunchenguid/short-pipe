@@ -11,7 +11,7 @@ const UPDATE_STATUS_REFRESH_INTERVAL_MS = 4 * 60 * 60 * 1000;
 
 type UpdateStatus = Awaited<ReturnType<typeof sp.app.getUpdateStatus>>;
 
-// Sits in the topbar next to Sign out. The main process runs the actual release
+// Sits in the topbar action area. The main process runs the actual release
 // check; this reads the cached status on mount and, when a newer version exists,
 // shows a small popover with the copy-paste upgrade command and a link to the
 // release notes. Renders nothing (and never surfaces an error) when there is no

@@ -125,7 +125,7 @@ for anything machine-shaped: timecodes (`0:04 - 0:19`), durations (`14.2s`), wor
 *"It stays on your disk."*, *"never leave this machine."*
 
 **Verbs are imperative and concrete:** Pick · Transcribe · Find shorts · Trim · Approve ·
-Reject · Render · Re-render · Reveal · Sign out. Buttons are verbs, not nouns.
+Reject · Render · Re-render · Reveal · Disconnect Codex. Buttons are verbs, not nouns.
 
 **Examples to imitate (verbatim from the product):**
 
