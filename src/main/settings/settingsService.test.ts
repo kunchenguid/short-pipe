@@ -2,7 +2,8 @@ import { mkdtemp, readFile, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { defaultShortPipeConfig, type ShortPipeConfig } from "@shared/config";
-import { afterEach, beforeEach, describe, expect, it } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import * as jsonStorage from "../storage/json";
 import { SettingsService } from "./settingsService";
 
 let dir: string;
@@ -46,5 +47,15 @@ describe("SettingsService", () => {
     const cleared = await service.update({ defaultOutputDir: "" });
     expect(cleared.defaultOutputDir).toBeUndefined();
     expect((await readConfig()).defaultOutputDir).toBeUndefined();
+  });
+
+  it("keeps the previous in-memory config when persistence fails", async () => {
+    const initial = defaultShortPipeConfig();
+    const service = new SettingsService({ configPath, initial });
+    vi.spyOn(jsonStorage, "writeJsonFile").mockRejectedValueOnce(new Error("write failed"));
+
+    await expect(service.update({ defaultOutputDir: "/tmp/out" })).rejects.toThrow("write failed");
+
+    expect(service.get()).toEqual(initial);
   });
 });

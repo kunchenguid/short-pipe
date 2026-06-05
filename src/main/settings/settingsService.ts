@@ -25,8 +25,9 @@ export class SettingsService {
   }
 
   async update(patch: SettingsPatch): Promise<ShortPipeConfig> {
-    this.config = applySettingsPatch(this.config, patch);
-    await writeJsonFile(this.configPath, this.config);
+    const next = applySettingsPatch(this.config, patch);
+    await writeJsonFile(this.configPath, next);
+    this.config = next;
     return this.config;
   }
 }
