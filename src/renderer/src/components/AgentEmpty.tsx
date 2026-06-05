@@ -16,6 +16,7 @@ export function AgentEmpty({
   onRun,
   onAbort,
   error,
+  waitingForDuration,
 }: {
   status: TranscriptStatus;
   running: boolean;
@@ -25,6 +26,7 @@ export function AgentEmpty({
   onRun: () => void;
   onAbort: () => void;
   error: string | null;
+  waitingForDuration: boolean;
 }) {
   const label = status === "ready" ? "Find shorts with AI" : "Transcribe & find shorts";
   const MIN = MIN_SHORT_COUNT;
@@ -72,7 +74,8 @@ export function AgentEmpty({
                 <Icon name="plus" />
               </button>
             </div>
-            <button type="button" className="btn primary" onClick={onRun}>
+            {waitingForDuration && <div className="runner-status">Waiting for video details...</div>}
+            <button type="button" className="btn primary" onClick={onRun} disabled={waitingForDuration}>
               <Icon name="sparkles" /> {label}
             </button>
           </>

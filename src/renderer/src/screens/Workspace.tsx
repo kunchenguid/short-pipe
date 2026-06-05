@@ -35,11 +35,17 @@ export function Workspace({ projectId, onBack }: { projectId: string; onBack: ()
   const [countTouched, setCountTouched] = useState(false);
   const [running, setRunning] = useState(false);
   const [step, setStep] = useState<string | null>(null);
+  const [probingDuration, setProbingDuration] = useState(true);
 
   useEffect(() => {
+    let cancelled = false;
+    setProbingDuration(true);
     sp.projects
       .get(projectId)
-      .then(setProject)
+      .then((p) => {
+        setProject(p);
+        if (p.source.duration) setProbingDuration(false);
+      })
       .catch((e) => setError(String(e)));
     sp.transcript
       .get(projectId)
@@ -47,9 +53,17 @@ export function Workspace({ projectId, onBack }: { projectId: string; onBack: ()
       .catch(() => {});
     sp.projects
       .probe(projectId)
-      .then(setProject)
-      .catch(() => {});
+      .then((p) => {
+        if (!cancelled) setProject(p);
+      })
+      .catch(() => {})
+      .finally(() => {
+        if (!cancelled) setProbingDuration(false);
+      });
     sp.agent.isRunning(projectId).then(setRunning);
+    return () => {
+      cancelled = true;
+    };
   }, [projectId]);
 
   // Default the requested count to one short per minute of source video, until the
@@ -143,6 +157,7 @@ export function Workspace({ projectId, onBack }: { projectId: string; onBack: ()
   const s = project.source;
   const ready = project.transcriptStatus === "ready";
   const selected = project.candidates.find((c) => c.id === selectedId) ?? null;
+  const waitingForDuration = !project.source.duration && probingDuration;
   const specs = `${s.width && s.height ? `${s.width}x${s.height}` : "size unknown"} · ${
     s.fps ? `${s.fps}fps` : "fps ?"
   } · ${formatTime(s.duration)}`;
@@ -227,6 +242,7 @@ export function Workspace({ projectId, onBack }: { projectId: string; onBack: ()
               onRun={findShorts}
               onAbort={() => void sp.agent.abort(projectId)}
               error={error}
+              waitingForDuration={waitingForDuration}
             />
           )}
         </div>
