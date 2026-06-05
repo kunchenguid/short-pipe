@@ -123,11 +123,11 @@ export type CandidateProposal = {
   rank: number;
   startWordId: string;
   endWordId: string;
-  /** Defaults to center-square when omitted or invalid. */
+  /** Falls back to Settings default layout when omitted or invalid. */
   layout?: LayoutKind;
   captionStyle?: CaptionStyle;
   titleStyle?: TitleStyle;
-  /** Defaults to dark when omitted or invalid. */
+  /** Falls back to Settings default theme when omitted or invalid. */
   theme?: Theme;
   /** Defaults to full when omitted or invalid. */
   videoFit?: VideoFit;
@@ -151,7 +151,7 @@ export type Project = {
   createdAt: string;
   updatedAt: string;
   source: ProjectSource;
-  /** Where rendered shorts are written; defaults under the project folder. */
+  /** Legacy per-project output override; effective output now comes from Settings or project `output/`. */
   outputDir?: string;
   transcriptStatus: TranscriptStatus;
   candidates: Candidate[];

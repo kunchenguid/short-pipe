@@ -39,22 +39,24 @@ Pick → Transcribe → Propose → Review / Trim → Render → Output
    following the bundled `shorts-from-longform` skill.
 4. **Review & trim** — approve, reject, trim by words, swap layout and caption style.
 5. **Render** — each approved short is rendered locally to 1080×1920.
-6. **Output** — finished shorts are written to a local folder.
+6. **Output** - finished shorts are written to the user's default output folder, or to the project's own `output/` folder when no default is set.
 
 ### Core domain objects
 
-- **Project** — one source video + its transcript + its candidates + an output folder.
+- **Project** - one source video + its transcript + its candidates.
+  Output uses the app default folder or the project's own `output/` folder.
 - **Candidate** — a proposed soundbite: `title`, `rank`, an inclusive word-id range
   (`startWordId`→`endWordId`), `keywords`, and a `status` (`proposed` · `approved` ·
   `rejected` · `rendered`). In the repo a candidate also carries `layout`, `captionStyle`,
-  `titleStyle`, `theme`, and `videoFit`.
+  `titleStyle`, `theme`, and `videoFit`; when the agent omits layout/theme/caption style,
+  the app fills them from Settings defaults.
 - **Transcript** — a flat list of words, each with `id` (`w0`, `w1`…), `text`, `start`, `end`.
 
 ### The rendering vocabularies (memorize these)
 
 **Layout** (`LayoutKind`):
 - `center-square` - a full-width video box centered on the page, with the title above it and captions below.
-  This is the default for talking-head / static / audio-led footage.
+  This is the initial Settings default for talking-head / static / audio-led footage.
 - `top-square` - a full-width video box pinned to the top of the page, with title and captions stacked below.
   Use when captions should carry the piece.
 - `full-bleed` - source video fills the whole 1080×1920 frame (cropped), captions over the footage.
@@ -67,7 +69,7 @@ Pick → Transcribe → Propose → Review / Trim → Render → Output
 
 **Theme** (`Theme`):
 - `dark` - ink page + warm off-white text.
-  This is the default.
+  This is the initial Settings default.
 - `light` - paper page + ink text for bright or busy footage.
 
 **Caption style** (`CaptionStyle`):
@@ -135,7 +137,7 @@ for anything machine-shaped: timecodes (`0:04 - 0:19`), durations (`14.2s`), wor
 *"It stays on your disk."*, *"never leave this machine."*
 
 **Verbs are imperative and concrete:** Pick · Transcribe · Find shorts · Trim · Approve ·
-Reject · Render · Re-render · Reveal · Disconnect Codex. Buttons are verbs, not nouns.
+Reject · Render · Re-render · Open output folder · Disconnect Codex. Buttons are verbs, not nouns.
 
 **Examples to imitate (verbatim from the product):**
 
@@ -228,9 +230,10 @@ page backgrounds · cool-grey shadows.
 
 ## 4. Iconography
 
-**The product as shipped uses essentially no icons** — actions are *words* ("Transcribe",
-"Approve", "Reveal"), status is *pills*, and the giant serif **rank numerals** (1, 2, 3) are
-the closest thing to an icon. This is deliberate: text-as-interface suits the editorial tone.
+**The product uses icons sparingly** - most actions are still *words* ("Transcribe",
+"Approve", "Open output folder"), status is *pills*, and the giant serif **rank numerals**
+(1, 2, 3) are the closest thing to an icon.
+The settings gear and folder action are the main icon-supported controls.
 
 For the revamped UI kit we introduce a **restrained, thin-stroke line-icon set** only where a
 glyph genuinely beats a word (filmstrip controls, the transcribe/render/output rail, a play
@@ -245,7 +248,9 @@ sets.
 > action.
 
 Rules:
-- Icons **support** a label; they rarely stand alone. Approve/Reject/Render keep their words.
+- Icons **support** a label; they rarely stand alone.
+  Approve/Reject/Render keep their words.
+  The settings gear is an intentional topbar icon-only exception.
 - **No emoji, ever**, including as icons.
 - Mono digits and the serif rank numerals do real iconographic work — lean on them.
 
