@@ -51,6 +51,7 @@ function stubBridge(overrides: Partial<ShortPipeApi> = {}) {
       probe: vi.fn(),
     },
     transcript: { get: vi.fn(), run: vi.fn() },
+    waveform: { peaks: vi.fn(async () => []) },
     candidates: {
       patch: vi.fn(),
       approve: vi.fn(),

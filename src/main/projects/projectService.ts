@@ -13,6 +13,7 @@ import type {
   TranscriptStatus,
 } from "@shared/project";
 import { projectSummary } from "@shared/project";
+import { extractPeaks } from "../media/waveform";
 import { readJsonFile, writeJsonFile } from "../storage/json";
 import { assertSafeId, projectDir, type ShortPipeLayout } from "../storage/layout";
 import {
@@ -26,6 +27,8 @@ import {
 const PROJECT_JSON = "project.json";
 const TRANSCRIPT_JSON = "transcript.json";
 const OUTPUT_DIR = "output";
+const MAX_WAVEFORM_BINS = 20_000;
+const MAX_WAVEFORM_WINDOW_SEC = 120;
 
 export type ProjectServiceOptions = {
   layout: ShortPipeLayout;
@@ -122,6 +125,35 @@ export class ProjectService {
     await writeJsonFile(this.transcriptPath(projectId), transcript);
   }
 
+  /**
+   * Waveform peaks for the source's [from, to] window, `bins` bars normalized to
+   * 0..1. The waveform trimmer requests only the slice it is showing, so a long
+   * source stays cheap (one short ffmpeg pass per visible window).
+   */
+  async getWaveformPeaks(
+    projectId: string,
+    from: number,
+    to: number,
+    bins: number,
+  ): Promise<number[]> {
+    const project = await this.get(projectId);
+    if (!Number.isFinite(from) || !Number.isFinite(to) || !Number.isFinite(bins) || bins <= 0) {
+      throw new Error("Invalid waveform request");
+    }
+    const safeFrom = Math.max(0, from);
+    const sourceEnd =
+      Number.isFinite(project.source.duration) && project.source.duration !== undefined
+        ? Math.max(0, project.source.duration)
+        : Number.POSITIVE_INFINITY;
+    const safeTo = Math.min(Math.max(0, to), sourceEnd, safeFrom + MAX_WAVEFORM_WINDOW_SEC);
+    if (safeTo <= safeFrom) throw new Error("Invalid waveform request");
+    return extractPeaks(project.source.path, {
+      from: safeFrom,
+      to: safeTo,
+      bins: Math.min(Math.floor(bins), MAX_WAVEFORM_BINS),
+    });
+  }
+
   // --- create / delete ---------------------------------------------------
 
   async create(input: CreateProjectInput): Promise<Project> {
@@ -194,14 +226,21 @@ export class ProjectService {
   /**
    * Patch a candidate. When the word range changes (from the transcript editor),
    * the cached startTime/endTime are recomputed from the transcript so renders
-   * stay consistent with the displayed trim.
+   * stay consistent with the displayed trim, and any manual waveform cut override
+   * is cleared - re-selecting words is the explicit "start over" gesture, so the
+   * clip drops back to silence-snapping unless the same patch sets a new override.
    */
   async patchCandidate(
     projectId: string,
     candidateId: string,
     patch: CandidatePatch,
   ): Promise<Project> {
-    let derived: { startTime?: number; endTime?: number } = {};
+    let derived: {
+      startTime?: number;
+      endTime?: number;
+      cutStart?: number;
+      cutEnd?: number;
+    } = {};
     if (patch.startWordId !== undefined || patch.endWordId !== undefined) {
       const [transcript, project] = await Promise.all([
         this.getTranscript(projectId),
@@ -209,11 +248,17 @@ export class ProjectService {
       ]);
       const current = project.candidates.find((c) => c.id === candidateId);
       if (transcript && current) {
-        derived = wordTimeRange(
-          transcript.words,
-          patch.startWordId ?? current.startWordId,
-          patch.endWordId ?? current.endWordId,
-        );
+        derived = {
+          ...wordTimeRange(
+            transcript.words,
+            patch.startWordId ?? current.startWordId,
+            patch.endWordId ?? current.endWordId,
+          ),
+          // Default the override to cleared, but let this same patch set a fresh
+          // one (the editor saves the word range and the waveform cut together).
+          cutStart: patch.cutStart,
+          cutEnd: patch.cutEnd,
+        };
       }
     }
     return this.mutate(projectId, (project) => ({

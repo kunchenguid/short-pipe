@@ -224,6 +224,12 @@ export function registerIpc(services: Services): void {
   });
 
   ipcMain.handle(
+    "sp:waveform:peaks",
+    (_e, projectId: string, from: number, to: number, bins: number) =>
+      projects.getWaveformPeaks(projectId, from, to, bins),
+  );
+
+  ipcMain.handle(
     "sp:candidates:patch",
     (_e, projectId: string, candidateId: string, patch: CandidatePatch) =>
       projects.patchCandidate(projectId, candidateId, patch),

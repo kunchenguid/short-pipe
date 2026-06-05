@@ -39,7 +39,7 @@ Pulled verbatim from `design/tokens/colors_and_type.css` (the canonical token so
 - **line-dark** `#2a2924` - rules on dark surfaces
 
 ### Accents - vermillion (the brand red) + ultramarine
-- **vermillion** `#c7361f` - the only loud accent: keywords, the accent Export button, scrubber fill, the bottom pipe bar, keyword chips, the live caption keyword
+- **vermillion** `#c7361f` - the only loud accent: keywords, the accent Export button, scrubber fill, selected waveform bars, the bottom pipe bar, keyword chips, the live caption keyword
 - **vermillion-soft** `#e8b8ae`, **vermillion-wash** `#fbe4dd`
 - **ultramarine** `#1f3a7a` - quiet secondary: the "ready" pill, info
 - **ultramarine-soft** `#b8c3dc`, **ultramarine-wash** `#e4ebfa`
@@ -74,11 +74,11 @@ Video scale: the editor is drawn at native app pixel sizes then the whole stage 
 
 A frame-0 outro poster (the pipe mark + `Short Pipe` wordmark + tagline + Homebrew install, used as the X thumbnail and the seamless loop point), then the story of one real cut, told from the very beginning:
 
-start on the project library -> drag a long-form file (`the-focus-hour.mp4`) onto the dropzone -> the project opens in the editor with the hour-long `The Focus Hour` loaded -> the empty stage invites the agent -> click `Find shorts with AI` -> the agent transcribes locally and scans the transcript (nothing leaves the machine) -> ranked shorts drop into the filmstrip -> select the top one -> the 9:16 phone plays the captioned short (`WHY BOREDOM IS GOOD FOR YOU`, boredom in vermillion) -> swap the caption style and watch the preview update live -> open the transcript editor and drag the end handle to extend the clip word by word (the duration ticks up) -> `Save range` -> back to the preview -> `Export 1080x1920` -> the pill flips to rendered with a written path -> wipe back to the outro.
+start on the project library -> drag a long-form file (`the-focus-hour.mp4`) onto the dropzone -> the project opens in the editor with the hour-long `The Focus Hour` loaded -> the empty stage invites the agent -> click `Find shorts with AI` -> the agent transcribes locally and scans the transcript (nothing leaves the machine) -> ranked shorts drop into the filmstrip -> select the top one -> the 9:16 phone plays the captioned short (`WHY BOREDOM IS GOOD FOR YOU`, boredom in vermillion) -> swap the caption style and watch the preview update live -> open the transcript editor, drag the transcript end handle to extend the clip by words, then nudge the exact out point on the waveform (the duration ticks up) -> `Save range` -> back to the preview -> `Export 1080x1920` -> the pill flips to rendered with a written path -> wipe back to the outro.
 
 The subject is the everyday-curious, never controversial: a podcast on focus and attention, with shorts like "Why boredom is good for you", "The myth of multitasking", and "The two-minute focus reset".
 
-The agent's work is never a chat. It is one quiet status line on a spinner, replaced by ranked cards when the real proposals land. The user never sees a terminal, a prompt, or a token count. The trim is the real highlight-to-select transcript: drag a rounded handle and the clip grows a word at a time, exactly like extending a quote.
+The agent's work is never a chat. It is one quiet status line on a spinner, replaced by ranked cards when the real proposals land. The user never sees a terminal, a prompt, or a token count. The trim is the real highlight-to-select transcript plus waveform timeline: drag a rounded transcript handle to grow the quote by words, then drag free in/out waveform handles to land on the clean audio cut.
 
 ## What NOT to do
 

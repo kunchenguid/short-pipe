@@ -8,6 +8,7 @@ import {
   clipWindow,
   paddedClipWindow,
   parseByteRange,
+  resolveClipWindow,
   selectCaptionGroups,
 } from "./composition";
 
@@ -50,6 +51,16 @@ describe("selectCaptionGroups", () => {
     const groups = selectCaptionGroups(words, 12.5, 14);
     const allText = groups.flatMap((g) => g.words.map((w) => w.text));
     expect(allText).toEqual(["Stop", "blaming", "yourself."]);
+  });
+
+  it("drops words outside the resolved manual media window", () => {
+    const groups = selectCaptionGroups(words, 10, 14, [], 4, 12.5, 1.0);
+
+    const allWords = groups.flatMap((g) => g.words);
+    expect(allWords.map((w) => w.text)).toEqual(["Stop", "blaming", "yourself."]);
+    expect(allWords.every((w) => w.start >= 0 && w.end >= 0)).toBe(true);
+    expect(allWords.every((w) => w.end <= 1.0)).toBe(true);
+    expect(groups.every((g) => g.end <= 1.0)).toBe(true);
   });
 });
 
@@ -254,6 +265,56 @@ describe("clipWindow (pause snapping)", () => {
     // symmetric to the end case: a gap sits between the previous word and the first.
     const w = clipWindow(10, 14, [{ start: 9.5, end: 9.9 }], { prevWordEnd: 9.4 });
     expect(w.mediaStart).toBe(9.82); // 9.9 - 0.08 breath
+  });
+});
+
+describe("resolveClipWindow (manual cut override)", () => {
+  const end = (w: { mediaStart: number; clipDuration: number }) =>
+    round(w.mediaStart + w.clipDuration);
+  // A pause would otherwise pull the snapped end to 14.18; the override must win.
+  const silences = [{ start: 14.1, end: 14.6 }];
+
+  it("uses the manual cut window verbatim when both bounds are set", () => {
+    const w = resolveClipWindow(
+      { startTime: 10, endTime: 14, cutStart: 9.73, cutEnd: 14.42 },
+      silences,
+      words,
+    );
+    expect(w.mediaStart).toBe(9.73);
+    expect(end(w)).toBe(14.42);
+  });
+
+  it("falls back to silence snapping when no override is set", () => {
+    const snapped = clipWindow(10, 14, silences, { nextWordStart: undefined });
+    const w = resolveClipWindow({ startTime: 10, endTime: 14 }, silences, words);
+    expect(w).toEqual(snapped);
+  });
+
+  it("ignores a half-set or degenerate override and snaps instead", () => {
+    const snapped = resolveClipWindow({ startTime: 10, endTime: 14 }, silences, words);
+    // only one bound
+    expect(
+      resolveClipWindow({ startTime: 10, endTime: 14, cutStart: 9.7 }, silences, words),
+    ).toEqual(snapped);
+    // inverted / sub-minimum span
+    expect(
+      resolveClipWindow(
+        { startTime: 10, endTime: 14, cutStart: 12, cutEnd: 12.04 },
+        silences,
+        words,
+      ),
+    ).toEqual(snapped);
+  });
+
+  it("clamps a manual override to [0, sourceDuration]", () => {
+    const w = resolveClipWindow(
+      { startTime: 10, endTime: 14, cutStart: -2, cutEnd: 99 },
+      silences,
+      words,
+      14.5,
+    );
+    expect(w.mediaStart).toBe(0);
+    expect(end(w)).toBe(14.5);
   });
 });
 

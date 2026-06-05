@@ -1,3 +1,4 @@
+import { resolveClipWindow } from "@shared/clipWindow";
 import type {
   Candidate,
   CaptionStyle,
@@ -8,6 +9,20 @@ import type {
   TranscriptWord,
   VideoFit,
 } from "@shared/project";
+
+export {
+  CLIP_LEAD_IN,
+  CLIP_LEAD_OUT,
+  type ClipBounds,
+  type ClipWindowOptions,
+  clipWindow,
+  neighborBounds,
+  paddedClipWindow,
+  resolveClipWindow,
+  SNAP_BREATH,
+  SNAP_JITTER,
+  SNAP_REACH,
+} from "@shared/clipWindow";
 
 export const SHORT_WIDTH = 1080;
 export const SHORT_HEIGHT = 1920;
@@ -58,7 +73,9 @@ export function selectCaptionGroups(
   clipStart = startTime,
   clipDuration = round(endTime - startTime),
 ): CaptionGroup[] {
-  const inRange = words.filter((w) => w.end > startTime && w.start < endTime);
+  const captionStart = Math.max(startTime, clipStart);
+  const captionEnd = Math.min(endTime, clipStart + clipDuration);
+  const inRange = words.filter((w) => w.end > captionStart && w.start < captionEnd);
   const groups: CaptionGroup[] = [];
   let current: CaptionWord[] = [];
 
@@ -75,7 +92,7 @@ export function selectCaptionGroups(
   for (let i = 0; i < inRange.length; i++) {
     const w = inRange[i];
     const localStart = Math.max(0, round(w.start - clipStart));
-    const localEnd = round(Math.min(endTime, w.end) - clipStart);
+    const localEnd = round(Math.min(captionEnd, w.end) - clipStart);
     const prev = inRange[i - 1];
     const pause = prev ? w.start - prev.end : 0;
     if (current.length > 0 && (pause > 0.25 || current.length >= maxWords)) flush();
@@ -95,138 +112,6 @@ export function selectCaptionGroups(
     ...g,
     end: round(i + 1 < groups.length ? groups[i + 1].start : Math.min(clipDuration, g.end + 0.4)),
   }));
-}
-
-/**
- * A small breath of footage before the first word and after the last, so a clip
- * doesn't snap hard onto the speech and sounds natural. Applied to the media trim
- * + caption timebase for both the render and the live preview; derived from the
- * word range, so it re-applies automatically whenever the range changes.
- *
- * It is a *fixed* pad rather than one clamped to the neighbouring words on
- * purpose: Whisper's word-end timestamps run early (a word's audio keeps going
- * ~0.15-0.25s past its reported end), so clamping to the next word's reported
- * start chops the real tail of the last word. The agent picks clips that end on a
- * complete thought, so the pad lands in the natural pause after the sentence.
- */
-export const CLIP_LEAD_IN = 0.24;
-export const CLIP_LEAD_OUT = 0.24;
-
-/** The padded media window [mediaStart, mediaStart+clipDuration] for a word range. */
-export function paddedClipWindow(
-  startTime: number,
-  endTime: number,
-  sourceDuration?: number,
-): { mediaStart: number; clipDuration: number } {
-  const ceil = sourceDuration ?? Number.POSITIVE_INFINITY;
-  const mediaStart = round(Math.max(0, startTime - CLIP_LEAD_IN));
-  const mediaEnd = round(Math.min(ceil, endTime + CLIP_LEAD_OUT));
-  return { mediaStart, clipDuration: round(Math.max(0.1, mediaEnd - mediaStart)) };
-}
-
-/** How far past a word's reported edge to look inward for the real gap (word-edge jitter). */
-export const SNAP_JITTER = 0.25;
-/** How far past the neighbour word's reported edge the real inter-word gap may still begin. */
-export const SNAP_REACH = 0.1;
-/** How far into the pause to land, so the clip ends/begins on a breath of silence. */
-export const SNAP_BREATH = 0.08;
-
-/**
- * The longest silence whose `anchor` falls in [lo, hi], or null. The longest is
- * chosen deliberately: silencedetect reports short *intra-word* phoneme stops as
- * well as real inter-word pauses, and the real pause is the long one. The window
- * keeps the search between the boundary word and its neighbour, so it can't grab
- * the (often longer) pause that sits *after* the neighbour word.
- */
-function longestPauseIn(
-  silences: Silence[],
-  anchor: (s: Silence) => number,
-  lo: number,
-  hi: number,
-): Silence | null {
-  let best: Silence | null = null;
-  for (const s of silences) {
-    const a = anchor(s);
-    if (a < lo || a > hi) continue;
-    if (!best || s.end - s.start > best.end - best.start) best = s;
-  }
-  return best;
-}
-
-export type ClipWindowOptions = {
-  sourceDuration?: number;
-  /** End of the word just before the clip; anchors the start-side gap search. */
-  prevWordEnd?: number;
-  /** Start of the word just after the clip; anchors the end-side gap search. */
-  nextWordStart?: number;
-};
-
-/**
- * The clip's media window, snapped to real acoustic pauses when available. The
- * end lands a breath into the pause that follows the last word (so the full word
- * is captured and the next one isn't), and the start a breath before speech
- * resumes.
- *
- * The end snaps into the *longest* pause that opens between the last word and the
- * next one - `start` within [endTime - jitter, nextWordStart + reach] - and the
- * start out of the longest pause that closes before the first word. Two facts
- * drive this: Whisper word timestamps jitter ~±0.25s (so the search reaches a
- * little past the reported edge), and silencedetect reports short *intra-word*
- * phoneme stops alongside real pauses (so we take the longest in the window, not
- * the nearest - the nearest is often an intra-word stop that would chop the word).
- * Bounding the window at the neighbour's edge keeps it from grabbing the pause
- * that sits *after* the neighbour. No pause in the window (continuous speech, or
- * the only gap is past the neighbour) falls back to the fixed pad.
- */
-export function clipWindow(
-  startTime: number,
-  endTime: number,
-  silences: Silence[] | undefined,
-  options: ClipWindowOptions = {},
-): { mediaStart: number; clipDuration: number } {
-  const { sourceDuration, prevWordEnd, nextWordStart } = options;
-  if (!silences || silences.length === 0) {
-    return paddedClipWindow(startTime, endTime, sourceDuration);
-  }
-  const ceil = sourceDuration ?? Number.POSITIVE_INFINITY;
-
-  // Start: the gap closes (its `end`) just before the first word's onset.
-  const startLo = (prevWordEnd ?? startTime - 0.3) - SNAP_REACH;
-  const startPause = longestPauseIn(silences, (s) => s.end, startLo, startTime + SNAP_JITTER);
-  // End: the gap opens (its `start`) just after the last word; never past the next word.
-  const endHi = (nextWordStart ?? endTime + 0.3) + SNAP_REACH;
-  const endPause = longestPauseIn(silences, (s) => s.start, endTime - SNAP_JITTER, endHi);
-
-  const rawStart = startPause
-    ? startPause.end - Math.min(SNAP_BREATH, (startPause.end - startPause.start) / 2)
-    : startTime - CLIP_LEAD_IN;
-  const rawEnd = endPause
-    ? endPause.start + Math.min(SNAP_BREATH, (endPause.end - endPause.start) / 2)
-    : endTime + CLIP_LEAD_OUT;
-
-  const mediaStart = round(Math.max(0, rawStart));
-  const mediaEnd = round(Math.min(ceil, rawEnd));
-  if (mediaEnd - mediaStart < 0.1) return paddedClipWindow(startTime, endTime, sourceDuration);
-  return { mediaStart, clipDuration: round(mediaEnd - mediaStart) };
-}
-
-/**
- * The reported end of the word just before [startTime, endTime] and the reported
- * start of the word just after, used to anchor the pause search at each boundary.
- * Time-based (the clip times are derived from these same word edges).
- */
-export function neighborBounds(
-  words: TranscriptWord[],
-  startTime: number,
-  endTime: number,
-): { prevWordEnd?: number; nextWordStart?: number } {
-  let prevWordEnd: number | undefined;
-  let nextWordStart: number | undefined;
-  for (const w of words) {
-    if (w.end <= startTime + 1e-6) prevWordEnd = w.end;
-    if (nextWordStart === undefined && w.start >= endTime - 1e-6) nextWordStart = w.start;
-  }
-  return { prevWordEnd, nextWordStart };
 }
 
 function escapeHtml(text: string): string {
@@ -560,7 +445,13 @@ export type BuildPreviewInput = {
   candidate: Pick<
     Candidate,
     "startTime" | "endTime" | "layout" | "captionStyle" | "keywords" | "title"
-  > & { titleStyle?: TitleStyle; theme?: Theme; videoFit?: VideoFit };
+  > & {
+    titleStyle?: TitleStyle;
+    theme?: Theme;
+    videoFit?: VideoFit;
+    cutStart?: number;
+    cutEnd?: number;
+  };
   words: TranscriptWord[];
   /** Detected pauses; clip boundaries snap to them when present. */
   silences?: Silence[];
@@ -579,14 +470,11 @@ export type BuildPreviewInput = {
  */
 export function buildPreviewDocument(input: BuildPreviewInput): string {
   const { candidate, videoSrc, gsapSource, words } = input;
-  const { mediaStart, clipDuration } = clipWindow(
-    candidate.startTime,
-    candidate.endTime,
+  const { mediaStart, clipDuration } = resolveClipWindow(
+    candidate,
     input.silences,
-    {
-      sourceDuration: input.sourceDuration,
-      ...neighborBounds(words, candidate.startTime, candidate.endTime),
-    },
+    words,
+    input.sourceDuration,
   );
   const groups = selectCaptionGroups(
     words,
@@ -679,7 +567,13 @@ export type BuildCompositionInput = {
   candidate: Pick<
     Candidate,
     "startTime" | "endTime" | "layout" | "captionStyle" | "keywords" | "title"
-  > & { titleStyle?: TitleStyle; theme?: Theme; videoFit?: VideoFit };
+  > & {
+    titleStyle?: TitleStyle;
+    theme?: Theme;
+    videoFit?: VideoFit;
+    cutStart?: number;
+    cutEnd?: number;
+  };
   words: TranscriptWord[];
   /** Detected pauses; clip boundaries snap to them when present. */
   silences?: Silence[];
@@ -696,14 +590,11 @@ export type BuildCompositionInput = {
  */
 export function buildShortComposition(input: BuildCompositionInput): string {
   const { candidate, sourceFileName, words } = input;
-  const { mediaStart, clipDuration } = clipWindow(
-    candidate.startTime,
-    candidate.endTime,
+  const { mediaStart, clipDuration } = resolveClipWindow(
+    candidate,
     input.silences,
-    {
-      sourceDuration: input.sourceDuration,
-      ...neighborBounds(words, candidate.startTime, candidate.endTime),
-    },
+    words,
+    input.sourceDuration,
   );
   const groups = selectCaptionGroups(
     words,

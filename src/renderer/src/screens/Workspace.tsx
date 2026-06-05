@@ -221,6 +221,7 @@ export function Workspace({ projectId, onBack }: { projectId: string; onBack: ()
               projectId={projectId}
               transcript={transcript}
               candidate={selected}
+              sourceDuration={project.source.duration}
               onClose={() => setMode("review")}
             />
           ) : selected ? (

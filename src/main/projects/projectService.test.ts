@@ -4,9 +4,14 @@ import { join } from "node:path";
 import type { ProjectEvent } from "@shared/events";
 import type { Transcript } from "@shared/project";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { extractPeaks } from "../media/waveform";
 import { writeJsonFile } from "../storage/json";
 import { bootstrapLayout, type ShortPipeLayout } from "../storage/layout";
 import { ProjectService } from "./projectService";
+
+vi.mock("../media/waveform", () => ({
+  extractPeaks: vi.fn(async () => []),
+}));
 
 let root: string;
 let layout: ShortPipeLayout;
@@ -22,6 +27,7 @@ const transcript: Transcript = {
 };
 
 beforeEach(async () => {
+  vi.mocked(extractPeaks).mockClear();
   root = await mkdtemp(join(tmpdir(), "short-pipe-proj-"));
   layout = await bootstrapLayout(join(root, "short-pipe"));
   ids = 0;
@@ -74,6 +80,33 @@ describe("output paths", () => {
     const project = await svc.create({ sourcePath: "/a.mp4" });
 
     expect(svc.outputDirFor({ ...project, outputDir: "/old/project/out" })).toBe("/global/out");
+  });
+});
+
+describe("waveform peaks", () => {
+  it("rejects non-finite and non-positive waveform requests before decoding", async () => {
+    await service.create({ sourcePath: "/a.mp4" });
+
+    await expect(service.getWaveformPeaks("id1", Number.NaN, 1, 100)).rejects.toThrow(
+      /Invalid waveform request/,
+    );
+    await expect(service.getWaveformPeaks("id1", 0, Number.POSITIVE_INFINITY, 100)).rejects.toThrow(
+      /Invalid waveform request/,
+    );
+    await expect(service.getWaveformPeaks("id1", 0, 1, 0)).rejects.toThrow(
+      /Invalid waveform request/,
+    );
+
+    expect(extractPeaks).not.toHaveBeenCalled();
+  });
+
+  it("clamps waveform requests to source duration and service limits", async () => {
+    await service.create({ sourcePath: "/a.mp4" });
+    await service.setSourceProbe("id1", { duration: 20 });
+
+    await service.getWaveformPeaks("id1", -5, 999, 999999);
+
+    expect(extractPeaks).toHaveBeenCalledWith("/a.mp4", { from: 0, to: 20, bins: 20000 });
   });
 });
 
@@ -134,6 +167,42 @@ describe("candidates", () => {
     // w1 starts at 0.3 in the test transcript.
     expect(patched.candidates[0].startTime).toBe(0.3);
     expect(patched.candidates[0].endTime).toBe(1.5);
+  });
+
+  it("clears the manual cut override when the word range changes", async () => {
+    await withTranscript();
+    await service.replaceCandidates("id1", [
+      { title: "Clip", rank: 1, startWordId: "w0", endWordId: "w2" },
+    ]);
+    const candidateId = (await service.get("id1")).candidates[0].id;
+
+    const withCut = await service.patchCandidate("id1", candidateId, {
+      cutStart: 0.05,
+      cutEnd: 1.4,
+    });
+    expect(withCut.candidates[0]).toMatchObject({ cutStart: 0.05, cutEnd: 1.4 });
+
+    // Re-selecting words is the "start over" gesture: the override drops.
+    const retrimmed = await service.patchCandidate("id1", candidateId, { startWordId: "w1" });
+    expect(retrimmed.candidates[0].cutStart).toBeUndefined();
+    expect(retrimmed.candidates[0].cutEnd).toBeUndefined();
+  });
+
+  it("keeps a cut override set in the same patch as the word range", async () => {
+    await withTranscript();
+    await service.replaceCandidates("id1", [
+      { title: "Clip", rank: 1, startWordId: "w0", endWordId: "w2" },
+    ]);
+    const candidateId = (await service.get("id1")).candidates[0].id;
+
+    // The editor saves the word range and the fresh waveform cut together.
+    const patched = await service.patchCandidate("id1", candidateId, {
+      startWordId: "w0",
+      endWordId: "w2",
+      cutStart: 0.1,
+      cutEnd: 1.45,
+    });
+    expect(patched.candidates[0]).toMatchObject({ cutStart: 0.1, cutEnd: 1.45 });
   });
 
   it("patches, renders, and removes candidates", async () => {
