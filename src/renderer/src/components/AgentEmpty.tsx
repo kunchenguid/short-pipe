@@ -1,4 +1,5 @@
 import type { TranscriptStatus } from "@shared/project";
+import { MIN_SHORT_COUNT } from "@shared/project";
 import { Icon, Spinner } from "./Icon";
 
 /**
@@ -15,6 +16,7 @@ export function AgentEmpty({
   onRun,
   onAbort,
   error,
+  waitingForDuration,
 }: {
   status: TranscriptStatus;
   running: boolean;
@@ -24,10 +26,10 @@ export function AgentEmpty({
   onRun: () => void;
   onAbort: () => void;
   error: string | null;
+  waitingForDuration: boolean;
 }) {
   const label = status === "ready" ? "Find shorts with AI" : "Transcribe & find shorts";
-  const MIN = 2;
-  const MAX = 6;
+  const MIN = MIN_SHORT_COUNT;
   return (
     <div className="stage-scroll">
       <div className="runner-empty">
@@ -66,14 +68,21 @@ export function AgentEmpty({
               <button
                 type="button"
                 className="step"
-                onClick={() => onCount(Math.min(MAX, count + 1))}
-                disabled={count >= MAX}
+                onClick={() => onCount(count + 1)}
                 aria-label="One more"
               >
                 <Icon name="plus" />
               </button>
             </div>
-            <button type="button" className="btn primary" onClick={onRun}>
+            {waitingForDuration && (
+              <div className="runner-status">Waiting for video details...</div>
+            )}
+            <button
+              type="button"
+              className="btn primary"
+              onClick={onRun}
+              disabled={waitingForDuration}
+            >
               <Icon name="sparkles" /> {label}
             </button>
           </>

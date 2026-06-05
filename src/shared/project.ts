@@ -123,10 +123,13 @@ export type CandidateProposal = {
   rank: number;
   startWordId: string;
   endWordId: string;
+  /** Defaults to center-square when omitted or invalid. */
   layout?: LayoutKind;
   captionStyle?: CaptionStyle;
   titleStyle?: TitleStyle;
+  /** Defaults to dark when omitted or invalid. */
   theme?: Theme;
+  /** Defaults to full when omitted or invalid. */
   videoFit?: VideoFit;
   keywords?: string[];
 };
@@ -187,6 +190,19 @@ export type CandidatePatch = Partial<
     | "status"
   >
 >;
+
+/** Smallest number of shorts the agent is ever asked to find. */
+export const MIN_SHORT_COUNT = 2;
+
+/**
+ * The default number of shorts to propose for a source: one per minute of video,
+ * floored at {@link MIN_SHORT_COUNT}. There is no upper cap - a long talk yields
+ * proportionally more shorts. Returns the floor when the duration is unknown.
+ */
+export function defaultShortCount(durationSeconds?: number): number {
+  if (!durationSeconds || durationSeconds <= 0) return MIN_SHORT_COUNT;
+  return Math.max(MIN_SHORT_COUNT, Math.round(durationSeconds / 60));
+}
 
 export function projectSummary(project: Project): ProjectSummary {
   return {

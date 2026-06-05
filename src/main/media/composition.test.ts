@@ -347,6 +347,9 @@ describe("title styles", () => {
     endTime: 14,
     layout: "top-square" as const,
     captionStyle: "clean" as const,
+    // Pin the light theme so the vermillion accent assertions are stable; the
+    // structural checks (rule/eyebrow/italic) hold in either polarity.
+    theme: "light" as const,
     keywords: ["money"],
     title: "The Real Reason",
   };
@@ -411,8 +414,15 @@ describe("theme (color polarity)", () => {
   const render = (over: Record<string, unknown>) =>
     buildShortComposition({ sourceFileName: "s.mp4", candidate: { ...square, ...over }, words });
 
-  it("defaults to the light (paper) theme", () => {
+  it("defaults to the dark (ink) theme", () => {
     const html = render({});
+    expect(html).toContain("background: #16161a"); // ink page
+    expect(html).toContain("color: #fbf7eb"); // off-white text
+    expect(html).not.toContain("background: #faf9f5");
+  });
+
+  it("light theme flips to a paper page with ink text", () => {
+    const html = render({ theme: "light" });
     expect(html).toContain("background: #faf9f5"); // paper page
     expect(html).toContain("color: #16161a"); // ink text
   });

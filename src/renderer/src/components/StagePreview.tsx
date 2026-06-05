@@ -34,8 +34,8 @@ export function StagePreview({
     caption: candidate.captionStyle,
     title: candidate.titleStyle ?? "kicker",
     head: candidate.title,
-    theme: candidate.theme ?? "light",
-    fit: candidate.videoFit ?? "square",
+    theme: candidate.theme ?? "dark",
+    fit: candidate.videoFit ?? "full",
     kw: candidate.keywords.join(","),
     s: String(candidate.startTime),
     e: String(candidate.endTime),
@@ -71,7 +71,25 @@ export function StagePreview({
   const post = (msg: Record<string, unknown>) =>
     frameRef.current?.contentWindow?.postMessage(msg, "*");
 
-  function seek(e: React.MouseEvent<HTMLButtonElement>) {
+  // The preview is a cross-origin (sp-media://) iframe, so it runs out-of-process
+  // and can hold the input focus. When it does, Chromium consumes the first
+  // *click* in the embedder to transfer focus across the process boundary, so an
+  // onClick handler on the phone is silently dropped ("the first click just
+  // focuses it"). pointerdown is delivered on hit-test regardless of focus, so we
+  // drive the controls from it and keep onClick only for keyboard activation.
+  function toggle(e: React.PointerEvent<HTMLButtonElement>) {
+    e.preventDefault(); // keep focus on the phone, never let it move into the iframe
+    post({ __sp: "toggle" });
+  }
+
+  // Enter/Space on a focused button fire a synthetic click with detail === 0;
+  // mouse-driven clicks (already handled by pointerdown) carry detail >= 1.
+  function toggleFromKeyboard(e: React.MouseEvent<HTMLButtonElement>) {
+    if (e.detail !== 0) return;
+    post({ __sp: "toggle" });
+  }
+
+  function seek(e: React.PointerEvent<HTMLButtonElement>) {
     const rect = e.currentTarget.getBoundingClientRect();
     const r = Math.min(1, Math.max(0, (e.clientX - rect.left) / rect.width));
     post({ __sp: "seek", t: r * dur });
@@ -84,7 +102,8 @@ export function StagePreview({
         <button
           type="button"
           className="phone"
-          onClick={() => post({ __sp: "toggle" })}
+          onPointerDown={toggle}
+          onClick={toggleFromKeyboard}
           aria-label={playing ? "Pause preview" : "Play preview"}
         >
           <iframe
@@ -93,6 +112,9 @@ export function StagePreview({
             src={src}
             title="Live preview"
             allow="autoplay"
+            // Keep the cross-origin preview out of the tab order so it can't take
+            // focus and swallow the next click on the controls.
+            tabIndex={-1}
           />
           <span className={`play-ind${playing ? " playing" : ""}`}>
             <Icon name={playing ? "pause" : "play"} />
@@ -100,7 +122,7 @@ export function StagePreview({
         </button>
         <div className="scrubber">
           <span className="tc">{formatTime(frac * dur)}</span>
-          <button type="button" className="track" onClick={seek} aria-label="Seek preview">
+          <button type="button" className="track" onPointerDown={seek} aria-label="Seek preview">
             <div className="fill" style={{ width: `${frac * 100}%` }} />
           </button>
           <span className="tc">{dur.toFixed(1)}s</span>

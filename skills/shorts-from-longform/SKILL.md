@@ -5,7 +5,7 @@ description: Turn a long-form video transcript into ranked, captioned vertical s
 
 # Shorts from long-form
 
-You turn one long-form video into a handful of strong vertical shorts.
+You turn one long-form video into a ranked set of strong vertical shorts.
 The video is already on disk and, once transcribed, `transcript.json` in the project folder holds every word with a `start`, `end`, and an `id` like `w0`, `w1`.
 Your job is to read that transcript, find the moments worth clipping, and propose them through the `propose_candidates` tool.
 
@@ -37,21 +37,23 @@ A real pause before the start and after the end (a visible gap between one word'
 Rank best-first, starting at `rank: 1`.
 Rank on: strength of the hook, emotional or informational payoff, and how well it stands alone.
 Propose only genuinely strong moments.
-Three excellent candidates beat ten mediocre ones - a long list of weak clips wastes the user's review time.
+Treat the requested count as the target number of strong clips to find, not a reason to pad with weak moments.
+The app defaults that count to roughly one short per minute of source video, with a floor of two and no upper cap.
+Three excellent candidates still beat ten mediocre ones - a long list of weak clips wastes the user's review time.
 
 ## Layout
 
 - `full-bleed` - the source video fills the whole 1080x1920 frame (cropped). Use when the source is already visually interesting (a face, a demo, motion).
-- `top-square` - a full-width square crop of the video pinned to the top of an editorial paper page, with the title and captions stacked in the open space below. The default for talking-head audio-led content: the square keeps the speaker, and the roomy lower half lets the captions carry the piece.
-- `center-square` - a full-width square crop centered on the paper page, the title above it and captions below. Use for a more composed, balanced look (a single strong quote, a calm explainer).
+- `top-square` - a full-width square crop of the video pinned to the top of an editorial paper page, with the title and captions stacked in the open space below. Use when the speaker is visually secondary and the roomy lower half should let captions carry the piece.
+- `center-square` - a full-width square crop centered on the paper page, the title above it and captions below. The default for talking-head audio-led content: balanced, composed, and strong for a single quote or calm explainer.
 
-When unsure, prefer `top-square` for talking-head audio-led content and `full-bleed` for visually rich footage.
+When unsure, prefer `center-square` for talking-head audio-led content and `full-bleed` for visually rich footage.
 Both square layouts show a static title, so give every candidate a short, punchy `title` - it appears on the page, not just in the app.
 
 On the square layouts, `videoFit` controls how the video fills its box:
 
-- `square` - cropped to a 1:1 square (the default). Best for talking heads, where the center of frame is all that matters.
-- `full` - the whole source frame, uncropped, at its real aspect ratio. Use when the framing carries information that cropping would cut off - a chart, a screen share, a wide shot, on-screen text. The box resizes to the source aspect and the title/captions sit below it.
+- `square` - cropped to a 1:1 square. Best for talking heads, where the center of frame is all that matters.
+- `full` - the whole source frame, uncropped, at its real aspect ratio. The default, and best when the framing carries information that cropping would cut off - a chart, a screen share, a wide shot, on-screen text. The box resizes to the source aspect and the title/captions sit below it.
 
 ## Title style
 
@@ -66,8 +68,8 @@ On the square layouts the title is a headline set in an editorial serif. Pick a 
 
 `theme` is an orthogonal color polarity applied across every layout, caption, and title style:
 
-- `light` - paper page, ink text; full-bleed captions are dark on a light scrim. The default, and the most legible over bright or busy footage (charts, slides, daylight).
-- `dark` - ink page, warm off-white text; full-bleed captions are light on a dark scrim. Best over dark or cinematic footage, or for a moodier feel.
+- `light` - paper page, ink text; full-bleed captions are dark on a light scrim. Best over bright or busy footage (charts, slides, daylight).
+- `dark` - ink page, warm off-white text; full-bleed captions are light on a dark scrim. The default, and best over dark or cinematic footage, or for a moodier feel.
 
 Pick the theme that contrasts with the footage: `light` when the video is bright, `dark` when it is dark. Full-bleed captions always get a stroke and a scrim, so either theme stays readable; the theme just sets which polarity.
 

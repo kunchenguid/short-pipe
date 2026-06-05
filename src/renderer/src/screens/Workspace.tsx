@@ -1,5 +1,6 @@
 import type { AppEvent } from "@shared/events";
 import type { Project, Transcript } from "@shared/project";
+import { defaultShortCount } from "@shared/project";
 import { useCallback, useEffect, useState } from "react";
 import { formatTime, sp, useAppEvents } from "../api";
 import { AgentEmpty } from "../components/AgentEmpty";
@@ -30,14 +31,21 @@ export function Workspace({ projectId, onBack }: { projectId: string; onBack: ()
   const [error, setError] = useState<string | null>(null);
 
   // Agent run state (driven by streaming tool events).
-  const [count, setCount] = useState(3);
+  const [count, setCount] = useState(defaultShortCount());
+  const [countTouched, setCountTouched] = useState(false);
   const [running, setRunning] = useState(false);
   const [step, setStep] = useState<string | null>(null);
+  const [probingDuration, setProbingDuration] = useState(true);
 
   useEffect(() => {
+    let cancelled = false;
+    setProbingDuration(true);
     sp.projects
       .get(projectId)
-      .then(setProject)
+      .then((p) => {
+        setProject(p);
+        if (p.source.duration) setProbingDuration(false);
+      })
       .catch((e) => setError(String(e)));
     sp.transcript
       .get(projectId)
@@ -45,10 +53,33 @@ export function Workspace({ projectId, onBack }: { projectId: string; onBack: ()
       .catch(() => {});
     sp.projects
       .probe(projectId)
-      .then(setProject)
-      .catch(() => {});
+      .then((p) => {
+        if (!cancelled) setProject(p);
+      })
+      .catch(() => {})
+      .finally(() => {
+        if (!cancelled) setProbingDuration(false);
+      });
     sp.agent.isRunning(projectId).then(setRunning);
+    return () => {
+      cancelled = true;
+    };
   }, [projectId]);
+
+  // Default the requested count to one short per minute of source video, until the
+  // user nudges it themselves. The duration arrives async from probe(), so this
+  // reacts to it rather than seeding useState (which runs before the project loads).
+  useEffect(() => {
+    if (countTouched) return;
+    const duration = project?.source.duration;
+    if (!duration) return;
+    setCount(defaultShortCount(duration));
+  }, [project?.source.duration, countTouched]);
+
+  const onCount = useCallback((n: number) => {
+    setCountTouched(true);
+    setCount(n);
+  }, []);
 
   // Default the selection to the first candidate; keep it valid as the queue changes.
   useEffect(() => {
@@ -126,6 +157,7 @@ export function Workspace({ projectId, onBack }: { projectId: string; onBack: ()
   const s = project.source;
   const ready = project.transcriptStatus === "ready";
   const selected = project.candidates.find((c) => c.id === selectedId) ?? null;
+  const waitingForDuration = !project.source.duration && probingDuration;
   const specs = `${s.width && s.height ? `${s.width}x${s.height}` : "size unknown"} · ${
     s.fps ? `${s.fps}fps` : "fps ?"
   } · ${formatTime(s.duration)}`;
@@ -188,8 +220,6 @@ export function Workspace({ projectId, onBack }: { projectId: string; onBack: ()
             setMode("review");
           }}
           onRemove={(id) => void run(() => sp.candidates.remove(projectId, id))}
-          onFind={findShorts}
-          canFind={!running}
         />
 
         <div className="pane stage">
@@ -208,10 +238,11 @@ export function Workspace({ projectId, onBack }: { projectId: string; onBack: ()
               running={running}
               step={step}
               count={count}
-              onCount={setCount}
+              onCount={onCount}
               onRun={findShorts}
               onAbort={() => void sp.agent.abort(projectId)}
               error={error}
+              waitingForDuration={waitingForDuration}
             />
           )}
         </div>

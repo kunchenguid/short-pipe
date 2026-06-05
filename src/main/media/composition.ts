@@ -599,10 +599,10 @@ export function buildPreviewDocument(input: BuildPreviewInput): string {
   );
   const src = escapeHtml(videoSrc);
   const titleStyle = candidate.titleStyle ?? "kicker";
-  const palette = themePalette(candidate.theme ?? "light");
+  const palette = themePalette(candidate.theme ?? "dark");
   const frame = pageVideoFrame(
     candidate.layout,
-    candidate.videoFit ?? "square",
+    candidate.videoFit ?? "full",
     aspectOf(input.sourceWidth, input.sourceHeight),
   );
 
@@ -716,10 +716,10 @@ export function buildShortComposition(input: BuildCompositionInput): string {
   );
   const src = escapeHtml(sourceFileName);
   const titleStyle = candidate.titleStyle ?? "kicker";
-  const palette = themePalette(candidate.theme ?? "light");
+  const palette = themePalette(candidate.theme ?? "dark");
   const frame = pageVideoFrame(
     candidate.layout,
-    candidate.videoFit ?? "square",
+    candidate.videoFit ?? "full",
     aspectOf(input.sourceWidth, input.sourceHeight),
   );
 
