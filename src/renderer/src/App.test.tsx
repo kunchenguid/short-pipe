@@ -23,7 +23,10 @@ function stubBridge(overrides: Partial<ShortPipeApi> = {}) {
       openReleasePage: vi.fn(),
     },
     auth: {
-      status: vi.fn(async () => ({ authenticated: true })),
+      status: vi.fn(async () => ({
+        authenticated: true,
+        storage: { path: "auth.json", encrypted: true },
+      })),
       login: vi.fn(),
       logout: vi.fn(),
     },
@@ -74,7 +77,10 @@ describe("App", () => {
       root.render(<App />);
     });
 
-    expect(await bridge.auth.status()).toEqual({ authenticated: true });
+    expect(await bridge.auth.status()).toEqual({
+      authenticated: true,
+      storage: { path: "auth.json", encrypted: true },
+    });
     expect(container.textContent).toContain("Your projects");
     expect(container.textContent).not.toContain("Sign out");
     expect(bridge.auth.logout).not.toHaveBeenCalled();
