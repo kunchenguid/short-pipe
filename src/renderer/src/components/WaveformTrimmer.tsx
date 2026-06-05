@@ -29,6 +29,7 @@ const PAN_EDGE_PX = 28;
 
 type Cut = { start: number; end: number };
 type Peaks = { from: number; to: number; values: number[] };
+type PeaksRequest = Peaks & { projectId: string; bins: number };
 
 function fmt(t: number): string {
   const m = Math.floor(t / 60);
@@ -71,6 +72,10 @@ export function WaveformTrimmer({
   const [viewport, setViewport] = useState(0);
   const [scrollLeft, setScrollLeft] = useState(0);
   const [peaks, setPeaks] = useState<Peaks | null>(null);
+  const peaksInFlight = useRef(false);
+  const peaksNeedsRefresh = useRef(false);
+  const latestPeaksRequest = useRef<PeaksRequest | null>(null);
+  const mounted = useRef(false);
 
   const duration = Math.max(sourceDuration, value.end, 0.1);
   // Min zoom fits the whole clip in the viewport; zoom in up to MAX from there.
@@ -87,6 +92,13 @@ export function WaveformTrimmer({
     const ro = new ResizeObserver(measure);
     ro.observe(el);
     return () => ro.disconnect();
+  }, []);
+
+  useEffect(() => {
+    mounted.current = true;
+    return () => {
+      mounted.current = false;
+    };
   }, []);
 
   // Apply a staged scroll once the content has re-laid-out at the new scale (runs
@@ -114,21 +126,39 @@ export function WaveformTrimmer({
 
   // Fetch peaks for just the visible window (debounced) whenever it changes.
   useEffect(() => {
+    function startPeaksRequest(request: PeaksRequest) {
+      peaksInFlight.current = true;
+      sp.waveform
+        .peaks(request.projectId, request.from, request.to, request.bins)
+        .then((values) => {
+          if (mounted.current && latestPeaksRequest.current === request) {
+            setPeaks({ from: request.from, to: request.to, values });
+          }
+        })
+        .catch(() => {})
+        .finally(() => {
+          peaksInFlight.current = false;
+          if (!mounted.current || !peaksNeedsRefresh.current) return;
+          peaksNeedsRefresh.current = false;
+          const next = latestPeaksRequest.current;
+          if (next) startPeaksRequest(next);
+        });
+    }
+
     if (viewport === 0 || duration <= 0) return;
     const { from, to } = visibleWindow(scrollLeft, viewport, pxPerSec, duration);
     const bins = binsForWidth(timeToX(to - from, pxPerSec));
     if (bins <= 0 || to <= from) return;
-    let cancelled = false;
+    const request = { projectId, from, to, bins, values: [] };
+    latestPeaksRequest.current = request;
+    if (peaksInFlight.current) {
+      peaksNeedsRefresh.current = true;
+      return;
+    }
     const id = window.setTimeout(() => {
-      sp.waveform
-        .peaks(projectId, from, to, bins)
-        .then((values) => {
-          if (!cancelled) setPeaks({ from, to, values });
-        })
-        .catch(() => {});
+      startPeaksRequest(request);
     }, 60);
     return () => {
-      cancelled = true;
       window.clearTimeout(id);
     };
   }, [projectId, scrollLeft, viewport, pxPerSec, duration]);
