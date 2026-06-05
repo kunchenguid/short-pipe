@@ -5,6 +5,14 @@
 ![Platform: macOS](https://img.shields.io/badge/platform-macOS-111?style=flat-square)
 ![License: MIT](https://img.shields.io/badge/license-MIT-111?style=flat-square)
 
+<p align="center">
+  <img
+    alt="Drag an hour-long talk into Short Pipe, let the agent find the best soundbites, trim and restyle them, and export captioned vertical shorts"
+    src="marketing-video/short-pipe-marketing-square.gif"
+    width="860"
+  />
+</p>
+
 Short Pipe is a local-first desktop app that turns a long-form video into captioned vertical shorts.
 You point it at a long-form file, it transcribes locally, an agent proposes soundbites, you review and edit, and it renders 1080x1920 captioned clips - all on your machine.
 The agent runs on your own Codex subscription, so there is no inference cost and nothing leaves your computer except the Codex API calls.
