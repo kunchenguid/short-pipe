@@ -7,15 +7,20 @@ description: Turn a long-form video transcript into ranked, captioned vertical s
 
 You turn one long-form video into a ranked set of strong vertical shorts.
 The video is already on disk and, once transcribed, `transcript.json` in the project folder holds every word with a `start`, `end`, and an `id` like `w0`, `w1`.
-Your job is to read that transcript, find the moments worth clipping, and propose them through the `propose_candidates` tool.
+Your job is to read that transcript, find the moments worth clipping, and submit them through the candidate tools.
+Use `propose_candidates` only for the initial complete batch or an explicit restart, because it replaces the review queue.
+Use `add_candidates` when the user asks for more shorts on top of the existing queue.
 
 ## Workflow
 
 1. If you do not yet know the source dimensions, call `probe`.
 2. If `transcript.json` does not exist yet, call `transcribe`. For known-English audio use a `.en` model; otherwise pass `model: "small"` so Whisper auto-detects.
 3. Read `transcript.json` with the `read` tool. Read the whole thing before choosing - the best shorts are rarely at the very start.
-4. Select and rank the strongest moments, then call `propose_candidates` once with the full ranked list.
+4. Select and rank the strongest moments, then call `propose_candidates` once with the full ranked list for the initial batch.
 5. Tell the user how many you proposed and invite them to review, trim, and approve. Do not render anything until the user approves it.
+
+If the user asks for one more short after candidates already exist, read the transcript and call `add_candidates` with exactly one new candidate unless the user asks for a different count.
+Do not call `propose_candidates` in that flow, because it would wipe the existing review queue.
 
 ## What makes a good short
 
@@ -90,8 +95,9 @@ Match the tone you hear in the transcript.
 Pass 1-4 `keywords` per candidate: the load-bearing words a viewer should catch even with the sound off - a number, a name, a verb that carries the point.
 Keywords are emphasized in the captions, so do not mark every word - pick the few that matter.
 
-## Calling propose_candidates
+## Calling candidate tools
 
 Each candidate needs: `title` (a short viewer-facing hook), `rank`, `startWordId`, `endWordId`, and ideally `reason` and `keywords`.
 Leave `layout`, `captionStyle`, and `theme` unset unless the candidate needs to override the user's Settings defaults.
-`propose_candidates` replaces any previous proposals for the project, so always submit the complete ranked list in one call.
+`propose_candidates` replaces any previous proposals for the project, so use it for a clean initial pass and submit the complete ranked list in one call.
+`add_candidates` preserves every existing proposal and merges the new candidates back into rank order, so use it for the add-one-more flow or any incremental request.

@@ -146,6 +146,25 @@ export function Workspace({ projectId, onBack }: { projectId: string; onBack: ()
     }
   }
 
+  // Ask the agent for exactly one more short, guided by the user's prompt. The
+  // agent works one prompt at a time, so the filmstrip footer disables itself
+  // while `running` is true.
+  async function findOneMore(prompt: string) {
+    setError(null);
+    setRunning(true);
+    setStep("Starting");
+    try {
+      await sp.agent.send(
+        projectId,
+        `Find one more short for this project, guided by what the user is looking for: "${prompt}". Read the transcript and add exactly one additional short using the add_candidates tool (never propose_candidates, which would wipe the existing queue). Do not duplicate any short already in the filmstrip, and do not render anything.`,
+      );
+    } catch (e) {
+      setError(e instanceof Error ? e.message : String(e));
+      setRunning(false);
+      setStep(null);
+    }
+  }
+
   if (!project) {
     return (
       <div className="center-screen">
@@ -213,6 +232,10 @@ export function Workspace({ projectId, onBack }: { projectId: string; onBack: ()
             setMode("review");
           }}
           onRemove={(id) => void run(() => sp.candidates.remove(projectId, id))}
+          onAddShort={findOneMore}
+          onAbort={() => void sp.agent.abort(projectId)}
+          running={running}
+          step={step}
         />
 
         <div className="pane stage">

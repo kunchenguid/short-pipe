@@ -35,6 +35,7 @@ Pick → Transcribe → Propose → Review / Trim → Render → Output
 2. **Transcribe** with local Whisper (via HyperFrames) → word-level timestamps.
 3. **Propose** — the agent reads the transcript and proposes *ranked* soundbite candidates,
    following the bundled `shorts-from-longform` skill.
+   After the first batch, the filmstrip can ask for **Add one more short** with a focused prompt; that flow appends one candidate instead of replacing the queue.
 4. **Review & trim** - approve, reject, select the word range, fine-tune the waveform cut, swap layout and caption style.
 5. **Render** — each approved short is rendered locally to 1080×1920.
 6. **Output** - finished shorts are written to the user's default output folder, or to the project's own `output/` folder when no default is set.
@@ -144,8 +145,9 @@ Reject · Render · Re-render · Open output folder · Disconnect Codex. Buttons
 | Empty library | *No projects yet. Pick a long-form video to begin - it stays on your disk.* |
 | Agent runner | *Let the agent find your shorts* / *It reads the transcript on your Codex plan and proposes ranked soundbites into the review queue below.* |
 | Empty queue | *No candidates yet. Once the video is transcribed, ask the agent to propose shorts.* |
+| Add-one-more | *Add one more short* / *What should this short be about? e.g. the strongest hook about burnout* |
 | Trim hint | *Drag across the transcript to pick the words, then fine-tune the exact in/out on the waveform below - drag the handles to a silent gap so no word is clipped.* |
-| Primary CTA | *New project from video* · *Transcribe & find shorts* · *Find shorts with AI* |
+| Primary CTA | *New project from video* · *Transcribe & find shorts* · *Find shorts with AI* · *Find it* |
 
 **Titles the agent writes for shorts** are viewer-facing *hooks*, sentence case, no quotes:
 *"The real reason layoffs happen"*. Short, a claim or a question — never a description like

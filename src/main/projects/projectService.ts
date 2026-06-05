@@ -3,6 +3,7 @@ import { mkdir, readdir, rm } from "node:fs/promises";
 import { basename, extname, join } from "node:path";
 import type { ProjectEvent } from "@shared/events";
 import type {
+  Candidate,
   CandidatePatch,
   CandidateProposal,
   CreateProjectInput,
@@ -207,20 +208,40 @@ export class ProjectService {
     return this.mutate(projectId, (project) => ({ ...project, agentSessionFile }));
   }
 
-  /**
-   * Replace the candidate list from a fresh batch of agent proposals, resolving
-   * each word range against the transcript. Rank-sorted best-first.
-   */
-  async replaceCandidates(projectId: string, proposals: CandidateProposal[]): Promise<Project> {
+  /** Resolve a batch of agent proposals into candidates against the transcript. */
+  private async resolveProposals(
+    projectId: string,
+    proposals: CandidateProposal[],
+  ): Promise<Candidate[]> {
     const transcript = await this.getTranscript(projectId);
     if (!transcript) throw new Error("Cannot propose candidates before transcription.");
     const defaults = this.getCandidateDefaults();
-    const candidates = sortByRank(
-      proposals.map((proposal) =>
-        candidateFromProposal(proposal, transcript.words, this.newId(), defaults),
-      ),
+    return proposals.map((proposal) =>
+      candidateFromProposal(proposal, transcript.words, this.newId(), defaults),
     );
+  }
+
+  /**
+   * Replace the candidate list from a fresh batch of agent proposals, resolving
+   * each word range against the transcript. Rank-sorted best-first. This is the
+   * clean-slate bulk operation behind the initial "find shorts" run.
+   */
+  async replaceCandidates(projectId: string, proposals: CandidateProposal[]): Promise<Project> {
+    const candidates = sortByRank(await this.resolveProposals(projectId, proposals));
     return this.mutate(projectId, (project) => ({ ...project, candidates }));
+  }
+
+  /**
+   * Add fresh proposals onto the existing queue without dropping any prior
+   * candidates, re-sorting the merged list by rank. This backs the incremental
+   * "add one more short" flow, where the user keeps everything they already have.
+   */
+  async appendCandidates(projectId: string, proposals: CandidateProposal[]): Promise<Project> {
+    const added = await this.resolveProposals(projectId, proposals);
+    return this.mutate(projectId, (project) => ({
+      ...project,
+      candidates: sortByRank([...project.candidates, ...added]),
+    }));
   }
 
   /**

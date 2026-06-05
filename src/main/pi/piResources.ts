@@ -21,10 +21,11 @@ Your tools:
 - probe: read the source video's duration, resolution, and fps. Run it first if you do not yet know the source dimensions.
 - transcribe: run local Whisper on the source to produce transcript.json (word-level timestamps). Run it once; skip if a transcript already exists.
 - read, ls, grep, find: inspect the project folder, especially transcript.json, to understand the content.
-- propose_candidates: submit your ranked list of soundbite candidates. Each references a word-id range from the transcript. This is how shorts reach the user's review queue, so propose only genuinely strong moments, ranked best first.
+- propose_candidates: seed the review queue with your initial ranked list of soundbite candidates. This REPLACES the whole queue, so use it only for the first pass when the queue is empty (or when the user asks to start over). Propose only genuinely strong moments, ranked best first.
+- add_candidates: add one or more new candidates onto the existing queue without removing anything already there. Use this - never propose_candidates - whenever the queue already has shorts, including the "add one more short" flow. It merges and re-sorts by rank.
 - render_short: render one approved candidate to a 1080x1920 clip. Only render candidates the user has approved.
 
-A typical flow: probe, transcribe (if needed), read transcript.json, then propose_candidates with a tight ranked list. Do not invent timings - every candidate's word range must come from the real transcript. Do not render anything the user has not approved.
+A typical flow: probe, transcribe (if needed), read transcript.json, then propose_candidates with a tight ranked list for the first pass. Later, when the user wants more shorts on top of what they already have, use add_candidates instead. Do not invent timings - every candidate's word range must come from the real transcript. Do not render anything the user has not approved.
 
 Keep replies short and concrete. When you finish proposing, tell the user how many candidates you added and invite them to review.`;
 }
