@@ -74,8 +74,15 @@ export function AgentEmpty({
                 <Icon name="plus" />
               </button>
             </div>
-            {waitingForDuration && <div className="runner-status">Waiting for video details...</div>}
-            <button type="button" className="btn primary" onClick={onRun} disabled={waitingForDuration}>
+            {waitingForDuration && (
+              <div className="runner-status">Waiting for video details...</div>
+            )}
+            <button
+              type="button"
+              className="btn primary"
+              onClick={onRun}
+              disabled={waitingForDuration}
+            >
               <Icon name="sparkles" /> {label}
             </button>
           </>
