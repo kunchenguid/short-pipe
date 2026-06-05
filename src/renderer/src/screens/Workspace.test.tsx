@@ -131,9 +131,9 @@ describe("Workspace add-one-more-short", () => {
       root.render(<Workspace projectId="p1" onBack={() => undefined} />);
     });
 
-    expect(
-      container.querySelector('button[aria-label="Add one more short"]'),
-    ).not.toBeInstanceOf(HTMLButtonElement);
+    expect(container.querySelector('button[aria-label="Add one more short"]')).not.toBeInstanceOf(
+      HTMLButtonElement,
+    );
     const addButton = [...container.querySelectorAll("button")].find((button) =>
       button.textContent?.includes("Add one more short"),
     );
