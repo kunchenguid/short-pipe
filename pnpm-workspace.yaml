@@ -8,3 +8,18 @@ allowBuilds:
   koffi: true
   protobufjs: true
 minimumReleaseAge: 0
+
+# Install the macOS prebuilt native binaries for BOTH architectures so the
+# universal electron-builder package runs on Intel and Apple Silicon. Without
+# this, pnpm 10+ only installs the host arch's binary (e.g. @mariozechner/
+# clipboard-darwin-arm64), and @electron/universal then fails the universal
+# merge because the single-arch .node is identical in both arch slices.
+# "current" keeps the host platform's binaries for dev/CI on other OSes.
+supportedArchitectures:
+  os:
+    - current
+    - darwin
+  cpu:
+    - current
+    - x64
+    - arm64
