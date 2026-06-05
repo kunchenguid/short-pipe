@@ -188,6 +188,19 @@ export type CandidatePatch = Partial<
   >
 >;
 
+/** Smallest number of shorts the agent is ever asked to find. */
+export const MIN_SHORT_COUNT = 2;
+
+/**
+ * The default number of shorts to propose for a source: one per minute of video,
+ * floored at {@link MIN_SHORT_COUNT}. There is no upper cap - a long talk yields
+ * proportionally more shorts. Returns the floor when the duration is unknown.
+ */
+export function defaultShortCount(durationSeconds?: number): number {
+  if (!durationSeconds || durationSeconds <= 0) return MIN_SHORT_COUNT;
+  return Math.max(MIN_SHORT_COUNT, Math.round(durationSeconds / 60));
+}
+
 export function projectSummary(project: Project): ProjectSummary {
   return {
     id: project.id,

@@ -47,29 +47,16 @@ export function Filmstrip({
   selectedId,
   onSelect,
   onRemove,
-  onFind,
-  canFind,
 }: {
   candidates: Candidate[];
   selectedId: string | null;
   onSelect: (id: string) => void;
   onRemove: (id: string) => void;
-  onFind: () => void;
-  canFind: boolean;
 }) {
   return (
     <div className="pane filmstrip">
       <div className="pane-head">
         <span className="section-title">Shorts - {candidates.length}</span>
-        <button
-          type="button"
-          className="btn ghost small"
-          onClick={onFind}
-          disabled={!canFind}
-          title="Re-run the agent"
-        >
-          <Icon name="sparkles" />
-        </button>
       </div>
       <div className="pane-scroll">
         <div className="strip">

@@ -38,11 +38,11 @@ describe("candidateFromProposal", () => {
       rank: 1,
       startTime: 0,
       endTime: 2.0,
-      layout: "top-square",
+      layout: "center-square",
       captionStyle: "clean",
       titleStyle: "kicker",
-      theme: "light",
-      videoFit: "square",
+      theme: "dark",
+      videoFit: "full",
       keywords: [],
       status: "proposed",
     });
@@ -89,11 +89,11 @@ describe("candidateFromProposal", () => {
       words,
       "c3",
     );
-    expect(candidate.layout).toBe("top-square");
+    expect(candidate.layout).toBe("center-square");
     expect(candidate.captionStyle).toBe("clean");
     expect(candidate.titleStyle).toBe("kicker");
-    expect(candidate.theme).toBe("light");
-    expect(candidate.videoFit).toBe("square");
+    expect(candidate.theme).toBe("dark");
+    expect(candidate.videoFit).toBe("full");
   });
 
   it("maps the legacy 'card' layout to top-square", () => {

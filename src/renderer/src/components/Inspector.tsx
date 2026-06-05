@@ -85,9 +85,9 @@ export function Inspector({
   // Candidates created before title styles existed have no titleStyle; the render
   // defaults them to "kicker", so reflect that in the picker.
   const activeTitleStyle: TitleStyle = candidate.titleStyle ?? "kicker";
-  // Likewise, candidates predating themes default to "light".
-  const activeTheme: Theme = candidate.theme ?? "light";
-  const activeVideoFit: VideoFit = candidate.videoFit ?? "square";
+  // Likewise, candidates predating themes default to "dark".
+  const activeTheme: Theme = candidate.theme ?? "dark";
+  const activeVideoFit: VideoFit = candidate.videoFit ?? "full";
 
   // Export = the one step that produces the .mp4. Approve first (the renderer
   // only renders approved candidates), then render to 1080x1920.

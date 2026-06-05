@@ -33,7 +33,9 @@ function normalizeLayout(value: string | undefined): LayoutKind {
   // "card" was the old key for what is now the top-square layout; map it so
   // older proposals/projects keep rendering without a migration.
   if (value === "card") return "top-square";
-  return value && (LAYOUT_KINDS as string[]).includes(value) ? (value as LayoutKind) : "top-square";
+  return value && (LAYOUT_KINDS as string[]).includes(value)
+    ? (value as LayoutKind)
+    : "center-square";
 }
 
 function normalizeCaptionStyle(
@@ -49,13 +51,13 @@ function normalizeTitleStyle(value: TitleStyle | undefined): TitleStyle {
 }
 
 function normalizeTheme(value: Theme | undefined): Theme {
-  // Light is the brand's primary "paper" identity and the square-layout default.
-  return value && THEMES.includes(value) ? value : "light";
+  // Dark is the default polarity shorts render in; the user/agent can switch to light.
+  return value && THEMES.includes(value) ? value : "dark";
 }
 
 function normalizeVideoFit(value: VideoFit | undefined): VideoFit {
-  // Square is the tight, predictable default; full preserves the source aspect.
-  return value && VIDEO_FITS.includes(value) ? value : "square";
+  // Full preserves the source aspect by default; square crops it tight.
+  return value && VIDEO_FITS.includes(value) ? value : "full";
 }
 
 /**

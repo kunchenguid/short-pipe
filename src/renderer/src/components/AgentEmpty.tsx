@@ -1,4 +1,5 @@
 import type { TranscriptStatus } from "@shared/project";
+import { MIN_SHORT_COUNT } from "@shared/project";
 import { Icon, Spinner } from "./Icon";
 
 /**
@@ -26,8 +27,7 @@ export function AgentEmpty({
   error: string | null;
 }) {
   const label = status === "ready" ? "Find shorts with AI" : "Transcribe & find shorts";
-  const MIN = 2;
-  const MAX = 6;
+  const MIN = MIN_SHORT_COUNT;
   return (
     <div className="stage-scroll">
       <div className="runner-empty">
@@ -66,8 +66,7 @@ export function AgentEmpty({
               <button
                 type="button"
                 className="step"
-                onClick={() => onCount(Math.min(MAX, count + 1))}
-                disabled={count >= MAX}
+                onClick={() => onCount(count + 1)}
                 aria-label="One more"
               >
                 <Icon name="plus" />
