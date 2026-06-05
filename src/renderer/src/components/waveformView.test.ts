@@ -8,6 +8,7 @@ import {
   fitPxPerSec,
   INITIAL_MAX_PX_PER_SEC,
   MAX_PX_PER_SEC,
+  MIN_HANDLE_GAP,
   MIN_PX_PER_SEC,
   medianWordDuration,
   timeToX,
@@ -136,15 +137,19 @@ describe("anchorScrollForZoom", () => {
 });
 
 describe("clampDraggedHandle", () => {
+  it("uses the renderer's minimum accepted clip duration", () => {
+    expect(MIN_HANDLE_GAP).toBe(0.1);
+  });
+
   it("keeps the start left of the end and within the source", () => {
-    expect(clampDraggedHandle("start", 5, 8, 60, 0.05)).toBe(5);
-    expect(clampDraggedHandle("start", 9, 8, 60, 0.05)).toBeCloseTo(7.95, 9);
-    expect(clampDraggedHandle("start", -3, 8, 60, 0.05)).toBe(0);
+    expect(clampDraggedHandle("start", 5, 8, 60)).toBe(5);
+    expect(clampDraggedHandle("start", 9, 8, 60)).toBeCloseTo(7.9, 9);
+    expect(clampDraggedHandle("start", -3, 8, 60)).toBe(0);
   });
 
   it("keeps the end right of the start and within the source", () => {
-    expect(clampDraggedHandle("end", 12, 8, 60, 0.05)).toBe(12);
-    expect(clampDraggedHandle("end", 7, 8, 60, 0.05)).toBeCloseTo(8.05, 9);
-    expect(clampDraggedHandle("end", 999, 8, 60, 0.05)).toBe(60);
+    expect(clampDraggedHandle("end", 12, 8, 60)).toBe(12);
+    expect(clampDraggedHandle("end", 7, 8, 60)).toBeCloseTo(8.1, 9);
+    expect(clampDraggedHandle("end", 999, 8, 60)).toBe(60);
   });
 });

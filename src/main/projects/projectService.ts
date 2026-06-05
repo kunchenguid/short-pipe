@@ -27,6 +27,8 @@ import {
 const PROJECT_JSON = "project.json";
 const TRANSCRIPT_JSON = "transcript.json";
 const OUTPUT_DIR = "output";
+const MAX_WAVEFORM_BINS = 20_000;
+const MAX_WAVEFORM_WINDOW_SEC = 120;
 
 export type ProjectServiceOptions = {
   layout: ShortPipeLayout;
@@ -135,7 +137,21 @@ export class ProjectService {
     bins: number,
   ): Promise<number[]> {
     const project = await this.get(projectId);
-    return extractPeaks(project.source.path, { from, to, bins });
+    if (!Number.isFinite(from) || !Number.isFinite(to) || !Number.isFinite(bins) || bins <= 0) {
+      throw new Error("Invalid waveform request");
+    }
+    const safeFrom = Math.max(0, from);
+    const sourceEnd =
+      Number.isFinite(project.source.duration) && project.source.duration !== undefined
+        ? Math.max(0, project.source.duration)
+        : Number.POSITIVE_INFINITY;
+    const safeTo = Math.min(Math.max(0, to), sourceEnd, safeFrom + MAX_WAVEFORM_WINDOW_SEC);
+    if (safeTo <= safeFrom) throw new Error("Invalid waveform request");
+    return extractPeaks(project.source.path, {
+      from: safeFrom,
+      to: safeTo,
+      bins: Math.min(Math.floor(bins), MAX_WAVEFORM_BINS),
+    });
   }
 
   // --- create / delete ---------------------------------------------------

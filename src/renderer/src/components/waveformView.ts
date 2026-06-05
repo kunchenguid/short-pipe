@@ -15,7 +15,7 @@ export const BAR_PX = 3;
 /** Extra seconds fetched/drawn beyond the viewport to hide scroll-edge flicker. */
 export const OVERSCAN_SEC = 1;
 /** Smallest clip the handles may pinch to, so start never crosses end. */
-export const MIN_HANDLE_GAP = 0.05;
+export const MIN_HANDLE_GAP = 0.1;
 /** Target on-screen width (px) for a typical word, so its label is readable. */
 export const WORD_LABEL_TARGET_PX = 48;
 /** Cap on the initial zoom, so very fast speech doesn't open absurdly deep. */

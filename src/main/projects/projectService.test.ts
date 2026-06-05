@@ -4,9 +4,14 @@ import { join } from "node:path";
 import type { ProjectEvent } from "@shared/events";
 import type { Transcript } from "@shared/project";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { extractPeaks } from "../media/waveform";
 import { writeJsonFile } from "../storage/json";
 import { bootstrapLayout, type ShortPipeLayout } from "../storage/layout";
 import { ProjectService } from "./projectService";
+
+vi.mock("../media/waveform", () => ({
+  extractPeaks: vi.fn(async () => []),
+}));
 
 let root: string;
 let layout: ShortPipeLayout;
@@ -22,6 +27,7 @@ const transcript: Transcript = {
 };
 
 beforeEach(async () => {
+  vi.mocked(extractPeaks).mockClear();
   root = await mkdtemp(join(tmpdir(), "short-pipe-proj-"));
   layout = await bootstrapLayout(join(root, "short-pipe"));
   ids = 0;
@@ -74,6 +80,33 @@ describe("output paths", () => {
     const project = await svc.create({ sourcePath: "/a.mp4" });
 
     expect(svc.outputDirFor({ ...project, outputDir: "/old/project/out" })).toBe("/global/out");
+  });
+});
+
+describe("waveform peaks", () => {
+  it("rejects non-finite and non-positive waveform requests before decoding", async () => {
+    await service.create({ sourcePath: "/a.mp4" });
+
+    await expect(service.getWaveformPeaks("id1", Number.NaN, 1, 100)).rejects.toThrow(
+      /Invalid waveform request/,
+    );
+    await expect(service.getWaveformPeaks("id1", 0, Number.POSITIVE_INFINITY, 100)).rejects.toThrow(
+      /Invalid waveform request/,
+    );
+    await expect(service.getWaveformPeaks("id1", 0, 1, 0)).rejects.toThrow(
+      /Invalid waveform request/,
+    );
+
+    expect(extractPeaks).not.toHaveBeenCalled();
+  });
+
+  it("clamps waveform requests to source duration and service limits", async () => {
+    await service.create({ sourcePath: "/a.mp4" });
+    await service.setSourceProbe("id1", { duration: 20 });
+
+    await service.getWaveformPeaks("id1", -5, 999, 999999);
+
+    expect(extractPeaks).toHaveBeenCalledWith("/a.mp4", { from: 0, to: 20, bins: 20000 });
   });
 });
 
