@@ -15,7 +15,13 @@ import type {
 import { projectSummary } from "@shared/project";
 import { readJsonFile, writeJsonFile } from "../storage/json";
 import { assertSafeId, projectDir, type ShortPipeLayout } from "../storage/layout";
-import { candidateFromProposal, sortByRank, wordTimeRange } from "./candidates";
+import {
+  type CandidateDefaults,
+  candidateFromProposal,
+  FALLBACK_CANDIDATE_DEFAULTS,
+  sortByRank,
+  wordTimeRange,
+} from "./candidates";
 
 const PROJECT_JSON = "project.json";
 const TRANSCRIPT_JSON = "transcript.json";
@@ -25,6 +31,10 @@ export type ProjectServiceOptions = {
   layout: ShortPipeLayout;
   now?: () => Date;
   newId?: () => string;
+  /** Style defaults (from Settings) used to fill agent proposals; live-read so changes apply without restart. */
+  getCandidateDefaults?: () => CandidateDefaults;
+  /** Global default output folder (from Settings); falls back to each project's own output/ when unset. */
+  getDefaultOutputDir?: () => string | undefined;
 };
 
 /**
@@ -37,12 +47,16 @@ export class ProjectService {
   private readonly layout: ShortPipeLayout;
   private readonly now: () => Date;
   private readonly newId: () => string;
+  private readonly getCandidateDefaults: () => CandidateDefaults;
+  private readonly getDefaultOutputDir: () => string | undefined;
   private readonly listeners = new Set<(event: ProjectEvent) => void>();
 
   constructor(options: ProjectServiceOptions) {
     this.layout = options.layout;
     this.now = options.now ?? (() => new Date());
     this.newId = options.newId ?? (() => randomUUID().slice(0, 8));
+    this.getCandidateDefaults = options.getCandidateDefaults ?? (() => FALLBACK_CANDIDATE_DEFAULTS);
+    this.getDefaultOutputDir = options.getDefaultOutputDir ?? (() => undefined);
   }
 
   subscribe(listener: (event: ProjectEvent) => void): () => void {
@@ -69,7 +83,7 @@ export class ProjectService {
   }
 
   outputDirFor(project: Project): string {
-    return project.outputDir ?? join(this.dir(project.id), OUTPUT_DIR);
+    return this.getDefaultOutputDir() ?? join(this.dir(project.id), OUTPUT_DIR);
   }
 
   // --- reads -------------------------------------------------------------
@@ -157,10 +171,6 @@ export class ProjectService {
     return this.mutate(projectId, (project) => ({ ...project, transcriptStatus: status }));
   }
 
-  setOutputDir(projectId: string, outputDir: string): Promise<Project> {
-    return this.mutate(projectId, (project) => ({ ...project, outputDir }));
-  }
-
   setAgentSessionFile(projectId: string, agentSessionFile: string | undefined): Promise<Project> {
     return this.mutate(projectId, (project) => ({ ...project, agentSessionFile }));
   }
@@ -172,8 +182,11 @@ export class ProjectService {
   async replaceCandidates(projectId: string, proposals: CandidateProposal[]): Promise<Project> {
     const transcript = await this.getTranscript(projectId);
     if (!transcript) throw new Error("Cannot propose candidates before transcription.");
+    const defaults = this.getCandidateDefaults();
     const candidates = sortByRank(
-      proposals.map((proposal) => candidateFromProposal(proposal, transcript.words, this.newId())),
+      proposals.map((proposal) =>
+        candidateFromProposal(proposal, transcript.words, this.newId(), defaults),
+      ),
     );
     return this.mutate(projectId, (project) => ({ ...project, candidates }));
   }

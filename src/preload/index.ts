@@ -1,4 +1,5 @@
 import type { AuthStatus } from "@shared/auth";
+import type { SettingsPatch, ShortPipeConfig } from "@shared/config";
 import type { AppEvent, ChatMessage } from "@shared/events";
 import type { AppInfo, PickResult, ShortPipeApi, UpdateStatus } from "@shared/ipc";
 import type {
@@ -16,6 +17,13 @@ const api: ShortPipeApi = {
     getUpdateStatus: (): Promise<UpdateStatus> => ipcRenderer.invoke("sp:app:get-update-status"),
     openReleasePage: (): Promise<{ ok: boolean }> => ipcRenderer.invoke("sp:app:open-release-page"),
   },
+  settings: {
+    get: (): Promise<ShortPipeConfig> => ipcRenderer.invoke("sp:settings:get"),
+    update: (patch: SettingsPatch): Promise<ShortPipeConfig> =>
+      ipcRenderer.invoke("sp:settings:update", patch),
+    chooseOutputDir: (): Promise<ShortPipeConfig> =>
+      ipcRenderer.invoke("sp:settings:choose-output-dir"),
+  },
   auth: {
     status: (): Promise<AuthStatus> => ipcRenderer.invoke("sp:auth:status"),
     login: (): Promise<AuthStatus> => ipcRenderer.invoke("sp:auth:login"),
@@ -29,8 +37,6 @@ const api: ShortPipeApi = {
     delete: (projectId: string): Promise<void> =>
       ipcRenderer.invoke("sp:projects:delete", projectId),
     pickSource: (): Promise<PickResult> => ipcRenderer.invoke("sp:projects:pick-source"),
-    chooseOutputDir: (projectId: string): Promise<Project> =>
-      ipcRenderer.invoke("sp:projects:choose-output-dir", projectId),
     revealOutput: (projectId: string): Promise<void> =>
       ipcRenderer.invoke("sp:projects:reveal-output", projectId),
     probe: (projectId: string): Promise<Project> =>

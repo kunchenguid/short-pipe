@@ -22,6 +22,17 @@ function stubBridge(overrides: Partial<ShortPipeApi> = {}) {
       })),
       openReleasePage: vi.fn(),
     },
+    settings: {
+      get: vi.fn(async () => ({
+        version: 1 as const,
+        defaultModel: "openai-codex/gpt-5.5",
+        defaultLayout: "center-square" as const,
+        defaultTheme: "dark" as const,
+        defaultCaptionStyle: "clean" as const,
+      })),
+      update: vi.fn(),
+      chooseOutputDir: vi.fn(),
+    },
     auth: {
       status: vi.fn(async () => ({
         authenticated: true,
@@ -36,7 +47,6 @@ function stubBridge(overrides: Partial<ShortPipeApi> = {}) {
       create: vi.fn(),
       delete: vi.fn(),
       pickSource: vi.fn(),
-      chooseOutputDir: vi.fn(),
       revealOutput: vi.fn(),
       probe: vi.fn(),
     },
@@ -84,5 +94,24 @@ describe("App", () => {
     expect(container.textContent).toContain("Your projects");
     expect(container.textContent).not.toContain("Sign out");
     expect(bridge.auth.logout).not.toHaveBeenCalled();
+  });
+
+  it("opens the settings sheet from the topbar gear", async () => {
+    const bridge = stubBridge();
+    const { App } = await import("./App");
+
+    await act(async () => {
+      root.render(<App />);
+    });
+
+    expect(container.querySelector(".settings-overlay")).toBeNull();
+    const gear = container.querySelector<HTMLButtonElement>('button[aria-label="Settings"]');
+    expect(gear).not.toBeNull();
+    await act(async () => {
+      gear?.click();
+    });
+
+    expect(container.querySelector(".settings-overlay")).not.toBeNull();
+    expect(bridge.settings.get).toHaveBeenCalled();
   });
 });

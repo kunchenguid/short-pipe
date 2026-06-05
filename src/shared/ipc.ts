@@ -1,4 +1,5 @@
 import type { AuthStatus } from "./auth";
+import type { SettingsPatch, ShortPipeConfig } from "./config";
 import type { AppEvent, ChatMessage } from "./events";
 import type {
   CandidatePatch,
@@ -45,6 +46,14 @@ export type ShortPipeApi = {
     /** Opens the latest release page in the user's browser. */
     openReleasePage: () => Promise<{ ok: boolean }>;
   };
+  settings: {
+    /** Current app-global config (model + style/output defaults). */
+    get: () => Promise<ShortPipeConfig>;
+    /** Patch one or more default fields and persist; resolves with the new config. */
+    update: (patch: SettingsPatch) => Promise<ShortPipeConfig>;
+    /** Opens a directory picker to set the global default output folder. */
+    chooseOutputDir: () => Promise<ShortPipeConfig>;
+  };
   auth: {
     status: () => Promise<AuthStatus>;
     login: () => Promise<AuthStatus>;
@@ -57,9 +66,7 @@ export type ShortPipeApi = {
     delete: (projectId: string) => Promise<void>;
     /** Opens the native file picker for a source video. */
     pickSource: () => Promise<PickResult>;
-    /** Opens a directory picker and sets the project's output folder. */
-    chooseOutputDir: (projectId: string) => Promise<Project>;
-    /** Reveals the project's output folder in the OS file manager. */
+    /** Reveals the project's effective output folder in the OS file manager. */
     revealOutput: (projectId: string) => Promise<void>;
     /** Probe the source video for duration/dimensions/fps. */
     probe: (projectId: string) => Promise<Project>;

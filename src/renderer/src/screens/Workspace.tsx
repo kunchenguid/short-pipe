@@ -192,16 +192,9 @@ export function Workspace({ projectId, onBack }: { projectId: string; onBack: ()
         <button
           type="button"
           className="btn small"
-          onClick={() => void run(() => sp.projects.chooseOutputDir(projectId).then(setProject))}
-        >
-          <Icon name="folderOpen" /> Output folder
-        </button>
-        <button
-          type="button"
-          className="btn small"
           onClick={() => void run(() => sp.projects.revealOutput(projectId))}
         >
-          Reveal
+          <Icon name="folderOpen" /> Open output folder
         </button>
       </div>
 

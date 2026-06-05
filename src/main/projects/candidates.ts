@@ -29,19 +29,35 @@ export function wordTimeRange(
   return { startTime: start.start, endTime: end.end };
 }
 
-function normalizeLayout(value: string | undefined): LayoutKind {
+/**
+ * The user-configurable style defaults (Settings) used to fill any field an
+ * agent proposal omits. Mirrors the hard fallbacks so callers that don't pass
+ * defaults keep the historical behavior.
+ */
+export type CandidateDefaults = {
+  layout: LayoutKind;
+  captionStyle: Candidate["captionStyle"];
+  theme: Theme;
+};
+
+export const FALLBACK_CANDIDATE_DEFAULTS: CandidateDefaults = {
+  layout: "center-square",
+  captionStyle: "clean",
+  theme: "dark",
+};
+
+function normalizeLayout(value: string | undefined, fallback: LayoutKind): LayoutKind {
   // "card" was the old key for what is now the top-square layout; map it so
   // older proposals/projects keep rendering without a migration.
   if (value === "card") return "top-square";
-  return value && (LAYOUT_KINDS as string[]).includes(value)
-    ? (value as LayoutKind)
-    : "center-square";
+  return value && (LAYOUT_KINDS as string[]).includes(value) ? (value as LayoutKind) : fallback;
 }
 
 function normalizeCaptionStyle(
   value: CandidateProposal["captionStyle"],
+  fallback: Candidate["captionStyle"],
 ): Candidate["captionStyle"] {
-  return value && CAPTION_STYLES.includes(value) ? value : "clean";
+  return value && CAPTION_STYLES.includes(value) ? value : fallback;
 }
 
 function normalizeTitleStyle(value: TitleStyle | undefined): TitleStyle {
@@ -50,9 +66,9 @@ function normalizeTitleStyle(value: TitleStyle | undefined): TitleStyle {
   return value && TITLE_STYLES.includes(value) ? value : "kicker";
 }
 
-function normalizeTheme(value: Theme | undefined): Theme {
+function normalizeTheme(value: Theme | undefined, fallback: Theme): Theme {
   // Dark is the default polarity shorts render in; the user/agent can switch to light.
-  return value && THEMES.includes(value) ? value : "dark";
+  return value && THEMES.includes(value) ? value : fallback;
 }
 
 function normalizeVideoFit(value: VideoFit | undefined): VideoFit {
@@ -68,6 +84,7 @@ export function candidateFromProposal(
   proposal: CandidateProposal,
   words: TranscriptWord[],
   id: string,
+  defaults: CandidateDefaults = FALLBACK_CANDIDATE_DEFAULTS,
 ): Candidate {
   const { startTime, endTime } = wordTimeRange(words, proposal.startWordId, proposal.endWordId);
   return {
@@ -79,10 +96,10 @@ export function candidateFromProposal(
     endWordId: proposal.endWordId,
     startTime,
     endTime,
-    layout: normalizeLayout(proposal.layout),
-    captionStyle: normalizeCaptionStyle(proposal.captionStyle),
+    layout: normalizeLayout(proposal.layout, defaults.layout),
+    captionStyle: normalizeCaptionStyle(proposal.captionStyle, defaults.captionStyle),
     titleStyle: normalizeTitleStyle(proposal.titleStyle),
-    theme: normalizeTheme(proposal.theme),
+    theme: normalizeTheme(proposal.theme, defaults.theme),
     videoFit: normalizeVideoFit(proposal.videoFit),
     keywords: (proposal.keywords ?? []).map((k) => k.trim()).filter(Boolean),
     status: "proposed",

@@ -28,6 +28,11 @@ function stubBridge(overrides: Partial<ShortPipeApi> = {}) {
       getUpdateStatus: vi.fn(),
       openReleasePage: vi.fn(),
     },
+    settings: {
+      get: vi.fn(),
+      update: vi.fn(),
+      chooseOutputDir: vi.fn(),
+    },
     auth: {
       status: vi.fn(),
       login: vi.fn(),
@@ -39,7 +44,6 @@ function stubBridge(overrides: Partial<ShortPipeApi> = {}) {
       create: vi.fn(),
       delete: vi.fn(),
       pickSource: vi.fn(),
-      chooseOutputDir: vi.fn(),
       revealOutput: vi.fn(),
       probe: vi.fn(() => new Promise<Project>(() => undefined)),
     },

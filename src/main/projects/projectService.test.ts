@@ -63,6 +63,20 @@ describe("create / get / list", () => {
   });
 });
 
+describe("output paths", () => {
+  it("uses the global default instead of a stale project outputDir", async () => {
+    const svc = new ProjectService({
+      layout,
+      now: () => new Date("2026-06-03T00:00:00.000Z"),
+      newId: () => "fixed",
+      getDefaultOutputDir: () => "/global/out",
+    });
+    const project = await svc.create({ sourcePath: "/a.mp4" });
+
+    expect(svc.outputDirFor({ ...project, outputDir: "/old/project/out" })).toBe("/global/out");
+  });
+});
+
 describe("mutations emit project_updated", () => {
   it("emits on every persist", async () => {
     const events: ProjectEvent[] = [];

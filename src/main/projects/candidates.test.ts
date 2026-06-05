@@ -104,6 +104,28 @@ describe("candidateFromProposal", () => {
     );
     expect(candidate.layout).toBe("top-square");
   });
+
+  it("fills omitted fields from the supplied defaults", () => {
+    const candidate = candidateFromProposal(
+      { title: "x", rank: 1, startWordId: "w0", endWordId: "w1" },
+      words,
+      "c5",
+      { layout: "full-bleed", captionStyle: "bold-pop", theme: "light" },
+    );
+    expect(candidate.layout).toBe("full-bleed");
+    expect(candidate.captionStyle).toBe("bold-pop");
+    expect(candidate.theme).toBe("light");
+  });
+
+  it("lets an explicit proposal field win over the defaults", () => {
+    const candidate = candidateFromProposal(
+      { title: "x", rank: 1, startWordId: "w0", endWordId: "w1", layout: "top-square" },
+      words,
+      "c6",
+      { layout: "full-bleed", captionStyle: "bold-pop", theme: "light" },
+    );
+    expect(candidate.layout).toBe("top-square");
+  });
 });
 
 describe("sortByRank", () => {

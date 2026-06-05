@@ -30,7 +30,7 @@ const ProposalSchema = Type.Object({
       [Type.Literal("top-square"), Type.Literal("center-square"), Type.Literal("full-bleed")],
       {
         description:
-          "top-square = square video at the top of a paper page, title + captions below; center-square = square video centered, title above and captions below; full-bleed = video fills the screen with captions over it.",
+          "Omit layout, captionStyle, and theme unless the footage needs a specific presentation that should override the user's Settings defaults. top-square = square video at the top of a paper page, title + captions below; center-square = square video centered, title above and captions below; full-bleed = video fills the screen with captions over it.",
       },
     ),
   ),
@@ -54,7 +54,7 @@ const ProposalSchema = Type.Object({
   theme: Type.Optional(
     Type.Union([Type.Literal("light"), Type.Literal("dark")], {
       description:
-        "Color polarity, orthogonal to layout: light = paper page + ink text (default, best over bright footage); dark = ink page + warm off-white text (best over dark/cinematic footage).",
+        "Override the user's Settings default only when the footage needs a specific color polarity: light = paper page + ink text; dark = ink page + warm off-white text.",
     }),
   ),
   videoFit: Type.Optional(

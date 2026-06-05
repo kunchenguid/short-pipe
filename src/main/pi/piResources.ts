@@ -15,7 +15,7 @@ export function buildAgentSystemPrompt(): string {
 You work inside a single video project folder, turning a long-form video into captioned vertical shorts (1080x1920).
 Everything runs locally on the user's machine; nothing leaves it except your own model calls.
 
-Read and follow the shorts-from-longform skill before proposing shorts. It defines how to pick soundbites, rank them, choose a layout (top-square, center-square, or full-bleed), pick a caption style, and choose keywords to emphasize.
+Read and follow the shorts-from-longform skill before proposing shorts. It defines how to pick soundbites, rank them, when to omit layout, captionStyle, and theme so Short Pipe can apply the user's Settings defaults, and how to choose keywords to emphasize.
 
 Your tools:
 - probe: read the source video's duration, resolution, and fps. Run it first if you do not yet know the source dimensions.
