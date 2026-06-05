@@ -119,4 +119,39 @@ describe("DependencyChecklist", () => {
     });
     expect(check).toHaveBeenCalledTimes(2);
   });
+
+  it("reports an error instead of all set when dependency probing fails", async () => {
+    stubBridge(
+      { check: vi.fn(async () => Promise.reject(new Error("ipc failed"))) },
+      { openExternal: vi.fn() },
+    );
+    await mount();
+    expect(container.textContent).toContain("Unable to check tools");
+    expect(container.textContent).not.toContain("All set");
+  });
+
+  it("keeps the newest result when dependency probes resolve out of order", async () => {
+    let resolveInitial: (deps: DependencyStatus[]) => void = () => undefined;
+    let resolveRecheck: (deps: DependencyStatus[]) => void = () => undefined;
+    const check = vi
+      .fn<() => Promise<DependencyStatus[]>>()
+      .mockImplementationOnce(() => new Promise((resolve) => (resolveInitial = resolve)))
+      .mockImplementationOnce(() => new Promise((resolve) => (resolveRecheck = resolve)));
+    stubBridge({ check }, { openExternal: vi.fn() });
+
+    await mount();
+    await act(async () => {
+      window.dispatchEvent(new Event("focus"));
+    });
+    await act(async () => {
+      resolveRecheck([{ ...hyperframes, available: true, version: "0.6.73" }]);
+    });
+    expect(container.textContent).toContain("0.6.73");
+
+    await act(async () => {
+      resolveInitial([hyperframes]);
+    });
+    expect(container.querySelector(".dep-row.missing")).toBeNull();
+    expect(container.textContent).toContain("0.6.73");
+  });
 });

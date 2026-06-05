@@ -1,5 +1,5 @@
 import type { DependencyStatus } from "@shared/deps";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { sp } from "../api";
 import { Icon } from "./Icon";
 
@@ -16,16 +16,29 @@ import { Icon } from "./Icon";
  */
 export function DependencyChecklist() {
   const [deps, setDeps] = useState<DependencyStatus[] | null>(null);
+  const [checkError, setCheckError] = useState(false);
   const [rechecking, setRechecking] = useState(false);
+  const checkRequestId = useRef(0);
 
   const check = useCallback(async () => {
+    const requestId = checkRequestId.current + 1;
+    checkRequestId.current = requestId;
     setRechecking(true);
+    setCheckError(false);
     try {
-      setDeps(await sp.deps.check());
+      const nextDeps = await sp.deps.check();
+      if (checkRequestId.current === requestId) {
+        setDeps(nextDeps);
+      }
     } catch {
-      setDeps([]);
+      if (checkRequestId.current === requestId) {
+        setCheckError(true);
+        setDeps(null);
+      }
     } finally {
-      setRechecking(false);
+      if (checkRequestId.current === requestId) {
+        setRechecking(false);
+      }
     }
   }, []);
 
@@ -35,6 +48,31 @@ export function DependencyChecklist() {
     window.addEventListener("focus", onFocus);
     return () => window.removeEventListener("focus", onFocus);
   }, [check]);
+
+  if (checkError) {
+    return (
+      <div className="dep-check">
+        <div className="dep-check-head">
+          <span className="dep-check-title">On-device tools</span>
+          <div className="dep-check-meta">
+            <span className="dep-summary missing">Check failed</span>
+            <button
+              type="button"
+              className="dep-recheck"
+              onClick={() => void check()}
+              disabled={rechecking}
+            >
+              {rechecking ? <span className="spinner" /> : <Icon name="rotateCw" />}
+              Re-check
+            </button>
+          </div>
+        </div>
+        <p className="dep-desc">
+          Unable to check tools. Re-check after confirming the app can access your shell.
+        </p>
+      </div>
+    );
+  }
 
   if (!deps) {
     return (
