@@ -55,12 +55,14 @@ function AddShort({
   adding,
   setAdding,
   onAddShort,
+  onAbort,
 }: {
   running: boolean;
   step: string | null;
   adding: boolean;
   setAdding: (adding: boolean) => void;
   onAddShort: (prompt: string) => void;
+  onAbort: () => void;
 }) {
   const [prompt, setPrompt] = useState("");
 
@@ -81,7 +83,12 @@ function AddShort({
     return (
       <div className="strip-foot">
         <div className="add-running">
-          <Spinner /> {step ?? "Working..."}
+          <span className="add-running-status">
+            <Spinner /> {step ?? "Working..."}
+          </span>
+          <button type="button" className="btn small" onClick={onAbort}>
+            Stop
+          </button>
         </div>
       </div>
     );
@@ -141,6 +148,7 @@ export function Filmstrip({
   onSelect,
   onRemove,
   onAddShort,
+  onAbort,
   running,
   step,
 }: {
@@ -149,6 +157,7 @@ export function Filmstrip({
   onSelect: (id: string) => void;
   onRemove: (id: string) => void;
   onAddShort: (prompt: string) => void;
+  onAbort: () => void;
   running: boolean;
   step: string | null;
 }) {
@@ -189,6 +198,7 @@ export function Filmstrip({
         adding={adding}
         setAdding={setAdding}
         onAddShort={onAddShort}
+        onAbort={onAbort}
       />
     </div>
   );

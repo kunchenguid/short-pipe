@@ -203,4 +203,39 @@ describe("Workspace add-one-more-short", () => {
     });
     expect(container.querySelector("textarea.add-input")).toBeInstanceOf(HTMLTextAreaElement);
   });
+
+  it("can stop a running add-one-more request when shorts already exist", async () => {
+    const bridge = stubBridge({
+      projects: {
+        list: vi.fn(),
+        get: vi.fn(async () => projectWithCandidate),
+        create: vi.fn(),
+        delete: vi.fn(),
+        pickSource: vi.fn(),
+        revealOutput: vi.fn(),
+        probe: vi.fn(async () => projectWithCandidate),
+      },
+      agent: {
+        history: vi.fn(),
+        send: vi.fn(),
+        abort: vi.fn(),
+        isRunning: vi.fn(async () => true),
+      },
+    });
+    const { Workspace } = await import("./Workspace");
+
+    await act(async () => {
+      root.render(<Workspace projectId="p1" onBack={() => undefined} />);
+    });
+
+    const stopButton = [...container.querySelectorAll("button")].find((button) =>
+      button.textContent?.includes("Stop"),
+    );
+    expect(stopButton).toBeInstanceOf(HTMLButtonElement);
+    act(() => {
+      stopButton?.click();
+    });
+
+    expect(bridge.agent.abort).toHaveBeenCalledWith("p1");
+  });
 });

@@ -233,6 +233,7 @@ export function Workspace({ projectId, onBack }: { projectId: string; onBack: ()
           }}
           onRemove={(id) => void run(() => sp.candidates.remove(projectId, id))}
           onAddShort={findOneMore}
+          onAbort={() => void sp.agent.abort(projectId)}
           running={running}
           step={step}
         />
