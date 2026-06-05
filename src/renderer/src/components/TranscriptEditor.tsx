@@ -1,3 +1,4 @@
+import { resolveClipWindow } from "@shared/clipWindow";
 import type { Candidate, Transcript } from "@shared/project";
 import { type MouseEvent, useEffect, useMemo, useRef, useState } from "react";
 import { formatTime, sp } from "../api";
@@ -100,12 +101,20 @@ export function TranscriptEditor({
   }, [words, startIdx, endIdx]);
   const count = endIdx - startIdx + 1;
 
-  // The waveform handles sit on the manual cut when set, else the word edges.
   const wordStart = words[startIdx]?.start ?? 0;
   const wordEnd = words[endIdx]?.end ?? wordStart;
-  const cutValue = cut ?? { start: wordStart, end: wordEnd };
   // Span the whole source; fall back to just past the last word when unknown.
   const timelineDuration = sourceDuration ?? (words[words.length - 1]?.end ?? 0) + 1;
+  const resolvedWindow = resolveClipWindow(
+    { startTime: wordStart, endTime: wordEnd },
+    transcript.silences,
+    words,
+    timelineDuration,
+  );
+  const cutValue = cut ?? {
+    start: resolvedWindow.mediaStart,
+    end: resolvedWindow.mediaStart + resolvedWindow.clipDuration,
+  };
 
   async function save() {
     setBusy(true);
