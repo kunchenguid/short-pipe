@@ -49,6 +49,7 @@ render, no Codex auth, no file system — the video preview is a neutral charcoa
 (the product shows the user's own frames), the agent "run" is a scripted progress line, and
 all data lives in `data.jsx`. Components are simplified, mainly-cosmetic versions of the real
 ones; the goal is pixel-level visual fidelity and interaction feel, not production logic.
+Production now also shows the FFmpeg / HyperFrames readiness checklist on the Connect Codex screen and in Settings; this kit has not modeled that live dependency state.
 
 ## Icons
 

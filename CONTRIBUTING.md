@@ -36,7 +36,7 @@ See the [no-mistakes quick start](https://kunchenguid.github.io/no-mistakes/star
 - Keep `pnpm-lock.yaml` changes with dependency changes.
 - Do not commit generated build output (`out/`, `dist/`) or release artifacts.
 - Do not hand-edit release-please metadata such as `CHANGELOG.md` or `.release-please-manifest.json`.
-- The on-device pipeline needs `ffmpeg`/`ffprobe` and the `hyperframes` CLI on `PATH`; see the README for the full development setup.
+- The on-device pipeline needs FFmpeg (`ffmpeg` and `ffprobe`) and the HyperFrames CLI on `PATH`; the app surfaces their readiness on the connect screen and in Settings, and the README has the install commands.
 
 ## Release Notes
 

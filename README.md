@@ -33,7 +33,7 @@ brew update && brew upgrade --cask short-pipe
 ```
 
 Short Pipe also surfaces an **Update** button in its top bar when a newer release is published, with the same `brew` command one click away.
-The on-device pipeline still needs `ffmpeg`/`ffprobe` and the `hyperframes` CLI on `PATH` (see [Requirements](#requirements)).
+The on-device pipeline still needs FFmpeg (including FFprobe) and the HyperFrames CLI on `PATH` (see [Requirements](#requirements)).
 
 ## How it works
 
@@ -42,7 +42,7 @@ The on-device pipeline still needs `ffmpeg`/`ffprobe` and the `hyperframes` CLI 
 3. **Candidates** - the agent reads the transcript and proposes ranked soundbites, defaulting to roughly one short per minute of source video, following the bundled `shorts-from-longform` skill.
    After the first batch, use **Add one more short** in the filmstrip to give the agent a focused prompt and append exactly one new candidate without replacing the queue.
 4. **Review and edit** - approve, select the word range, fine-tune exact in/out points on the waveform, and swap layouts and caption styles in the editor.
-   Use the topbar gear to set defaults for new shorts: output folder, layout, theme, and caption style.
+   Use the topbar gear to set defaults for new shorts, re-check local tools, and disconnect Codex: output folder, layout, theme, and caption style.
 5. **Render** - HyperFrames (headless Chrome + ffmpeg) renders each approved short locally to 1080x1920.
 6. **Output** - shorts are written to the default output folder, or to the project's own `output/` folder when no default is set.
 
@@ -50,9 +50,16 @@ The on-device pipeline still needs `ffmpeg`/`ffprobe` and the `hyperframes` CLI 
 
 - macOS (Apple Silicon or Intel). Short Pipe is macOS-only for now - there are no Windows or Linux builds.
 - Node 20+ and pnpm.
-- `ffmpeg` / `ffprobe` on PATH.
-- The `hyperframes` CLI on PATH (used for local Whisper transcription and rendering). On first use it downloads a Whisper model and a headless Chrome.
+- FFmpeg on `PATH`, including both `ffmpeg` and `ffprobe`.
+  Install with `brew install ffmpeg` or use the [FFmpeg download guide](https://ffmpeg.org/download.html).
+- The HyperFrames CLI on `PATH` (used for local Whisper transcription and rendering).
+  Install with `npm install -g hyperframes` or see the [HyperFrames repository](https://github.com/heygen-com/hyperframes).
+  On first use it downloads a Whisper model and a headless Chrome.
 - A Codex (ChatGPT) subscription to sign in to.
+
+The connect screen and Settings both show an **On-device tools** checklist for FFmpeg and HyperFrames, including detected versions, install commands, and setup links.
+The checklist re-runs when the app window regains focus after you install a tool, and you can also use **Re-check** manually.
+Use **Disconnect Codex** in Settings to sign out on this machine and return to the connect screen.
 
 ## Develop
 

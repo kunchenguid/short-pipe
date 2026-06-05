@@ -40,6 +40,10 @@ Pick → Transcribe → Propose → Review / Trim → Render → Output
 5. **Render** — each approved short is rendered locally to 1080×1920.
 6. **Output** - finished shorts are written to the user's default output folder, or to the project's own `output/` folder when no default is set.
 
+The Connect Codex screen and Settings include an **On-device tools** checklist for FFmpeg and HyperFrames.
+It shows readiness, detected versions, install commands, and setup links, and it re-checks on window focus or when the user clicks **Re-check**.
+Settings also includes **Disconnect Codex**, which signs out on this machine and returns to the connect screen.
+
 ### Core domain objects
 
 - **Project** - one source video + its transcript + its candidates.
@@ -142,6 +146,7 @@ Reject · Render · Re-render · Open output folder · Disconnect Codex. Buttons
 |---|---|
 | Tagline | *long-form in, captioned shorts out* |
 | Auth | *Short Pipe runs the agent on your own Codex subscription. Sign in once - your video and transcripts never leave this machine.* |
+| Dependency checklist | *On-device tools* / *All set* / *Re-check* |
 | Empty library | *No projects yet. Pick a long-form video to begin - it stays on your disk.* |
 | Agent runner | *Let the agent find your shorts* / *It reads the transcript on your Codex plan and proposes ranked soundbites into the review queue below.* |
 | Empty queue | *No candidates yet. Once the video is transcribed, ask the agent to propose shorts.* |
