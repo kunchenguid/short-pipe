@@ -123,10 +123,13 @@ export type CandidateProposal = {
   rank: number;
   startWordId: string;
   endWordId: string;
+  /** Defaults to center-square when omitted or invalid. */
   layout?: LayoutKind;
   captionStyle?: CaptionStyle;
   titleStyle?: TitleStyle;
+  /** Defaults to dark when omitted or invalid. */
   theme?: Theme;
+  /** Defaults to full when omitted or invalid. */
   videoFit?: VideoFit;
   keywords?: string[];
 };

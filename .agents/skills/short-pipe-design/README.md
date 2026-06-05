@@ -46,17 +46,29 @@ Pick → Transcribe → Propose → Review / Trim → Render → Output
 - **Project** — one source video + its transcript + its candidates + an output folder.
 - **Candidate** — a proposed soundbite: `title`, `rank`, an inclusive word-id range
   (`startWordId`→`endWordId`), `keywords`, and a `status` (`proposed` · `approved` ·
-  `rejected` · `rendered`). In the repo a candidate also carries `layout` + `captionStyle`;
-  this system promotes those to **project-global** (see the UX note below).
+  `rejected` · `rendered`). In the repo a candidate also carries `layout`, `captionStyle`,
+  `titleStyle`, `theme`, and `videoFit`.
 - **Transcript** — a flat list of words, each with `id` (`w0`, `w1`…), `text`, `start`, `end`.
 
-### The two rendering vocabularies (memorize these)
+### The rendering vocabularies (memorize these)
 
 **Layout** (`LayoutKind`):
-- `card` — video in a rounded card up top on an editorial **paper** background, captions
-  below in **ink**. For talking-head / static / audio-led footage where captions carry it.
-- `full-bleed` — source video fills the whole 1080×1920 frame (cropped), captions in **white**
-  over the footage. For visually rich footage (faces, demos, motion).
+- `center-square` - a full-width video box centered on the page, with the title above it and captions below.
+  This is the default for talking-head / static / audio-led footage.
+- `top-square` - a full-width video box pinned to the top of the page, with title and captions stacked below.
+  Use when captions should carry the piece.
+- `full-bleed` - source video fills the whole 1080×1920 frame (cropped), captions over the footage.
+  For visually rich footage (faces, demos, motion).
+
+**Video fit** (`VideoFit`):
+- `full` - the whole source frame, uncropped, at its real aspect ratio.
+  This is the default.
+- `square` - cropped to a 1:1 square for tighter talking-head framing.
+
+**Theme** (`Theme`):
+- `dark` - ink page + warm off-white text.
+  This is the default.
+- `light` - paper page + ink text for bright or busy footage.
 
 **Caption style** (`CaptionStyle`):
 - `clean` — calm, readable. 74px, weight 700. Corporate / explanatory / storytelling.
@@ -90,9 +102,7 @@ with the sound off.
 >    **highlight-to-select**: drag across the words you want — exactly like quoting a
 >    passage — then drag either rounded handle (or use −/+) to nudge an edge. See the
 >    "Body & transcript" card and the editor's Trim mode.
-> 2. **Project-global style.** Layout + caption style moved out of every candidate card into
->    one "Style · all shorts" bar (see above), so the candidate card can foreground what
->    actually matters per clip — the proposed **passage** and a **video preview**.
+> 2. **Project-global style.** The UI kit keeps a single "Style · all shorts" bar as an intentional prototype simplification, while the production app stores layout, caption style, title style, theme, and video fit on each candidate.
 >
 > Note also: the status hues (`--ok`, `--caution`, `--danger`) were enriched a step from the
 > raw repo values so the pills read confidently rather than washed-out, while staying in the
@@ -202,8 +212,10 @@ chiefly the rendered short.
 
 ### Imagery
 The app ships **no illustration and no photography** of its own — the "imagery" is the user's
-own video frames, shown either full-bleed (cropped, cool/neutral, as filmed) or inside the
-warm card. There are no stock photos, no gradients-as-decoration, no 3D blobs. When a video
+own video frames, shown either full-bleed (cropped, cool/neutral, as filmed) or inside a
+square-layout video box.
+There are no stock photos, no gradients-as-decoration, no 3D blobs.
+When a video
 poster is unavailable in a mock, use a neutral charcoal frame (`--frame`), not a colored
 placeholder.
 

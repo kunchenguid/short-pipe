@@ -5,7 +5,7 @@ description: Turn a long-form video transcript into ranked, captioned vertical s
 
 # Shorts from long-form
 
-You turn one long-form video into a handful of strong vertical shorts.
+You turn one long-form video into a ranked set of strong vertical shorts.
 The video is already on disk and, once transcribed, `transcript.json` in the project folder holds every word with a `start`, `end`, and an `id` like `w0`, `w1`.
 Your job is to read that transcript, find the moments worth clipping, and propose them through the `propose_candidates` tool.
 
@@ -37,7 +37,9 @@ A real pause before the start and after the end (a visible gap between one word'
 Rank best-first, starting at `rank: 1`.
 Rank on: strength of the hook, emotional or informational payoff, and how well it stands alone.
 Propose only genuinely strong moments.
-Three excellent candidates beat ten mediocre ones - a long list of weak clips wastes the user's review time.
+Treat the requested count as the target number of strong clips to find, not a reason to pad with weak moments.
+The app defaults that count to roughly one short per minute of source video, with a floor of two and no upper cap.
+Three excellent candidates still beat ten mediocre ones - a long list of weak clips wastes the user's review time.
 
 ## Layout
 

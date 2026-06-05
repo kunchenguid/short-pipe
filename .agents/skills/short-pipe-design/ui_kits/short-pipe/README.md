@@ -36,7 +36,7 @@ shorts into the filmstrip.
 - **`Editor`** — the three-pane workspace (source bar + global style bar + filmstrip / stage / inspector).
 - **`StyleBar`** — the project-global Layout + Caption controls ("Style · all shorts").
 - **`Filmstrip`** / **`Clip`** — left rail of candidate shorts as 9:16 posters with rank, mini-caption, status, timecode.
-- **`StagePreview`** / **`CaptionLine`** — the centre live 9:16 preview that renders the real `clean` / `karaoke` / `bold-pop` caption styles over `card` / `full-bleed` layouts, with a play scrubber.
+- **`StagePreview`** / **`CaptionLine`** — the centre live 9:16 preview that renders the real `clean` / `karaoke` / `bold-pop` caption styles over `center-square` / `top-square` / `full-bleed` layouts, with a play scrubber.
 - **`Inspector`** — per-candidate panel: proposed **passage**, meta, keyword editor, Trim, Approve / Reject / Render.
 - **`TranscriptTrim`** — the highlight-to-select word range editor (drag to select, drag handles to nudge, ± steppers).
 - **`AgentEmpty`** — the "Let the agent find your shorts" empty/running state.
