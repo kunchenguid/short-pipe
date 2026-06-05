@@ -1,5 +1,6 @@
 import type { AuthStatus } from "./auth";
 import type { SettingsPatch, ShortPipeConfig } from "./config";
+import type { DependencyStatus } from "./deps";
 import type { AppEvent, ChatMessage } from "./events";
 import type {
   CandidatePatch,
@@ -45,6 +46,8 @@ export type ShortPipeApi = {
     getUpdateStatus: () => Promise<UpdateStatus>;
     /** Opens the latest release page in the user's browser. */
     openReleasePage: () => Promise<{ ok: boolean }>;
+    /** Opens an http(s) URL (e.g. a dependency setup page) in the user's browser. */
+    openExternal: (url: string) => Promise<{ ok: boolean }>;
   };
   settings: {
     /** Current app-global config (model + style/output defaults). */
@@ -58,6 +61,10 @@ export type ShortPipeApi = {
     status: () => Promise<AuthStatus>;
     login: () => Promise<AuthStatus>;
     logout: () => Promise<void>;
+  };
+  deps: {
+    /** Probe the external CLI tools the pipeline shells out to. */
+    check: () => Promise<DependencyStatus[]>;
   };
   projects: {
     list: () => Promise<ProjectSummary[]>;

@@ -14,6 +14,7 @@ import type { AppInfo, PickResult, Platform } from "@shared/ipc";
 import type { CandidatePatch, CreateProjectInput } from "@shared/project";
 import { app, BrowserWindow, dialog, ipcMain, safeStorage, shell } from "electron";
 import { CodexAuthService, createSafeStorageTokenCodec } from "./auth/codexAuth";
+import { checkDependencies } from "./deps/dependencies";
 import { registerMediaProtocol, registerMediaScheme } from "./media/mediaProtocol";
 import { AgentRuntimeService } from "./pi/agentRuntimeService";
 import {
@@ -173,6 +174,22 @@ export function registerIpc(services: Services): void {
     await updateChecker.openReleasePage();
     return { ok: true };
   });
+  // Opens an http(s) setup/docs link in the user's browser. Scheme-restricted so
+  // a renderer can never coax the main process into opening a file:// or custom
+  // protocol URL.
+  ipcMain.handle("sp:app:open-external", async (_e, url: string) => {
+    const parsed = new URL(url);
+    if (parsed.protocol !== "https:" && parsed.protocol !== "http:") {
+      throw new Error(`Refusing to open non-web URL: ${parsed.protocol}`);
+    }
+    await shell.openExternal(parsed.toString());
+    return { ok: true };
+  });
+
+  // Probe the external CLI tools (ffmpeg/ffprobe/hyperframes) the pipeline shells
+  // out to, so the startup checklist can show what is ready and how to install
+  // the rest before any project runs.
+  ipcMain.handle("sp:deps:check", () => checkDependencies());
 
   ipcMain.handle("sp:settings:get", () => settings.get());
   ipcMain.handle("sp:settings:update", (_e, patch: SettingsPatch) => settings.update(patch));

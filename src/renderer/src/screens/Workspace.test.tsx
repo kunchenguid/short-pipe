@@ -50,6 +50,7 @@ function stubBridge(overrides: Partial<ShortPipeApi> = {}) {
       info: vi.fn(),
       getUpdateStatus: vi.fn(),
       openReleasePage: vi.fn(),
+      openExternal: vi.fn(),
     },
     settings: {
       get: vi.fn(),
@@ -61,6 +62,7 @@ function stubBridge(overrides: Partial<ShortPipeApi> = {}) {
       login: vi.fn(),
       logout: vi.fn(),
     },
+    deps: { check: vi.fn(async () => []) },
     projects: {
       list: vi.fn(),
       get: vi.fn(async () => projectWithoutDuration),

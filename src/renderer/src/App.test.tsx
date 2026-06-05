@@ -21,6 +21,7 @@ function stubBridge(overrides: Partial<ShortPipeApi> = {}) {
         releaseUrl: null,
       })),
       openReleasePage: vi.fn(),
+      openExternal: vi.fn(),
     },
     settings: {
       get: vi.fn(async () => ({
@@ -41,6 +42,7 @@ function stubBridge(overrides: Partial<ShortPipeApi> = {}) {
       login: vi.fn(),
       logout: vi.fn(),
     },
+    deps: { check: vi.fn(async () => []) },
     projects: {
       list: vi.fn(async () => []),
       get: vi.fn(),
@@ -114,5 +116,29 @@ describe("App", () => {
 
     expect(container.querySelector(".settings-overlay")).not.toBeNull();
     expect(bridge.settings.get).toHaveBeenCalled();
+  });
+
+  it("disconnects Codex from settings and returns to the connect screen", async () => {
+    const bridge = stubBridge();
+    const { App } = await import("./App");
+    await act(async () => {
+      root.render(<App />);
+    });
+
+    // Open settings, then disconnect.
+    await act(async () => {
+      container.querySelector<HTMLButtonElement>('button[aria-label="Settings"]')?.click();
+    });
+    const disconnect = Array.from(container.querySelectorAll<HTMLButtonElement>("button")).find(
+      (b) => b.textContent?.includes("Disconnect"),
+    );
+    expect(disconnect).toBeTruthy();
+    await act(async () => {
+      disconnect?.click();
+    });
+
+    expect(bridge.auth.logout).toHaveBeenCalledOnce();
+    expect(container.querySelector(".settings-overlay")).toBeNull();
+    expect(container.textContent).toContain("Sign in with Codex");
   });
 });

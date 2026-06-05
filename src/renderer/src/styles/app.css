@@ -128,6 +128,14 @@ button {
 .btn.accent:hover {
   background: #b22f1a;
 }
+.btn.danger {
+  color: var(--danger);
+  border-color: var(--vermillion-soft);
+}
+.btn.danger:hover {
+  background: var(--vermillion-wash);
+  border-color: var(--vermillion);
+}
 .btn.ghost {
   background: transparent;
   border-color: transparent;
@@ -284,6 +292,156 @@ input[type="text"] {
 .panel .banner {
   margin-bottom: var(--space-4);
   text-align: left;
+}
+
+/* ---- Dependency checklist (startup readiness) ---- */
+.dep-check {
+  margin-top: var(--space-6);
+  padding-top: var(--space-5);
+  border-top: 1px solid var(--line);
+  text-align: left;
+}
+.dep-check.loading {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  color: var(--ink-3);
+  font-size: 13px;
+}
+.dep-check-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: var(--space-3);
+}
+.dep-check-title {
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+.dep-check-meta {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+.dep-summary {
+  font-size: 12px;
+  font-weight: 500;
+}
+.dep-summary.ok {
+  color: var(--ok);
+}
+.dep-summary.missing {
+  color: var(--danger);
+}
+.dep-recheck {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  color: var(--ink-3);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+}
+.dep-recheck:hover:not(:disabled) {
+  color: var(--ink);
+}
+.dep-recheck:disabled {
+  cursor: default;
+  opacity: 0.6;
+}
+.dep-recheck .lucide {
+  width: 13px;
+  height: 13px;
+}
+.dep-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+.dep-row {
+  display: flex;
+  gap: var(--space-3);
+}
+.dep-status-icon {
+  flex: none;
+  width: 18px;
+  height: 18px;
+  margin-top: 1px;
+}
+.dep-row.ok .dep-status-icon {
+  color: var(--ok);
+}
+.dep-row.missing .dep-status-icon {
+  color: var(--danger);
+}
+.dep-body {
+  min-width: 0;
+  flex: 1;
+}
+.dep-name {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-2);
+  font-size: 14px;
+  color: var(--ink);
+}
+.dep-version {
+  font-size: 12px;
+  color: var(--ink-3);
+}
+.dep-badge {
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--danger);
+  background: var(--vermillion-wash);
+  padding: 1px 6px;
+  border-radius: var(--radius-pill);
+}
+.dep-desc {
+  font-size: 12px;
+  color: var(--ink-2);
+  line-height: 1.5;
+  margin-top: 2px;
+}
+.dep-setup {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+  margin-top: var(--space-2);
+}
+.dep-cmd {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--ink-2);
+  background: var(--paper-2);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-2);
+  padding: 2px 6px;
+}
+.dep-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  color: var(--ultramarine);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+}
+.dep-link:hover {
+  text-decoration: underline;
+}
+.dep-link .lucide {
+  width: 13px;
+  height: 13px;
 }
 
 /* ---- Library ---- */
