@@ -1,5 +1,5 @@
 import type { CaptionStyle, LayoutKind, Theme } from "./project";
-import { CAPTION_STYLES, clampTargetDuration, LAYOUT_KINDS, THEMES } from "./project";
+import { CAPTION_STYLES, LAYOUT_KINDS, SHORT_DURATION_PRESETS, THEMES } from "./project";
 
 export type ShortPipeConfig = {
   version: 1;
@@ -65,10 +65,11 @@ export function normalizeShortPipeConfig(value: unknown): ShortPipeConfig {
     defaultCaptionStyle: CAPTION_STYLES.includes(c.defaultCaptionStyle as CaptionStyle)
       ? (c.defaultCaptionStyle as CaptionStyle)
       : base.defaultCaptionStyle,
-    defaultTargetDurationSec:
-      typeof c.defaultTargetDurationSec === "number"
-        ? clampTargetDuration(c.defaultTargetDurationSec)
-        : base.defaultTargetDurationSec,
+    defaultTargetDurationSec: SHORT_DURATION_PRESETS.includes(
+      c.defaultTargetDurationSec as (typeof SHORT_DURATION_PRESETS)[number],
+    )
+      ? (c.defaultTargetDurationSec as (typeof SHORT_DURATION_PRESETS)[number])
+      : base.defaultTargetDurationSec,
   };
 }
 
