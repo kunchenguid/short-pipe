@@ -233,9 +233,13 @@ export function createCodexTokenCodec(safeStorage: {
   return {
     encrypted: false,
     encrypt: (value) => value,
-    decrypt: (value) =>
-      safeStorage.isEncryptionAvailable()
-        ? safeStorage.decryptString(Buffer.from(value, "base64"))
-        : value,
+    decrypt: (value) => {
+      if (!safeStorage.isEncryptionAvailable()) {
+        throw new Error(
+          "Cannot decrypt legacy Codex auth file because OS keychain access is unavailable.",
+        );
+      }
+      return safeStorage.decryptString(Buffer.from(value, "base64"));
+    },
   };
 }

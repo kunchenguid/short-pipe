@@ -160,6 +160,33 @@ describe("CodexAuthService", () => {
     expect(decryptCalls).toBe(callsAfterMigration);
   });
 
+  it("does not rewrite legacy keychain-encrypted credentials when decryption is unavailable", async () => {
+    const authPath = await tempAuthPath();
+    const codec = createCodexTokenCodec({
+      isEncryptionAvailable: () => false,
+      decryptString: () => {
+        throw new Error("decryptString must not be called without safeStorage");
+      },
+    });
+    const service = new CodexAuthService({ authPath, codec });
+    const legacyCredential = {
+      version: 1,
+      encrypted: true,
+      accessToken: Buffer.from(jwtWithPayload({ exp: 2_000 })).toString("base64"),
+      refreshToken: Buffer.from("legacy-refresh").toString("base64"),
+      updatedAt: "2026-01-01T00:00:00.000Z",
+    };
+    await mkdir(dirname(authPath), { recursive: true });
+    await writeFile(authPath, JSON.stringify(legacyCredential));
+
+    await expect(service.status()).resolves.toMatchObject({
+      authenticated: false,
+      error: "Cannot decrypt legacy Codex auth file because OS keychain access is unavailable.",
+    });
+
+    await expect(readFile(authPath, "utf8")).resolves.toBe(JSON.stringify(legacyCredential));
+  });
+
   it("logs out by removing the app-owned auth file", async () => {
     const authPath = await tempAuthPath();
     const service = new CodexAuthService({ authPath });
