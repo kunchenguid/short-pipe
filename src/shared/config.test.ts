@@ -27,15 +27,15 @@ describe("normalizeShortPipeConfig", () => {
   });
 
   it("keeps a valid target duration and clamps out-of-range values", () => {
-    expect(normalizeShortPipeConfig({ defaultTargetDurationSec: 30 }).defaultTargetDurationSec).toBe(
-      30,
-    );
+    expect(
+      normalizeShortPipeConfig({ defaultTargetDurationSec: 30 }).defaultTargetDurationSec,
+    ).toBe(30);
     expect(
       normalizeShortPipeConfig({ defaultTargetDurationSec: 99999 }).defaultTargetDurationSec,
     ).toBe(600);
-    expect(normalizeShortPipeConfig({ defaultTargetDurationSec: "nope" }).defaultTargetDurationSec).toBe(
-      60,
-    );
+    expect(
+      normalizeShortPipeConfig({ defaultTargetDurationSec: "nope" }).defaultTargetDurationSec,
+    ).toBe(60);
   });
 
   it("keeps valid style defaults and a trimmed output dir", () => {
