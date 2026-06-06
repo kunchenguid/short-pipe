@@ -1,6 +1,6 @@
 ---
 name: shorts-from-longform
-description: Turn a long-form video transcript into ranked, captioned vertical shorts. Use when proposing soundbite candidates, deciding whether to override the user's layout/theme/caption defaults, and selecting keywords to emphasize in a Short Pipe project.
+description: Turn a long-form video transcript into ranked, captioned vertical shorts. Use when proposing soundbite candidates, following the user's target-length setting, deciding whether to override the user's layout/theme/caption defaults, and selecting keywords to emphasize in a Short Pipe project.
 ---
 
 # Shorts from long-form

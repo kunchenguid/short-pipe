@@ -26,8 +26,9 @@ const CAPTION_LABELS: Record<CaptionStyle, string> = {
 
 /**
  * App-global settings, reached from the gear in the topbar. Sets the default
- * output folder for rendered shorts and the layout/theme/caption defaults the
- * agent starts new proposals from. Renders as a modal sheet over the app.
+ * output folder for rendered shorts and the target length/layout/theme/caption
+ * defaults the agent starts new proposals from. Renders as a modal sheet over
+ * the app.
  */
 export function Settings({ onClose, onSignOut }: { onClose: () => void; onSignOut: () => void }) {
   const [config, setConfig] = useState<ShortPipeConfig | null>(null);
