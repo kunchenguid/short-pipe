@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.0.6](https://github.com/kunchenguid/short-pipe/compare/short-pipe-v0.0.5...short-pipe-v0.0.6) (2026-06-06)
+
+
+### Bug Fixes
+
+* **main:** store Codex auth without keychain prompts ([#12](https://github.com/kunchenguid/short-pipe/issues/12)) ([c8e8a12](https://github.com/kunchenguid/short-pipe/commit/c8e8a1272fe3f566d5049b56a6bb22a0f77c042f))
+
 ## [0.0.5](https://github.com/kunchenguid/short-pipe/compare/short-pipe-v0.0.4...short-pipe-v0.0.5) (2026-06-06)
 
 
