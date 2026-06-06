@@ -1,6 +1,10 @@
 import type { AppEvent } from "@shared/events";
 import type { Project, Transcript } from "@shared/project";
-import { DEFAULT_TARGET_DURATION_SEC, defaultShortCount } from "@shared/project";
+import {
+  DEFAULT_TARGET_DURATION_SEC,
+  defaultShortCount,
+  targetDurationHint,
+} from "@shared/project";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { formatTime, sp, useAppEvents } from "../api";
 import { AgentEmpty } from "../components/AgentEmpty";
@@ -154,7 +158,7 @@ export function Workspace({ projectId, onBack }: { projectId: string; onBack: ()
     try {
       await sp.agent.send(
         projectId,
-        `Transcribe the video if it is not already transcribed, then read the transcript and propose the ${count} best shorts using propose_candidates. Aim for shorts around ${targetDuration} seconds long each. Do not render anything.`,
+        `Transcribe the video if it is not already transcribed, then read the transcript and propose the ${count} best shorts using propose_candidates. ${targetDurationHint(targetDuration)} Do not render anything.`,
       );
     } catch (e) {
       setError(e instanceof Error ? e.message : String(e));
@@ -173,7 +177,7 @@ export function Workspace({ projectId, onBack }: { projectId: string; onBack: ()
     try {
       await sp.agent.send(
         projectId,
-        `Find one more short for this project, guided by what the user is looking for: "${prompt}". Aim for a short around ${durationSec} seconds long. Read the transcript and add exactly one additional short using the add_candidates tool (never propose_candidates, which would wipe the existing queue). Do not duplicate any short already in the filmstrip, and do not render anything.`,
+        `Find one more short for this project, guided by what the user is looking for: "${prompt}". ${targetDurationHint(durationSec)} Read the transcript and add exactly one additional short using the add_candidates tool (never propose_candidates, which would wipe the existing queue). Do not duplicate any short already in the filmstrip, and do not render anything.`,
       );
     } catch (e) {
       setError(e instanceof Error ? e.message : String(e));

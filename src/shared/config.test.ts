@@ -36,6 +36,9 @@ describe("normalizeShortPipeConfig", () => {
     expect(
       normalizeShortPipeConfig({ defaultTargetDurationSec: "nope" }).defaultTargetDurationSec,
     ).toBe(60);
+    expect(
+      normalizeShortPipeConfig({ defaultTargetDurationSec: 0 }).defaultTargetDurationSec,
+    ).toBe(0);
   });
 
   it("keeps valid style defaults and a trimmed output dir", () => {
