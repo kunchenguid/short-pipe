@@ -1,5 +1,5 @@
 import type { CaptionStyle, LayoutKind, Theme } from "./project";
-import { CAPTION_STYLES, LAYOUT_KINDS, THEMES } from "./project";
+import { CAPTION_STYLES, clampTargetDuration, LAYOUT_KINDS, THEMES } from "./project";
 
 export type ShortPipeConfig = {
   version: 1;
@@ -15,6 +15,8 @@ export type ShortPipeConfig = {
   defaultTheme: Theme;
   /** Default caption style applied to agent proposals that omit one. */
   defaultCaptionStyle: CaptionStyle;
+  /** Roughly how long each short should be, in seconds. Guides the agent's word range. */
+  defaultTargetDurationSec: number;
 };
 
 export const DEFAULT_CODEX_MODEL = "openai-codex/gpt-5.5";
@@ -26,6 +28,7 @@ export function defaultShortPipeConfig(): ShortPipeConfig {
     defaultLayout: "center-square",
     defaultTheme: "dark",
     defaultCaptionStyle: "clean",
+    defaultTargetDurationSec: 60,
   };
 }
 
@@ -33,7 +36,11 @@ export function defaultShortPipeConfig(): ShortPipeConfig {
 export type SettingsPatch = Partial<
   Pick<
     ShortPipeConfig,
-    "defaultOutputDir" | "defaultLayout" | "defaultTheme" | "defaultCaptionStyle"
+    | "defaultOutputDir"
+    | "defaultLayout"
+    | "defaultTheme"
+    | "defaultCaptionStyle"
+    | "defaultTargetDurationSec"
   >
 >;
 
@@ -58,6 +65,10 @@ export function normalizeShortPipeConfig(value: unknown): ShortPipeConfig {
     defaultCaptionStyle: CAPTION_STYLES.includes(c.defaultCaptionStyle as CaptionStyle)
       ? (c.defaultCaptionStyle as CaptionStyle)
       : base.defaultCaptionStyle,
+    defaultTargetDurationSec:
+      typeof c.defaultTargetDurationSec === "number"
+        ? clampTargetDuration(c.defaultTargetDurationSec)
+        : base.defaultTargetDurationSec,
   };
 }
 

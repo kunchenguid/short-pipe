@@ -214,6 +214,27 @@ export function defaultShortCount(durationSeconds?: number): number {
   return Math.max(MIN_SHORT_COUNT, Math.round(durationSeconds / 60));
 }
 
+/** Roughly how long each short should be, in seconds, when the user hasn't picked one. */
+export const DEFAULT_TARGET_DURATION_SEC = 60;
+/** Smallest target length the user can ask for. */
+export const MIN_TARGET_DURATION_SEC = 5;
+/** Largest target length the user can ask for. */
+export const MAX_TARGET_DURATION_SEC = 600;
+/** The rough-length buckets offered in the UI (settings and both find flows). */
+export const SHORT_DURATION_PRESETS = [15, 30, 45, 60] as const;
+
+/**
+ * Coerce an arbitrary target-length value into a whole number of seconds inside
+ * the allowed range, falling back to {@link DEFAULT_TARGET_DURATION_SEC} when the
+ * input is missing or not a positive number.
+ */
+export function clampTargetDuration(seconds?: number): number {
+  if (typeof seconds !== "number" || !Number.isFinite(seconds) || seconds <= 0) {
+    return DEFAULT_TARGET_DURATION_SEC;
+  }
+  return Math.min(MAX_TARGET_DURATION_SEC, Math.max(MIN_TARGET_DURATION_SEC, Math.round(seconds)));
+}
+
 export function projectSummary(project: Project): ProjectSummary {
   return {
     id: project.id,

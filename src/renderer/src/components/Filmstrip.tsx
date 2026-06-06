@@ -1,6 +1,7 @@
 import type { Candidate } from "@shared/project";
 import { useState } from "react";
 import { formatTime } from "../api";
+import { DurationPicker } from "./DurationPicker";
 import { Icon, Pill, Spinner } from "./Icon";
 
 function Clip({
@@ -55,27 +56,32 @@ function AddShort({
   adding,
   setAdding,
   onAddShort,
+  defaultDurationSec,
   onAbort,
 }: {
   running: boolean;
   step: string | null;
   adding: boolean;
   setAdding: (adding: boolean) => void;
-  onAddShort: (prompt: string) => void;
+  onAddShort: (prompt: string, durationSec: number) => void;
+  defaultDurationSec: number;
   onAbort: () => void;
 }) {
   const [prompt, setPrompt] = useState("");
+  const [duration, setDuration] = useState(defaultDurationSec);
 
   function cancel() {
     setAdding(false);
     setPrompt("");
+    setDuration(defaultDurationSec);
   }
 
   function submit() {
     const text = prompt.trim();
     if (!text) return;
-    onAddShort(text);
+    onAddShort(text, duration);
     setPrompt("");
+    setDuration(defaultDurationSec);
     setAdding(false);
   }
 
@@ -124,6 +130,10 @@ function AddShort({
             }
           }}
         />
+        <div className="add-length">
+          <span className="add-length-label">Target length</span>
+          <DurationPicker value={duration} onChange={setDuration} />
+        </div>
         <div className="add-actions">
           <button type="button" className="btn small ghost" onClick={cancel}>
             Cancel
@@ -148,6 +158,7 @@ export function Filmstrip({
   onSelect,
   onRemove,
   onAddShort,
+  defaultDurationSec,
   onAbort,
   running,
   step,
@@ -156,7 +167,8 @@ export function Filmstrip({
   selectedId: string | null;
   onSelect: (id: string) => void;
   onRemove: (id: string) => void;
-  onAddShort: (prompt: string) => void;
+  onAddShort: (prompt: string, durationSec: number) => void;
+  defaultDurationSec: number;
   onAbort: () => void;
   running: boolean;
   step: string | null;
@@ -202,6 +214,7 @@ export function Filmstrip({
           adding={adding}
           setAdding={setAdding}
           onAddShort={onAddShort}
+          defaultDurationSec={defaultDurationSec}
           onAbort={onAbort}
         />
       )}

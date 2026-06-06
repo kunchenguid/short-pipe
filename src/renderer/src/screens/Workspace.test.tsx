@@ -1,5 +1,6 @@
 // @vitest-environment jsdom
 
+import { defaultShortPipeConfig } from "@shared/config";
 import type { ShortPipeApi } from "@shared/ipc";
 import type { Candidate, Project } from "@shared/project";
 import { act } from "react";
@@ -53,7 +54,7 @@ function stubBridge(overrides: Partial<ShortPipeApi> = {}) {
       openExternal: vi.fn(),
     },
     settings: {
-      get: vi.fn(),
+      get: vi.fn(async () => defaultShortPipeConfig()),
       update: vi.fn(),
       chooseOutputDir: vi.fn(),
     },
@@ -192,6 +193,8 @@ describe("Workspace add-one-more-short", () => {
     const [, prompt] = (bridge.agent.send as ReturnType<typeof vi.fn>).mock.calls[0];
     expect(prompt).toContain("a punchy hook about burnout");
     expect(prompt).toContain("one");
+    // The settings default target length (60s) rides along with the request.
+    expect(prompt).toContain("60 seconds");
   });
 
   it("opens the prompt box from the filmstrip header plus button", async () => {

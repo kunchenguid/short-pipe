@@ -30,6 +30,7 @@ function stubBridge(overrides: Partial<ShortPipeApi> = {}) {
         defaultLayout: "center-square" as const,
         defaultTheme: "dark" as const,
         defaultCaptionStyle: "clean" as const,
+        defaultTargetDurationSec: 60,
       })),
       update: vi.fn(),
       chooseOutputDir: vi.fn(),

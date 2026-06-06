@@ -796,6 +796,16 @@ input[type="text"] {
   outline: none;
   border-color: var(--vermillion);
 }
+.add-length {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+}
+.add-length-label {
+  font-size: 12px;
+  color: var(--ink-3);
+}
 .add-actions {
   display: flex;
   justify-content: flex-end;
@@ -1243,6 +1253,18 @@ input[type="text"] {
   color: var(--ink-2);
   font-size: 13px;
   line-height: 1.55;
+}
+/* target-length row in the empty state: "each about [~15s ~30s ...]" */
+.length-row {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+  justify-content: center;
+}
+.length-label {
+  font-size: 13px;
+  color: var(--ink-3);
 }
 /* quantity stepper: - 3 shorts + */
 .count-step {
