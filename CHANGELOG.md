@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.0.5](https://github.com/kunchenguid/short-pipe/compare/short-pipe-v0.0.4...short-pipe-v0.0.5) (2026-06-06)
+
+
+### Bug Fixes
+
+* include macOS asar runtime dependencies ([#10](https://github.com/kunchenguid/short-pipe/issues/10)) ([b13859a](https://github.com/kunchenguid/short-pipe/commit/b13859a2d910c99f46907a1152ecf9b9ecf0434d))
+
 ## [0.0.4](https://github.com/kunchenguid/short-pipe/compare/short-pipe-v0.0.3...short-pipe-v0.0.4) (2026-06-05)
 
 
