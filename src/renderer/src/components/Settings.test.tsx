@@ -94,16 +94,18 @@ describe("Settings", () => {
     expect(update).toHaveBeenCalledWith({ defaultLayout: "full-bleed" });
   });
 
-  it("patches the default target length when a duration option is clicked", async () => {
+  it("patches the default target length when a duration is chosen", async () => {
     const update = vi.fn(async () => ({ ...baseConfig, defaultTargetDurationSec: 30 }));
     await mount({ get: vi.fn(async () => baseConfig), update, chooseOutputDir: vi.fn() });
 
-    const thirty = Array.from(container.querySelectorAll<HTMLButtonElement>(".seg button")).find(
-      (b) => b.textContent === "~30s",
-    );
-    expect(thirty).toBeTruthy();
+    const select = container.querySelector<HTMLSelectElement>("select.duration-select");
+    expect(select).toBeTruthy();
+    expect(Array.from(select?.options ?? []).map((o) => o.textContent)).toContain("No cap");
     await act(async () => {
-      thirty?.click();
+      if (select) {
+        select.value = "30";
+        select.dispatchEvent(new Event("change", { bubbles: true }));
+      }
     });
     expect(update).toHaveBeenCalledWith({ defaultTargetDurationSec: 30 });
   });

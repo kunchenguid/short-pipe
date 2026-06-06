@@ -158,12 +158,13 @@ describe("Workspace empty-state generation", () => {
       root.render(<Workspace projectId="p1" onBack={() => undefined} />);
     });
 
-    const fortyFive = [...container.querySelectorAll("button")].find(
-      (button) => button.textContent === "~45s",
-    );
-    expect(fortyFive).toBeInstanceOf(HTMLButtonElement);
+    const select = container.querySelector<HTMLSelectElement>("select.duration-select");
+    expect(select).toBeInstanceOf(HTMLSelectElement);
     act(() => {
-      fortyFive?.click();
+      if (select) {
+        select.value = "45";
+        select.dispatchEvent(new Event("change", { bubbles: true }));
+      }
     });
 
     await act(async () => {
@@ -358,12 +359,13 @@ describe("Workspace add-one-more-short", () => {
       addButton?.click();
     });
 
-    const fortyFive = [...container.querySelectorAll("button")].find(
-      (button) => button.textContent === "~45s",
-    );
-    expect(fortyFive).toBeInstanceOf(HTMLButtonElement);
+    const select = container.querySelector<HTMLSelectElement>("select.duration-select");
+    expect(select).toBeInstanceOf(HTMLSelectElement);
     act(() => {
-      fortyFive?.click();
+      if (select) {
+        select.value = "45";
+        select.dispatchEvent(new Event("change", { bubbles: true }));
+      }
     });
 
     await act(async () => {

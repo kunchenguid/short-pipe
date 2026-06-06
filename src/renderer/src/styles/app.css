@@ -1219,6 +1219,36 @@ input[type="text"] {
   font-weight: 600;
 }
 
+/* Rough target length picker (Settings + both find flows). */
+.duration-select {
+  appearance: none;
+  -webkit-appearance: none;
+  border: 1px solid var(--line-strong);
+  background-color: var(--canvas-2);
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23888' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg>");
+  background-repeat: no-repeat;
+  background-position: right 8px center;
+  border-radius: var(--radius-2);
+  padding: 6px 26px 6px 10px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--ink);
+  font-family: var(--font-ui);
+  cursor: pointer;
+  transition: border-color var(--dur-1) var(--ease);
+}
+.duration-select:hover:not(:disabled) {
+  border-color: var(--ink-3);
+}
+.duration-select:focus-visible {
+  outline: none;
+  border-color: var(--vermillion);
+}
+.duration-select:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
 /* ---- Agent runner (empty state) ---- */
 .runner-empty {
   max-width: 380px;

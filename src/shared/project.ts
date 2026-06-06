@@ -214,25 +214,57 @@ export function defaultShortCount(durationSeconds?: number): number {
   return Math.max(MIN_SHORT_COUNT, Math.round(durationSeconds / 60));
 }
 
-/** Roughly how long each short should be, in seconds, when the user hasn't picked one. */
+/** Default preset target length, in seconds, when the user hasn't picked one. */
 export const DEFAULT_TARGET_DURATION_SEC = 60;
-/** Smallest target length the user can ask for. */
+/** Smallest positive target length accepted when clamping arbitrary stored values. */
 export const MIN_TARGET_DURATION_SEC = 5;
-/** Largest target length the user can ask for. */
+/** Largest positive target length accepted when clamping arbitrary stored values. */
 export const MAX_TARGET_DURATION_SEC = 600;
-/** The rough-length buckets offered in the UI (settings and both find flows). */
-export const SHORT_DURATION_PRESETS = [15, 30, 45, 60] as const;
+/**
+ * Sentinel target length meaning "no cap" - the agent picks each short's length
+ * freely instead of aiming for a fixed number of seconds.
+ */
+export const UNCAPPED_TARGET_DURATION_SEC = 0;
+/** The rough-length buckets offered in the UI (settings and both find flows); 0 means uncapped. */
+export const SHORT_DURATION_PRESETS = [
+  15,
+  30,
+  45,
+  60,
+  90,
+  120,
+  UNCAPPED_TARGET_DURATION_SEC,
+] as const;
+
+/** Whether a target length means "let the agent decide where to cut". */
+export function isUncappedDuration(seconds: number): boolean {
+  return seconds === UNCAPPED_TARGET_DURATION_SEC;
+}
 
 /**
  * Coerce an arbitrary target-length value into a whole number of seconds inside
- * the allowed range, falling back to {@link DEFAULT_TARGET_DURATION_SEC} when the
- * input is missing or not a positive number.
+ * the allowed range. The {@link UNCAPPED_TARGET_DURATION_SEC} sentinel passes
+ * through untouched; any other missing or non-positive value falls back to
+ * {@link DEFAULT_TARGET_DURATION_SEC}.
  */
 export function clampTargetDuration(seconds?: number): number {
+  if (seconds === UNCAPPED_TARGET_DURATION_SEC) return UNCAPPED_TARGET_DURATION_SEC;
   if (typeof seconds !== "number" || !Number.isFinite(seconds) || seconds <= 0) {
     return DEFAULT_TARGET_DURATION_SEC;
   }
   return Math.min(MAX_TARGET_DURATION_SEC, Math.max(MIN_TARGET_DURATION_SEC, Math.round(seconds)));
+}
+
+/**
+ * The natural-language target-length instruction handed to the agent. For a real
+ * target it asks the agent to aim near that many seconds; for the uncapped
+ * sentinel it tells the agent to cut wherever makes the strongest short.
+ */
+export function targetDurationHint(seconds: number): string {
+  if (isUncappedDuration(seconds)) {
+    return "Do not aim for a fixed length - cut each short wherever it makes the strongest, most self-contained clip, however long or short that ends up being.";
+  }
+  return `Aim for each short to be around ${seconds} seconds long.`;
 }
 
 export function projectSummary(project: Project): ProjectSummary {
