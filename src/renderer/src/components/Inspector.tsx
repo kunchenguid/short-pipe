@@ -1,3 +1,4 @@
+import type { AppEvent } from "@shared/events";
 import type {
   Candidate,
   LayoutKind,
@@ -7,8 +8,8 @@ import type {
   VideoFit,
 } from "@shared/project";
 import { CAPTION_STYLES, LAYOUT_KINDS, THEMES, TITLE_STYLES, VIDEO_FITS } from "@shared/project";
-import { useState } from "react";
-import { formatTime, sp } from "../api";
+import { useCallback, useState } from "react";
+import { formatTime, sp, useAppEvents } from "../api";
 import { Icon, Pill } from "./Icon";
 import { indexOfId } from "./transcriptSelection";
 
@@ -63,6 +64,9 @@ export function Inspector({
   const [newKw, setNewKw] = useState("");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  // Determinate render progress (0-100), streamed from the main process while the
+  // export runs; null when no export is in flight.
+  const [progress, setProgress] = useState<number | null>(null);
 
   async function call(fn: () => Promise<unknown>) {
     setBusy(true);
@@ -73,8 +77,21 @@ export function Inspector({
       setError(e instanceof Error ? e.message : String(e));
     } finally {
       setBusy(false);
+      setProgress(null);
     }
   }
+
+  // The main process broadcasts render_progress for the candidate being exported;
+  // pick out the ones for this candidate to drive the in-button fill.
+  const onEvent = useCallback(
+    (event: AppEvent) => {
+      if (event.type === "render_progress" && event.candidateId === candidate.id) {
+        setProgress(event.percent);
+      }
+    },
+    [candidate.id],
+  );
+  useAppEvents(onEvent);
 
   const patch = (p: Parameters<typeof sp.candidates.patch>[2]) =>
     call(() => sp.candidates.patch(projectId, candidate.id, p));
@@ -296,7 +313,17 @@ export function Inspector({
                   <Icon name="folderOpen" /> Open folder
                 </button>
                 <button type="button" className="btn" disabled={busy} onClick={exportShort}>
-                  <Icon name="rotateCw" /> {busy ? "Exporting..." : "Re-export"}
+                  {busy && progress !== null && (
+                    <span className="progress-fill" style={{ width: `${progress}%` }} />
+                  )}
+                  <span className="btn-label">
+                    <Icon name="rotateCw" />{" "}
+                    {busy
+                      ? progress !== null
+                        ? `Exporting ${progress}%`
+                        : "Exporting..."
+                      : "Re-export"}
+                  </span>
                 </button>
               </div>
             </>
@@ -307,7 +334,17 @@ export function Inspector({
               disabled={busy}
               onClick={exportShort}
             >
-              <Icon name="film" /> {busy ? "Exporting 1080x1920..." : "Export 1080x1920"}
+              {busy && progress !== null && (
+                <span className="progress-fill" style={{ width: `${progress}%` }} />
+              )}
+              <span className="btn-label">
+                <Icon name="film" />{" "}
+                {busy
+                  ? progress !== null
+                    ? `Exporting 1080x1920... ${progress}%`
+                    : "Exporting 1080x1920..."
+                  : "Export 1080x1920"}
+              </span>
             </button>
           )}
         </div>

@@ -43,7 +43,7 @@ The on-device pipeline still needs FFmpeg (including FFprobe) and the HyperFrame
    After the first batch, use **Add one more short** in the filmstrip to give the agent a focused prompt and append exactly one new candidate without replacing the queue.
 4. **Review and edit** - approve, select the word range, fine-tune exact in/out points on the waveform, and swap layouts and caption styles in the editor.
    Use the topbar gear to set defaults for new shorts, re-check local tools, and disconnect Codex: output folder, layout, theme, and caption style.
-5. **Render** - HyperFrames (headless Chrome + ffmpeg) renders each approved short locally to 1080x1920.
+5. **Render** - HyperFrames (headless Chrome + ffmpeg) renders each approved short locally to 1080x1920, with the Export or Re-export button filling left to right as progress streams back.
 6. **Output** - shorts are written to the default output folder, or to the project's own `output/` folder when no default is set.
 
 ## Requirements

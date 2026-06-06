@@ -95,6 +95,7 @@ export type ShortPipeApi = {
     approve: (projectId: string, candidateId: string) => Promise<Project>;
     reject: (projectId: string, candidateId: string) => Promise<Project>;
     remove: (projectId: string, candidateId: string) => Promise<Project>;
+    /** Renders a candidate; progress streams separately through `events.on`. */
     render: (projectId: string, candidateId: string) => Promise<Project>;
   };
   agent: {

@@ -88,6 +88,8 @@ button {
 
 /* ---- Buttons ---- */
 .btn {
+  position: relative;
+  overflow: hidden;
   display: inline-flex;
   align-items: center;
   gap: 6px;
@@ -101,6 +103,24 @@ button {
   transition:
     background var(--dur-1) var(--ease),
     border-color var(--dur-1) var(--ease);
+}
+/* Determinate export progress: a wash sweeps left->right behind the label as the
+   render advances. A darkening tint reads on both the vermillion accent button
+   and the plain Re-export button. */
+.btn .progress-fill {
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 0;
+  background: rgba(0, 0, 0, 0.16);
+  transition: width var(--dur-1) var(--ease);
+  pointer-events: none;
+}
+.btn .btn-label {
+  position: relative;
+  z-index: 1;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
 }
 .btn:hover {
   background: var(--canvas-hover);

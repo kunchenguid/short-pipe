@@ -44,11 +44,14 @@ export type AgentEvent =
 /**
  * Project lifecycle events. The project store emits `project_updated` after any
  * mutation - whether it came from a UI IPC call or from one of the agent's
- * tools - so the renderer and any agent-driven state stay convergent.
+ * tools - so the renderer and any agent-driven state stay convergent. Render
+ * jobs additionally stream `render_progress` percentages before the final
+ * project mutation marks the candidate rendered.
  */
 export type ProjectEvent =
   | { type: "project_updated"; project: Project }
-  | { type: "projects_listed"; projects: ProjectSummary[] };
+  | { type: "projects_listed"; projects: ProjectSummary[] }
+  | { type: "render_progress"; projectId: string; candidateId: string; percent: number };
 
 /** Everything that flows over the one-way `sp:event` channel. */
 export type AppEvent = AgentEvent | ProjectEvent;

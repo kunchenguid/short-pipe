@@ -113,7 +113,8 @@ function slug(text: string): string {
 /**
  * Render one candidate to the project's output folder and mark it rendered. The
  * candidate must be approved - rendering a proposed/rejected clip is a no-op
- * guard so the UI's approve step is meaningful.
+ * guard so the UI's approve step is meaningful. `onProgress` receives streamed
+ * HyperFrames output so embedders can surface determinate render progress.
  */
 export async function renderCandidate(
   projects: ProjectService,
