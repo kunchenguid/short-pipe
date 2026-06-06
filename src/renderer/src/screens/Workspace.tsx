@@ -1,7 +1,7 @@
 import type { AppEvent } from "@shared/events";
 import type { Project, Transcript } from "@shared/project";
 import { DEFAULT_TARGET_DURATION_SEC, defaultShortCount } from "@shared/project";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { formatTime, sp, useAppEvents } from "../api";
 import { AgentEmpty } from "../components/AgentEmpty";
 import { Filmstrip } from "../components/Filmstrip";
@@ -35,12 +35,14 @@ export function Workspace({ projectId, onBack }: { projectId: string; onBack: ()
   const [countTouched, setCountTouched] = useState(false);
   // Rough target length per short, seeded from the global Settings default.
   const [targetDuration, setTargetDuration] = useState(DEFAULT_TARGET_DURATION_SEC);
+  const targetDurationTouchedRef = useRef(false);
   const [running, setRunning] = useState(false);
   const [step, setStep] = useState<string | null>(null);
   const [probingDuration, setProbingDuration] = useState(true);
 
   useEffect(() => {
     let cancelled = false;
+    targetDurationTouchedRef.current = false;
     setProbingDuration(true);
     sp.projects
       .get(projectId)
@@ -66,7 +68,9 @@ export function Workspace({ projectId, onBack }: { projectId: string; onBack: ()
     sp.settings
       .get()
       .then((c) => {
-        if (!cancelled) setTargetDuration(c.defaultTargetDurationSec);
+        if (!cancelled && !targetDurationTouchedRef.current) {
+          setTargetDuration(c.defaultTargetDurationSec);
+        }
       })
       .catch(() => {});
     return () => {
@@ -87,6 +91,11 @@ export function Workspace({ projectId, onBack }: { projectId: string; onBack: ()
   const onCount = useCallback((n: number) => {
     setCountTouched(true);
     setCount(n);
+  }, []);
+
+  const onTargetDuration = useCallback((seconds: number) => {
+    targetDurationTouchedRef.current = true;
+    setTargetDuration(seconds);
   }, []);
 
   // Default the selection to the first candidate; keep it valid as the queue changes.
@@ -266,7 +275,7 @@ export function Workspace({ projectId, onBack }: { projectId: string; onBack: ()
               count={count}
               onCount={onCount}
               duration={targetDuration}
-              onDuration={setTargetDuration}
+              onDuration={onTargetDuration}
               onRun={findShorts}
               onAbort={() => void sp.agent.abort(projectId)}
               error={error}

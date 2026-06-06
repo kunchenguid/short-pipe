@@ -123,6 +123,66 @@ describe("Workspace empty-state generation", () => {
     });
     expect(bridge.agent.send).not.toHaveBeenCalled();
   });
+
+  it("keeps a user-selected target duration when settings load later", async () => {
+    let resolveSettings: (config: ReturnType<typeof defaultShortPipeConfig>) => void = () =>
+      undefined;
+    const settingsPromise = new Promise<ReturnType<typeof defaultShortPipeConfig>>((resolve) => {
+      resolveSettings = resolve;
+    });
+    const bridge = stubBridge({
+      settings: {
+        get: vi.fn(() => settingsPromise),
+        update: vi.fn(),
+        chooseOutputDir: vi.fn(),
+      },
+      projects: {
+        list: vi.fn(),
+        get: vi.fn(async () => ({
+          ...projectWithoutDuration,
+          source: { path: "/video.mp4", duration: 600 },
+        })),
+        create: vi.fn(),
+        delete: vi.fn(),
+        pickSource: vi.fn(),
+        revealOutput: vi.fn(),
+        probe: vi.fn(async () => ({
+          ...projectWithoutDuration,
+          source: { path: "/video.mp4", duration: 600 },
+        })),
+      },
+    });
+    const { Workspace } = await import("./Workspace");
+
+    await act(async () => {
+      root.render(<Workspace projectId="p1" onBack={() => undefined} />);
+    });
+
+    const fortyFive = [...container.querySelectorAll("button")].find(
+      (button) => button.textContent === "~45s",
+    );
+    expect(fortyFive).toBeInstanceOf(HTMLButtonElement);
+    act(() => {
+      fortyFive?.click();
+    });
+
+    await act(async () => {
+      resolveSettings({ ...defaultShortPipeConfig(), defaultTargetDurationSec: 30 });
+      await settingsPromise;
+    });
+
+    const runButton = [...container.querySelectorAll("button")].find((button) =>
+      button.textContent?.includes("Find shorts"),
+    );
+    expect(runButton).toBeInstanceOf(HTMLButtonElement);
+    await act(async () => {
+      runButton?.click();
+    });
+
+    expect(bridge.agent.send).toHaveBeenCalledTimes(1);
+    const [, prompt] = (bridge.agent.send as ReturnType<typeof vi.fn>).mock.calls[0];
+    expect(prompt).toContain("45 seconds");
+  });
 });
 
 describe("Workspace add-one-more-short", () => {
@@ -198,7 +258,8 @@ describe("Workspace add-one-more-short", () => {
   });
 
   it("uses the loaded default duration when settings arrive after add-one-more opens", async () => {
-    let resolveSettings: (config: ReturnType<typeof defaultShortPipeConfig>) => void = () => undefined;
+    let resolveSettings: (config: ReturnType<typeof defaultShortPipeConfig>) => void = () =>
+      undefined;
     const settingsPromise = new Promise<ReturnType<typeof defaultShortPipeConfig>>((resolve) => {
       resolveSettings = resolve;
     });
