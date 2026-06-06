@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.0.8](https://github.com/kunchenguid/short-pipe/compare/short-pipe-v0.0.7...short-pipe-v0.0.8) (2026-06-06)
+
+
+### Features
+
+* **renderer:** add target duration controls for shorts ([#16](https://github.com/kunchenguid/short-pipe/issues/16)) ([5968bd8](https://github.com/kunchenguid/short-pipe/commit/5968bd891aa67bc72bee7bf08925a3c804564b31))
+
 ## [0.0.7](https://github.com/kunchenguid/short-pipe/compare/short-pipe-v0.0.6...short-pipe-v0.0.7) (2026-06-06)
 
 
