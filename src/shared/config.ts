@@ -15,7 +15,7 @@ export type ShortPipeConfig = {
   defaultTheme: Theme;
   /** Default caption style applied to agent proposals that omit one. */
   defaultCaptionStyle: CaptionStyle;
-  /** Roughly how long each short should be, in seconds. Guides the agent's word range. */
+  /** Preset rough length for each short, or 0 for uncapped agent-chosen cuts. */
   defaultTargetDurationSec: number;
 };
 

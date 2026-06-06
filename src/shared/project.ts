@@ -214,18 +214,18 @@ export function defaultShortCount(durationSeconds?: number): number {
   return Math.max(MIN_SHORT_COUNT, Math.round(durationSeconds / 60));
 }
 
-/** Roughly how long each short should be, in seconds, when the user hasn't picked one. */
+/** Default preset target length, in seconds, when the user hasn't picked one. */
 export const DEFAULT_TARGET_DURATION_SEC = 60;
-/** Smallest target length the user can ask for. */
+/** Smallest positive target length accepted when clamping arbitrary stored values. */
 export const MIN_TARGET_DURATION_SEC = 5;
-/** Largest target length the user can ask for. */
+/** Largest positive target length accepted when clamping arbitrary stored values. */
 export const MAX_TARGET_DURATION_SEC = 600;
 /**
  * Sentinel target length meaning "no cap" - the agent picks each short's length
  * freely instead of aiming for a fixed number of seconds.
  */
 export const UNCAPPED_TARGET_DURATION_SEC = 0;
-/** The rough-length buckets offered in the UI (settings and both find flows). */
+/** The rough-length buckets offered in the UI (settings and both find flows); 0 means uncapped. */
 export const SHORT_DURATION_PRESETS = [
   15,
   30,

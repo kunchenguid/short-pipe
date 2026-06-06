@@ -39,8 +39,8 @@ The on-device pipeline still needs FFmpeg (including FFprobe) and the HyperFrame
 
 1. **Pick** a long-form video. It stays on disk.
 2. **Transcribe** with local Whisper (via HyperFrames), producing word-level timestamps.
-3. **Candidates** - choose how many shorts to find and a rough target length (`~15s`, `~30s`, `~45s`, or `~60s`), then the agent reads the transcript and proposes ranked soundbites following the bundled `shorts-from-longform` skill.
-   The count defaults to roughly one short per minute of source video, and the length defaults to `~60s`.
+3. **Candidates** - choose how many shorts to find and a rough target length (`~15s`, `~30s`, `~45s`, `~60s`, `~90s`, `~120s`, or `No cap`), then the agent reads the transcript and proposes ranked soundbites following the bundled `shorts-from-longform` skill.
+   The count defaults to roughly one short per minute of source video, the length defaults to `~60s`, and `No cap` lets the agent decide where each self-contained short is strongest.
    After the first batch, use **Add one more short** in the filmstrip to give the agent a focused prompt and target length, then append exactly one new candidate without replacing the queue.
 4. **Review and edit** - approve, select the word range, fine-tune exact in/out points on the waveform, and swap layouts and caption styles in the editor.
    Use the topbar gear to set defaults for new shorts, re-check local tools, and disconnect Codex: output folder, target length, layout, theme, and caption style.
