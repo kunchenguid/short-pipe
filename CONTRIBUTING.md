@@ -30,9 +30,9 @@ See the [no-mistakes quick start](https://kunchenguid.github.io/no-mistakes/star
 - Use TDD for bug fixes and new features.
 - Tests live next to the code they cover as `*.test.ts` files (for example `src/main/auth/codexAuth.test.ts`).
 - Run `pnpm check` (Biome lint + format), `pnpm typecheck`, `pnpm test`, and `pnpm build` before pushing.
-- Run `pnpm package:mac` when changing packaging, runtime paths, native dependencies, or release behavior.
+- Run `pnpm package:mac` when changing packaging, runtime paths, native dependencies, or release behavior; it runs `pnpm verify:asar` before signing so missing packaged runtime dependencies fail locally.
 - Local `pnpm package:mac` builds intentionally produce `Short Pipe Dev.app` with bundle id `com.shortpipe.app.dev`; release automation uses `electron-builder.yml` directly for the production `Short Pipe.app` identity.
-- Keep universal macOS packaging compatible with both Intel and Apple Silicon Macs.
+- Keep universal macOS packaging compatible with both Intel and Apple Silicon Macs, including pnpm `supportedArchitectures` and electron-builder `x64ArchFiles` when adding prebuilt native packages.
 - Keep `pnpm-lock.yaml` changes with dependency changes.
 - Do not commit generated build output (`out/`, `dist/`) or release artifacts.
 - Do not hand-edit release-please metadata such as `CHANGELOG.md` or `.release-please-manifest.json`.
@@ -44,7 +44,7 @@ Short Pipe releases are proposed by release-please after conventional commits la
 Use prefixes such as `feat:` and `fix:` so release-please can choose the version bump and release notes.
 Mark breaking changes with `!` in the commit type or a `BREAKING CHANGE:` footer.
 Merging the release-please PR creates the version tag and GitHub Release.
-The release-please workflow then builds and uploads the universal macOS DMG, then updates `kunchenguid/homebrew-tap` with the release SHA so `brew upgrade --cask short-pipe` picks it up.
+The release-please workflow then builds the universal macOS DMG, verifies the packaged asar dependencies, uploads the DMG, and updates `kunchenguid/homebrew-tap` with the release SHA so `brew upgrade --cask short-pipe` picks it up.
 Maintainers must keep `HOMEBREW_TAP_TOKEN` configured with write access to `kunchenguid/homebrew-tap` for that update step.
 Maintainers must also keep the `SHORT_PIPE_UMAMI_WEBSITE_ID` GitHub Actions repository variable configured for packaged-release telemetry; it is intentionally a variable rather than a secret because the id is baked into the app and sent in Umami payloads.
 Do not manually rewrite the tap from this repo outside that workflow unless you are repairing a failed release.
