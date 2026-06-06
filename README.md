@@ -59,7 +59,9 @@ The on-device pipeline still needs FFmpeg (including FFprobe) and the HyperFrame
 
 The connect screen and Settings both show an **On-device tools** checklist for FFmpeg and HyperFrames, including detected versions, install commands, and setup links.
 The checklist re-runs when the app window regains focus after you install a tool, and you can also use **Re-check** manually.
-Use **Disconnect Codex** in Settings to sign out on this machine and return to the connect screen.
+When you sign in, Short Pipe stores Codex OAuth tokens in plaintext at `~/.short-pipe/auth/codex.json` with owner-only file permissions (`0600`), matching the Codex CLI storage model and avoiding macOS Keychain prompts from Electron safe storage.
+Older encrypted auth files are migrated to that plaintext file the first time Short Pipe can decrypt them, which may cause one final Keychain prompt.
+Use **Disconnect Codex** in Settings to remove the local token file, sign out on this machine, and return to the connect screen.
 
 ## Develop
 

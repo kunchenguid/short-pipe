@@ -4,7 +4,7 @@ import { normalizeShortPipeConfig, type ShortPipeConfig } from "@shared/config";
 import { readJsonFile, writeJsonFile } from "./json";
 
 /**
- * On-disk layout under `~/.short-pipe/`. Holds config, encrypted Codex auth, the
+ * On-disk layout under `~/.short-pipe/`. Holds config, Codex auth, the
  * pi agent's working dir, and one folder per video project (each with its own
  * `output/`). A single visible home keeps all persistent state in one place
  * instead of buried under the OS app-data directory.
