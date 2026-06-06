@@ -50,7 +50,6 @@ type CodexAuthServiceOptions = {
 
 export const plainCodexTokenCodec: CodexTokenCodec = {
   encrypted: false,
-  warning: "Codex tokens are stored in a local file because secure storage is unavailable.",
   encrypt: (value) => value,
   decrypt: (value) => value,
 };
@@ -178,13 +177,21 @@ export class CodexAuthService {
       throw new Error("Codex auth file is missing tokens.");
     }
 
-    return {
+    const credential: CodexCredential = {
       accessToken,
       refreshToken,
       accountId: stored.accountId ?? extractCodexAccountId(accessToken),
       expiresAt: stored.expiresAt ?? getCodexAccessTokenExpiry(accessToken),
       updatedAt: stored.updatedAt,
     };
+
+    // One-time migration: rewrite legacy keychain-encrypted files as plaintext so
+    // later launches never touch the OS keychain (and never re-prompt the user).
+    if (stored.encrypted && !this.codec.encrypted) {
+      await this.writeCredential(credential);
+    }
+
+    return credential;
   }
 
   private async writeCredential(credential: CodexCredential): Promise<void> {
@@ -213,17 +220,26 @@ export class CodexAuthService {
   }
 }
 
-export function createSafeStorageTokenCodec(options: {
+// Tokens are stored as plaintext in a 0600 file (the same model the Codex CLI
+// uses for ~/.codex/auth.json). We deliberately avoid Electron's safeStorage for
+// writes: on macOS it keeps its key in the login Keychain, and an ad-hoc-signed
+// app triggers a Keychain password prompt on every launch, which looks alarming
+// to regular users. `decrypt` is kept safeStorage-backed only so a one-time
+// migration can read credentials written by older, encrypted builds.
+export function createCodexTokenCodec(safeStorage: {
   isEncryptionAvailable: () => boolean;
-  encryptString: (value: string) => Buffer;
   decryptString: (value: Buffer) => string;
 }): CodexTokenCodec {
-  if (!options.isEncryptionAvailable()) {
-    return plainCodexTokenCodec;
-  }
   return {
-    encrypted: true,
-    encrypt: (value) => options.encryptString(value).toString("base64"),
-    decrypt: (value) => options.decryptString(Buffer.from(value, "base64")),
+    encrypted: false,
+    encrypt: (value) => value,
+    decrypt: (value) => {
+      if (!safeStorage.isEncryptionAvailable()) {
+        throw new Error(
+          "Cannot decrypt legacy Codex auth file because OS keychain access is unavailable.",
+        );
+      }
+      return safeStorage.decryptString(Buffer.from(value, "base64"));
+    },
   };
 }
