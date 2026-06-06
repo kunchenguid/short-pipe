@@ -64,6 +64,11 @@ jobs:
       - name: Package macOS app
         run: pnpm exec electron-builder --mac dir --universal
 
+      - name: Verify packaged dependencies
+        # Fail the release if electron-builder's pnpm collector dropped any
+        # runtime dependency from the asar (see scripts/verify-asar-deps.mjs).
+        run: node scripts/verify-asar-deps.mjs dist
+
       - name: Ad-hoc sign app
         run: codesign --force --deep --sign - "dist/mac-universal/Short Pipe.app"
 

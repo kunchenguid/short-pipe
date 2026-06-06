@@ -40,6 +40,13 @@ mac:
   identity: null
   hardenedRuntime: false
   gatekeeperAssess: false
+  # @mariozechner/clipboard (pulled in by pi-coding-agent) ships prebuilt
+  # per-arch .node binaries as separate packages. They are byte-identical across
+  # the x64 and arm64 app slices, so @electron/universal needs them flagged here
+  # or it aborts the universal merge ("same in both ... not covered by the
+  # x64ArchFiles rule"). The glob covers every @mariozechner clipboard binary.
+  # Pair this with supportedArchitectures in pnpm-workspace.yaml.
+  x64ArchFiles: Contents/Resources/app.asar.unpacked/node_modules/@mariozechner/**
 
 dmg:
   writeUpdateInfo: false

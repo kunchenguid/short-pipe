@@ -70,11 +70,13 @@ pnpm test         # unit + integration tests
 pnpm typecheck    # tsc across main, preload, renderer
 pnpm lint         # biome
 pnpm build        # bundle all three electron targets
-pnpm package:mac  # build a universal, ad-hoc-signed "Short Pipe Dev.app"
+pnpm verify:asar  # verify packaged runtime deps after electron-builder output exists
+pnpm package:mac  # build, verify, and ad-hoc-sign a universal "Short Pipe Dev.app"
 pnpm dist:mac     # package:mac, then wrap it in a universal .dmg
 ```
 
 Local `package:mac`/`dist:mac` builds use `electron-builder.dev.yml`, so they produce a `Short Pipe Dev.app` (bundle id `com.shortpipe.app.dev`) that will not collide with an installed release copy.
+The packaged app is verified with `scripts/verify-asar-deps.mjs` before signing so missing pnpm transitive dependencies fail locally instead of shipping a crashing asar.
 
 The agent's editorial logic lives in [`skills/shorts-from-longform/SKILL.md`](./skills/shorts-from-longform/SKILL.md), authored in this repo and bundled into the packaged app.
 
@@ -97,7 +99,7 @@ SP_SMOKE=1 SHORT_PIPE_USER_DATA_DIR=/tmp/sp-smoke npx electron .
 ## Releases
 
 Releases are automated with [release-please](https://github.com/googleapis/release-please).
-Conventional commits (`feat:`, `fix:`, `feat!:`) on `main` open a release PR; merging it tags the release, builds a universal macOS DMG, attaches it to the GitHub Release, and updates the [`kunchenguid/homebrew-tap`](https://github.com/kunchenguid/homebrew-tap) cask.
+Conventional commits (`feat:`, `fix:`, `feat!:`) on `main` open a release PR; merging it tags the release, builds and verifies a universal macOS DMG, attaches it to the GitHub Release, and updates the [`kunchenguid/homebrew-tap`](https://github.com/kunchenguid/homebrew-tap) cask.
 See [CONTRIBUTING.md](./CONTRIBUTING.md) for the contributor workflow and the maintainer secrets/variables the release job needs.
 
 ## Telemetry
@@ -108,7 +110,7 @@ It is a no-op in source/dev builds, and you can turn it off in a packaged build 
 ## Status
 
 This is an MVP. The core pipeline (pick → transcribe → propose → review/trim → render) works end-to-end on-device.
-Distribution is wired up: universal macOS DMG built and published via the Homebrew cask on every release, with an in-app update indicator.
+Distribution is wired up: universal macOS DMG built, verified, and published via the Homebrew cask on every release, with an in-app update indicator.
 Builds are currently ad-hoc signed (not Developer ID signed or notarized), so first launch needs a right-click → Open.
 
 ## License
