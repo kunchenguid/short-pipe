@@ -1,8 +1,8 @@
-import { mkdtemp, readFile, stat } from "node:fs/promises";
+import { mkdir, mkdtemp, readFile, stat, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
-import { join } from "node:path";
+import { dirname, join } from "node:path";
 import { describe, expect, it } from "vitest";
-import { CodexAuthService, type CodexTokenCodec } from "./codexAuth";
+import { CodexAuthService, type CodexTokenCodec, createCodexTokenCodec } from "./codexAuth";
 
 async function tempAuthPath(): Promise<string> {
   const root = await mkdtemp(join(tmpdir(), "hibit-auth-"));
@@ -96,6 +96,68 @@ describe("CodexAuthService", () => {
     const stored = JSON.parse(raw) as { refreshToken: string };
     expect(stored.refreshToken).not.toBe("refresh");
     await expect(service.getFreshAccessToken()).resolves.toBe(jwtWithPayload({ exp: 2_000 }));
+  });
+
+  it("writes tokens as plaintext so the OS keychain is never touched on startup", async () => {
+    const authPath = await tempAuthPath();
+    const codec = createCodexTokenCodec({
+      isEncryptionAvailable: () => true,
+      decryptString: () => {
+        throw new Error("decryptString must not be called for fresh logins");
+      },
+    });
+    const service = new CodexAuthService({ authPath, codec, now: () => new Date(0) });
+
+    await service.saveTokenPair({
+      accessToken: jwtWithPayload({ exp: 2_000 }),
+      refreshToken: "refresh",
+    });
+
+    const stored = JSON.parse(await readFile(authPath, "utf8"));
+    expect(stored).toMatchObject({ encrypted: false, refreshToken: "refresh" });
+    await expect(service.getFreshAccessToken()).resolves.toBe(jwtWithPayload({ exp: 2_000 }));
+  });
+
+  it("migrates a legacy keychain-encrypted file to plaintext on first load", async () => {
+    const authPath = await tempAuthPath();
+    let decryptCalls = 0;
+    const codec = createCodexTokenCodec({
+      isEncryptionAvailable: () => true,
+      decryptString: (value) => {
+        decryptCalls += 1;
+        return value.toString("utf8");
+      },
+    });
+    const service = new CodexAuthService({ authPath, codec, now: () => new Date(0) });
+
+    const accessToken = jwtWithPayload({ exp: 2_000, chatgpt_account_id: "acct-legacy" });
+    await mkdir(dirname(authPath), { recursive: true });
+    await writeFile(
+      authPath,
+      JSON.stringify({
+        version: 1,
+        encrypted: true,
+        accessToken: Buffer.from(accessToken).toString("base64"),
+        refreshToken: Buffer.from("legacy-refresh").toString("base64"),
+        updatedAt: "2026-01-01T00:00:00.000Z",
+      }),
+    );
+
+    await expect(service.status()).resolves.toMatchObject({
+      authenticated: true,
+      accountId: "acct-legacy",
+    });
+
+    const migrated = JSON.parse(await readFile(authPath, "utf8"));
+    expect(migrated).toMatchObject({
+      encrypted: false,
+      accessToken,
+      refreshToken: "legacy-refresh",
+    });
+
+    const callsAfterMigration = decryptCalls;
+    await service.status();
+    expect(decryptCalls).toBe(callsAfterMigration);
   });
 
   it("logs out by removing the app-owned auth file", async () => {

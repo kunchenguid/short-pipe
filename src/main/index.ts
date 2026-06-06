@@ -13,7 +13,7 @@ import type { AppEvent } from "@shared/events";
 import type { AppInfo, PickResult, Platform } from "@shared/ipc";
 import type { CandidatePatch, CreateProjectInput } from "@shared/project";
 import { app, BrowserWindow, dialog, ipcMain, safeStorage, shell } from "electron";
-import { CodexAuthService, createSafeStorageTokenCodec } from "./auth/codexAuth";
+import { CodexAuthService, createCodexTokenCodec } from "./auth/codexAuth";
 import { checkDependencies } from "./deps/dependencies";
 import { registerMediaProtocol, registerMediaScheme } from "./media/mediaProtocol";
 import { AgentRuntimeService } from "./pi/agentRuntimeService";
@@ -112,7 +112,7 @@ async function createServices(layout: ShortPipeLayout): Promise<Services> {
   const settings = new SettingsService({ configPath: layout.configPath, initial: config });
   const auth = new CodexAuthService({
     authPath: layout.codexAuthPath,
-    codec: createSafeStorageTokenCodec(safeStorage),
+    codec: createCodexTokenCodec(safeStorage),
     openExternal: (url) => shell.openExternal(url),
   });
   const projects = new ProjectService({
