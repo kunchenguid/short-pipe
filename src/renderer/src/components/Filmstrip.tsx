@@ -1,5 +1,5 @@
 import type { Candidate } from "@shared/project";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { formatTime } from "../api";
 import { DurationPicker } from "./DurationPicker";
 import { Icon, Pill, Spinner } from "./Icon";
@@ -69,6 +69,10 @@ function AddShort({
 }) {
   const [prompt, setPrompt] = useState("");
   const [duration, setDuration] = useState(defaultDurationSec);
+
+  useEffect(() => {
+    setDuration(defaultDurationSec);
+  }, [defaultDurationSec]);
 
   function cancel() {
     setAdding(false);
