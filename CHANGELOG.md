@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.0.9](https://github.com/kunchenguid/short-pipe/compare/short-pipe-v0.0.8...short-pipe-v0.0.9) (2026-06-06)
+
+
+### Features
+
+* **renderer:** add uncapped short duration selection ([#18](https://github.com/kunchenguid/short-pipe/issues/18)) ([34ca594](https://github.com/kunchenguid/short-pipe/commit/34ca594de9a7b421e28a7e2c4a4b401329f9479b))
+
 ## [0.0.8](https://github.com/kunchenguid/short-pipe/compare/short-pipe-v0.0.7...short-pipe-v0.0.8) (2026-06-06)
 
 
