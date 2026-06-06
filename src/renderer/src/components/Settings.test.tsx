@@ -35,6 +35,7 @@ const baseConfig: ShortPipeConfig = {
   defaultLayout: "center-square",
   defaultTheme: "dark",
   defaultCaptionStyle: "clean",
+  defaultTargetDurationSec: 60,
 };
 
 let container: HTMLDivElement;
@@ -91,6 +92,20 @@ describe("Settings", () => {
       fullBleed?.click();
     });
     expect(update).toHaveBeenCalledWith({ defaultLayout: "full-bleed" });
+  });
+
+  it("patches the default target length when a duration option is clicked", async () => {
+    const update = vi.fn(async () => ({ ...baseConfig, defaultTargetDurationSec: 30 }));
+    await mount({ get: vi.fn(async () => baseConfig), update, chooseOutputDir: vi.fn() });
+
+    const thirty = Array.from(container.querySelectorAll<HTMLButtonElement>(".seg button")).find(
+      (b) => b.textContent === "~30s",
+    );
+    expect(thirty).toBeTruthy();
+    await act(async () => {
+      thirty?.click();
+    });
+    expect(update).toHaveBeenCalledWith({ defaultTargetDurationSec: 30 });
   });
 
   it("shows the on-device tools checklist", async () => {

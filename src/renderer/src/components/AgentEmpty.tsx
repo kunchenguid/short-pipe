@@ -1,5 +1,6 @@
 import type { TranscriptStatus } from "@shared/project";
 import { MIN_SHORT_COUNT } from "@shared/project";
+import { DurationPicker } from "./DurationPicker";
 import { Icon, Spinner } from "./Icon";
 
 /**
@@ -13,6 +14,8 @@ export function AgentEmpty({
   step,
   count,
   onCount,
+  duration,
+  onDuration,
   onRun,
   onAbort,
   error,
@@ -23,6 +26,8 @@ export function AgentEmpty({
   step: string | null;
   count: number;
   onCount: (n: number) => void;
+  duration: number;
+  onDuration: (seconds: number) => void;
   onRun: () => void;
   onAbort: () => void;
   error: string | null;
@@ -73,6 +78,10 @@ export function AgentEmpty({
               >
                 <Icon name="plus" />
               </button>
+            </div>
+            <div className="length-row">
+              <span className="length-label">each about</span>
+              <DurationPicker value={duration} onChange={onDuration} />
             </div>
             {waitingForDuration && (
               <div className="runner-status">Waiting for video details...</div>

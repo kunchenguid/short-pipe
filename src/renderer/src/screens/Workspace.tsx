@@ -1,7 +1,7 @@
 import type { AppEvent } from "@shared/events";
 import type { Project, Transcript } from "@shared/project";
-import { defaultShortCount } from "@shared/project";
-import { useCallback, useEffect, useState } from "react";
+import { DEFAULT_TARGET_DURATION_SEC, defaultShortCount } from "@shared/project";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { formatTime, sp, useAppEvents } from "../api";
 import { AgentEmpty } from "../components/AgentEmpty";
 import { Filmstrip } from "../components/Filmstrip";
@@ -33,12 +33,16 @@ export function Workspace({ projectId, onBack }: { projectId: string; onBack: ()
   // Agent run state (driven by streaming tool events).
   const [count, setCount] = useState(defaultShortCount());
   const [countTouched, setCountTouched] = useState(false);
+  // Rough target length per short, seeded from the global Settings default.
+  const [targetDuration, setTargetDuration] = useState(DEFAULT_TARGET_DURATION_SEC);
+  const targetDurationTouchedRef = useRef(false);
   const [running, setRunning] = useState(false);
   const [step, setStep] = useState<string | null>(null);
   const [probingDuration, setProbingDuration] = useState(true);
 
   useEffect(() => {
     let cancelled = false;
+    targetDurationTouchedRef.current = false;
     setProbingDuration(true);
     sp.projects
       .get(projectId)
@@ -61,6 +65,14 @@ export function Workspace({ projectId, onBack }: { projectId: string; onBack: ()
         if (!cancelled) setProbingDuration(false);
       });
     sp.agent.isRunning(projectId).then(setRunning);
+    sp.settings
+      .get()
+      .then((c) => {
+        if (!cancelled && !targetDurationTouchedRef.current) {
+          setTargetDuration(c.defaultTargetDurationSec);
+        }
+      })
+      .catch(() => {});
     return () => {
       cancelled = true;
     };
@@ -79,6 +91,11 @@ export function Workspace({ projectId, onBack }: { projectId: string; onBack: ()
   const onCount = useCallback((n: number) => {
     setCountTouched(true);
     setCount(n);
+  }, []);
+
+  const onTargetDuration = useCallback((seconds: number) => {
+    targetDurationTouchedRef.current = true;
+    setTargetDuration(seconds);
   }, []);
 
   // Default the selection to the first candidate; keep it valid as the queue changes.
@@ -137,7 +154,7 @@ export function Workspace({ projectId, onBack }: { projectId: string; onBack: ()
     try {
       await sp.agent.send(
         projectId,
-        `Transcribe the video if it is not already transcribed, then read the transcript and propose the ${count} best shorts using propose_candidates. Do not render anything.`,
+        `Transcribe the video if it is not already transcribed, then read the transcript and propose the ${count} best shorts using propose_candidates. Aim for shorts around ${targetDuration} seconds long each. Do not render anything.`,
       );
     } catch (e) {
       setError(e instanceof Error ? e.message : String(e));
@@ -149,14 +166,14 @@ export function Workspace({ projectId, onBack }: { projectId: string; onBack: ()
   // Ask the agent for exactly one more short, guided by the user's prompt. The
   // agent works one prompt at a time, so the filmstrip footer disables itself
   // while `running` is true.
-  async function findOneMore(prompt: string) {
+  async function findOneMore(prompt: string, durationSec: number) {
     setError(null);
     setRunning(true);
     setStep("Starting");
     try {
       await sp.agent.send(
         projectId,
-        `Find one more short for this project, guided by what the user is looking for: "${prompt}". Read the transcript and add exactly one additional short using the add_candidates tool (never propose_candidates, which would wipe the existing queue). Do not duplicate any short already in the filmstrip, and do not render anything.`,
+        `Find one more short for this project, guided by what the user is looking for: "${prompt}". Aim for a short around ${durationSec} seconds long. Read the transcript and add exactly one additional short using the add_candidates tool (never propose_candidates, which would wipe the existing queue). Do not duplicate any short already in the filmstrip, and do not render anything.`,
       );
     } catch (e) {
       setError(e instanceof Error ? e.message : String(e));
@@ -233,6 +250,7 @@ export function Workspace({ projectId, onBack }: { projectId: string; onBack: ()
           }}
           onRemove={(id) => void run(() => sp.candidates.remove(projectId, id))}
           onAddShort={findOneMore}
+          defaultDurationSec={targetDuration}
           onAbort={() => void sp.agent.abort(projectId)}
           running={running}
           step={step}
@@ -256,6 +274,8 @@ export function Workspace({ projectId, onBack }: { projectId: string; onBack: ()
               step={step}
               count={count}
               onCount={onCount}
+              duration={targetDuration}
+              onDuration={onTargetDuration}
               onRun={findShorts}
               onAbort={() => void sp.agent.abort(projectId)}
               error={error}

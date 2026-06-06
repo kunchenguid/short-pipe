@@ -4,6 +4,7 @@ import { CAPTION_STYLES, LAYOUT_KINDS, THEMES } from "@shared/project";
 import { useEffect, useState } from "react";
 import { sp } from "../api";
 import { DependencyChecklist } from "./DependencyChecklist";
+import { DurationPicker } from "./DurationPicker";
 import { Icon } from "./Icon";
 
 const LAYOUT_LABELS: Record<LayoutKind, string> = {
@@ -25,8 +26,9 @@ const CAPTION_LABELS: Record<CaptionStyle, string> = {
 
 /**
  * App-global settings, reached from the gear in the topbar. Sets the default
- * output folder for rendered shorts and the layout/theme/caption defaults the
- * agent starts new proposals from. Renders as a modal sheet over the app.
+ * output folder for rendered shorts and the target length/layout/theme/caption
+ * defaults the agent starts new proposals from. Renders as a modal sheet over
+ * the app.
  */
 export function Settings({ onClose, onSignOut }: { onClose: () => void; onSignOut: () => void }) {
   const [config, setConfig] = useState<ShortPipeConfig | null>(null);
@@ -127,6 +129,19 @@ export function Settings({ onClose, onSignOut }: { onClose: () => void; onSignOu
               Defaults the agent starts new shorts from. You can still change any short in the
               inspector.
             </p>
+
+            <div className="field-group">
+              <span className="fg-label">Target length</span>
+              <p className="settings-hint">
+                Roughly how long each short should be. The agent aims for this when it picks word
+                ranges; you can still trim any short afterwards.
+              </p>
+              <DurationPicker
+                value={config.defaultTargetDurationSec}
+                disabled={busy}
+                onChange={(sec) => void update({ defaultTargetDurationSec: sec })}
+              />
+            </div>
 
             <div className="field-group">
               <span className="fg-label">Layout</span>

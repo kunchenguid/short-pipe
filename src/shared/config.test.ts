@@ -22,7 +22,20 @@ describe("normalizeShortPipeConfig", () => {
       defaultLayout: "center-square",
       defaultTheme: "dark",
       defaultCaptionStyle: "clean",
+      defaultTargetDurationSec: 60,
     });
+  });
+
+  it("keeps a valid target duration and clamps out-of-range values", () => {
+    expect(
+      normalizeShortPipeConfig({ defaultTargetDurationSec: 30 }).defaultTargetDurationSec,
+    ).toBe(30);
+    expect(
+      normalizeShortPipeConfig({ defaultTargetDurationSec: 99999 }).defaultTargetDurationSec,
+    ).toBe(600);
+    expect(
+      normalizeShortPipeConfig({ defaultTargetDurationSec: "nope" }).defaultTargetDurationSec,
+    ).toBe(60);
   });
 
   it("keeps valid style defaults and a trimmed output dir", () => {
@@ -61,11 +74,13 @@ describe("applySettingsPatch", () => {
     const next = applySettingsPatch(defaultShortPipeConfig(), {
       defaultLayout: "top-square",
       defaultOutputDir: "/tmp/out",
+      defaultTargetDurationSec: 30,
     });
     expect(next.defaultLayout).toBe("top-square");
     expect(next.defaultOutputDir).toBe("/tmp/out");
     expect(next.defaultTheme).toBe("dark");
     expect(next.defaultModel).toBe(DEFAULT_CODEX_MODEL);
+    expect(next.defaultTargetDurationSec).toBe(30);
   });
 
   it("clears the output dir when patched with an empty string", () => {

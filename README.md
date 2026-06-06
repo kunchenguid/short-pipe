@@ -39,10 +39,11 @@ The on-device pipeline still needs FFmpeg (including FFprobe) and the HyperFrame
 
 1. **Pick** a long-form video. It stays on disk.
 2. **Transcribe** with local Whisper (via HyperFrames), producing word-level timestamps.
-3. **Candidates** - the agent reads the transcript and proposes ranked soundbites, defaulting to roughly one short per minute of source video, following the bundled `shorts-from-longform` skill.
-   After the first batch, use **Add one more short** in the filmstrip to give the agent a focused prompt and append exactly one new candidate without replacing the queue.
+3. **Candidates** - choose how many shorts to find and a rough target length (`~15s`, `~30s`, `~45s`, or `~60s`), then the agent reads the transcript and proposes ranked soundbites following the bundled `shorts-from-longform` skill.
+   The count defaults to roughly one short per minute of source video, and the length defaults to `~60s`.
+   After the first batch, use **Add one more short** in the filmstrip to give the agent a focused prompt and target length, then append exactly one new candidate without replacing the queue.
 4. **Review and edit** - approve, select the word range, fine-tune exact in/out points on the waveform, and swap layouts and caption styles in the editor.
-   Use the topbar gear to set defaults for new shorts, re-check local tools, and disconnect Codex: output folder, layout, theme, and caption style.
+   Use the topbar gear to set defaults for new shorts, re-check local tools, and disconnect Codex: output folder, target length, layout, theme, and caption style.
 5. **Render** - HyperFrames (headless Chrome + ffmpeg) renders each approved short locally to 1080x1920, with the Export or Re-export button filling left to right as progress streams back.
 6. **Output** - shorts are written to the default output folder, or to the project's own `output/` folder when no default is set.
 

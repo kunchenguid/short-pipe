@@ -1,6 +1,6 @@
 ---
 name: shorts-from-longform
-description: Turn a long-form video transcript into ranked, captioned vertical shorts. Use when proposing soundbite candidates, deciding whether to override the user's layout/theme/caption defaults, and selecting keywords to emphasize in a Short Pipe project.
+description: Turn a long-form video transcript into ranked, captioned vertical shorts. Use when proposing soundbite candidates, following the user's target-length setting, deciding whether to override the user's layout/theme/caption defaults, and selecting keywords to emphasize in a Short Pipe project.
 ---
 
 # Shorts from long-form
@@ -27,7 +27,7 @@ Do not call `propose_candidates` in that flow, because it would wipe the existin
 A short is one self-contained idea a stranger can drop into and immediately get.
 
 - **Self-contained.** It must make sense with zero setup. No dangling "as I said before" or "that's why".
-- **Length.** Aim for 15-45 seconds of speech. Shorter than ~10s feels thin; longer than ~60s loses people.
+- **Length.** The prompt tells you the rough target length the user picked (e.g. "around 30 seconds"); aim each short near that target. It is a guide, not a hard cap - prefer a clean self-contained idea with a real hook and landing over hitting the number exactly. When no target is given, aim for 15-45 seconds; shorter than ~10s feels thin and much longer than ~60s loses people.
 - **Starts on a hook.** Begin on a sentence that creates a question or a claim, not on filler ("So, um, yeah").
 - **Ends on a landing.** End on the completed thought or punchline, not mid-sentence. Prefer ending right after a `.`, `!`, or `?` word.
 - **Ends where the speaker pauses.** Prefer an `endWordId` that is followed by a real beat of silence - a clear gap before the next word's `start`. The renderer snaps clip boundaries to actual pauses in the audio, so a landing the speaker rushes past (no gap to the next word) gets cut tight no matter what. A period in the transcript does not guarantee a pause; check the timing gap, not just the punctuation. Same for the start: prefer a `startWordId` preceded by a gap.
