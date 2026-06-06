@@ -16,6 +16,7 @@ import { app, BrowserWindow, dialog, ipcMain, safeStorage, shell } from "electro
 import { CodexAuthService, createCodexTokenCodec } from "./auth/codexAuth";
 import { checkDependencies } from "./deps/dependencies";
 import { registerMediaProtocol, registerMediaScheme } from "./media/mediaProtocol";
+import { parseRenderProgress } from "./media/renderProgress";
 import { AgentRuntimeService } from "./pi/agentRuntimeService";
 import {
   probeProject,
@@ -262,7 +263,13 @@ export function registerIpc(services: Services): void {
   );
   ipcMain.handle("sp:candidates:render", (_e, projectId: string, candidateId: string) => {
     getDefaultTelemetry().track("render");
-    return renderCandidate(projects, projectId, candidateId, realMediaDeps);
+    return renderCandidate(projects, projectId, candidateId, realMediaDeps, {
+      onProgress: (chunk) => {
+        const percent = parseRenderProgress(chunk);
+        if (percent !== null)
+          broadcast({ type: "render_progress", projectId, candidateId, percent });
+      },
+    });
   });
 
   ipcMain.handle("sp:agent:history", (_e, projectId: string) => agent.getMessages(projectId));

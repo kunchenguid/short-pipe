@@ -48,7 +48,8 @@ export type AgentEvent =
  */
 export type ProjectEvent =
   | { type: "project_updated"; project: Project }
-  | { type: "projects_listed"; projects: ProjectSummary[] };
+  | { type: "projects_listed"; projects: ProjectSummary[] }
+  | { type: "render_progress"; projectId: string; candidateId: string; percent: number };
 
 /** Everything that flows over the one-way `sp:event` channel. */
 export type AppEvent = AgentEvent | ProjectEvent;
