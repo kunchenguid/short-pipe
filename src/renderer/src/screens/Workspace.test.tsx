@@ -322,6 +322,79 @@ describe("Workspace add-one-more-short", () => {
     expect(prompt).toContain("30 seconds");
   });
 
+  it("keeps a user-selected add-one-more duration when settings load later", async () => {
+    let resolveSettings: (config: ReturnType<typeof defaultShortPipeConfig>) => void = () =>
+      undefined;
+    const settingsPromise = new Promise<ReturnType<typeof defaultShortPipeConfig>>((resolve) => {
+      resolveSettings = resolve;
+    });
+    const bridge = stubBridge({
+      settings: {
+        get: vi.fn(() => settingsPromise),
+        update: vi.fn(),
+        chooseOutputDir: vi.fn(),
+      },
+      projects: {
+        list: vi.fn(),
+        get: vi.fn(async () => projectWithCandidate),
+        create: vi.fn(),
+        delete: vi.fn(),
+        pickSource: vi.fn(),
+        revealOutput: vi.fn(),
+        probe: vi.fn(async () => projectWithCandidate),
+      },
+    });
+    const { Workspace } = await import("./Workspace");
+
+    await act(async () => {
+      root.render(<Workspace projectId="p1" onBack={() => undefined} />);
+    });
+
+    const addButton = [...container.querySelectorAll("button")].find((button) =>
+      button.textContent?.includes("Add one more short"),
+    );
+    expect(addButton).toBeInstanceOf(HTMLButtonElement);
+    act(() => {
+      addButton?.click();
+    });
+
+    const fortyFive = [...container.querySelectorAll("button")].find(
+      (button) => button.textContent === "~45s",
+    );
+    expect(fortyFive).toBeInstanceOf(HTMLButtonElement);
+    act(() => {
+      fortyFive?.click();
+    });
+
+    await act(async () => {
+      resolveSettings({ ...defaultShortPipeConfig(), defaultTargetDurationSec: 30 });
+      await settingsPromise;
+    });
+
+    const input = container.querySelector("textarea.add-input") as HTMLTextAreaElement | null;
+    expect(input).toBeInstanceOf(HTMLTextAreaElement);
+    const setValue = Object.getOwnPropertyDescriptor(
+      window.HTMLTextAreaElement.prototype,
+      "value",
+    )?.set;
+    act(() => {
+      setValue?.call(input, "a user-picked duration");
+      input?.dispatchEvent(new Event("input", { bubbles: true }));
+    });
+
+    const submit = [...container.querySelectorAll("button")].find((button) =>
+      button.textContent?.includes("Find it"),
+    );
+    expect(submit).toBeInstanceOf(HTMLButtonElement);
+    await act(async () => {
+      submit?.click();
+    });
+
+    expect(bridge.agent.send).toHaveBeenCalledTimes(1);
+    const [, prompt] = (bridge.agent.send as ReturnType<typeof vi.fn>).mock.calls[0];
+    expect(prompt).toContain("45 seconds");
+  });
+
   it("opens the prompt box from the filmstrip header plus button", async () => {
     stubBridge({
       projects: {

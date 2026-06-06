@@ -1,5 +1,5 @@
 import type { Candidate } from "@shared/project";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { formatTime } from "../api";
 import { DurationPicker } from "./DurationPicker";
 import { Icon, Pill, Spinner } from "./Icon";
@@ -69,14 +69,18 @@ function AddShort({
 }) {
   const [prompt, setPrompt] = useState("");
   const [duration, setDuration] = useState(defaultDurationSec);
+  const durationTouchedRef = useRef(false);
 
   useEffect(() => {
-    setDuration(defaultDurationSec);
+    if (!durationTouchedRef.current) {
+      setDuration(defaultDurationSec);
+    }
   }, [defaultDurationSec]);
 
   function cancel() {
     setAdding(false);
     setPrompt("");
+    durationTouchedRef.current = false;
     setDuration(defaultDurationSec);
   }
 
@@ -85,8 +89,14 @@ function AddShort({
     if (!text) return;
     onAddShort(text, duration);
     setPrompt("");
+    durationTouchedRef.current = false;
     setDuration(defaultDurationSec);
     setAdding(false);
+  }
+
+  function changeDuration(nextDuration: number) {
+    durationTouchedRef.current = true;
+    setDuration(nextDuration);
   }
 
   if (running) {
@@ -136,7 +146,7 @@ function AddShort({
         />
         <div className="add-length">
           <span className="add-length-label">Target length</span>
-          <DurationPicker value={duration} onChange={setDuration} />
+          <DurationPicker value={duration} onChange={changeDuration} />
         </div>
         <div className="add-actions">
           <button type="button" className="btn small ghost" onClick={cancel}>
