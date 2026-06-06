@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.0.7](https://github.com/kunchenguid/short-pipe/compare/short-pipe-v0.0.6...short-pipe-v0.0.7) (2026-06-06)
+
+
+### Features
+
+* **renderer:** show render export progress ([#14](https://github.com/kunchenguid/short-pipe/issues/14)) ([869f9b1](https://github.com/kunchenguid/short-pipe/commit/869f9b11388e4c23c1fa1778c8a41eb30cafe529))
+
 ## [0.0.6](https://github.com/kunchenguid/short-pipe/compare/short-pipe-v0.0.5...short-pipe-v0.0.6) (2026-06-06)
 
 
