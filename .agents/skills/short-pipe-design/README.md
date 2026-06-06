@@ -138,7 +138,8 @@ for anything machine-shaped: timecodes (`0:04 - 0:19`), durations (`14.2s`), wor
 *"It stays on your disk."*, *"never leave this machine."*
 
 **Verbs are imperative and concrete:** Pick · Transcribe · Find shorts · Trim · Approve ·
-Reject · Render · Re-render · Open output folder · Disconnect Codex. Buttons are verbs, not nouns.
+Reject · Render · Re-export · Open output folder · Disconnect Codex. Buttons are verbs, not nouns.
+During export, the Export and Re-export buttons become determinate progress buttons whose dark wash fills left to right behind copy such as *"Exporting 1080x1920... 42%"*.
 
 **Examples to imitate (verbatim from the product):**
 
@@ -214,6 +215,7 @@ chiefly the rendered short.
 - **Hover** = surface lightens (`--canvas-hover`) or border darkens. **Press** = surface
   darkens one more step (`--canvas-press`); no scale-shrink in chrome.
 - Spinner: a 12px ring, `--line-strong` track with an `--ink-2` head, 0.7s linear.
+- Determinate export progress uses the existing button, not a separate bar: a dark translucent wash fills left to right behind the label on both Export and Re-export.
 
 ### Imagery
 The app ships **no illustration and no photography** of its own — the "imagery" is the user's

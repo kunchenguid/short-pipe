@@ -37,7 +37,7 @@ shorts into the filmstrip.
 - **`StyleBar`** — the project-global Layout + Caption controls ("Style · all shorts").
 - **`Filmstrip`** / **`Clip`** — left rail of candidate shorts as 9:16 posters with rank, mini-caption, status, timecode.
 - **`StagePreview`** / **`CaptionLine`** — the centre live 9:16 preview that renders the real `clean` / `karaoke` / `bold-pop` caption styles over `center-square` / `top-square` / `full-bleed` layouts, with a play scrubber.
-- **`Inspector`** — per-candidate panel: proposed **passage**, meta, keyword editor, Trim, Approve / Reject / Render.
+- **`Inspector`** — per-candidate panel: proposed **passage**, meta, keyword editor, Trim, Approve / Reject / Render, with production export progress shown as a left-to-right fill inside Export / Re-export buttons.
 - **`TranscriptTrim`** - the highlight-to-select word range editor (drag to select, drag handles to nudge, ± steppers).
   Production pairs this with a bottom waveform trimmer for exact in/out timing.
 - **`AgentEmpty`** — the "Let the agent find your shorts" empty/running state.
@@ -49,7 +49,7 @@ render, no Codex auth, no file system — the video preview is a neutral charcoa
 (the product shows the user's own frames), the agent "run" is a scripted progress line, and
 all data lives in `data.jsx`. Components are simplified, mainly-cosmetic versions of the real
 ones; the goal is pixel-level visual fidelity and interaction feel, not production logic.
-Production now also shows the FFmpeg / HyperFrames readiness checklist on the Connect Codex screen and in Settings; this kit has not modeled that live dependency state.
+Production now also shows the FFmpeg / HyperFrames readiness checklist on the Connect Codex screen and in Settings, and streams render percentages into the Export / Re-export button while HyperFrames runs; this kit has not modeled those live dependency or render states.
 
 ## Icons
 
