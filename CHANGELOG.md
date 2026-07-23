@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.0.10](https://github.com/kunchenguid/short-pipe/compare/short-pipe-v0.0.9...short-pipe-v0.0.10) (2026-07-23)
+
+
+### Bug Fixes
+
+* execute every PR body compliance event ([#20](https://github.com/kunchenguid/short-pipe/issues/20)) ([ee27365](https://github.com/kunchenguid/short-pipe/commit/ee27365673e77dc8fafb0747aad92945e64773cd))
+
 ## [0.0.9](https://github.com/kunchenguid/short-pipe/compare/short-pipe-v0.0.8...short-pipe-v0.0.9) (2026-06-06)
 
 
