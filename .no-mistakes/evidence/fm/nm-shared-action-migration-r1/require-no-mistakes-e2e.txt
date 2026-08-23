@@ -1,0 +1,6 @@
+PASS workflow model: only trigger types and enforcement steps changed; check name, job-level exemptions, filters, permissions, concurrency, and pull_request fork boundary are preserved
+PASS caller pin and executable contract: kunchenguid/no-mistakes/.github/actions/require-no-mistakes@32d396ac0f29135daf7fcb9964aba9d5f4e796d6 invokes verify.py
+PASS compliant event payload with intended last-wins and ignored skip-shaped siblings: exit=0; Found structurally compliant pipeline step attestation.
+PASS stale head is rejected: exit=1; head_sha does not match the current PR head
+PASS incomplete pipeline is rejected: exit=1; test (status=failed)
+PASS unsigned PR is rejected: exit=1; This PR was not raised through no-mistakes
