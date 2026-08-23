@@ -9,7 +9,7 @@ We require this to reduce the maintainer's burden of reviewing and merging contr
 `no-mistakes` puts a local git proxy in front of your real remote.
 Pushing through it runs an AI-driven review, test, lint, and CI pipeline in an isolated worktree, forwards the push upstream only after every check passes, and opens a clean PR automatically.
 
-A GitHub Actions check named `Require no-mistakes` runs on PRs targeting `main` and fails if the body is missing the deterministic signature that no-mistakes writes.
+A GitHub Actions job named `PR must be raised via no-mistakes` runs on PRs targeting `main` and requires the deterministic signature and completed pipeline attestation that no-mistakes writes to the PR body.
 Known automation accounts are exempt so dependency and release automation can keep working.
 Regular contributor PRs without the signature will not be reviewed or merged.
 
